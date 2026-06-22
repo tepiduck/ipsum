@@ -1,0 +1,34 @@
+[project]
+name = "ipsum"
+version = "0.0.1"
+description = "Expertise as a cheaply-updated, inspectable prior that compounds over time."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Jeffrey Zhao", email = "jzhaojz@berkeley.edu" }]
+dependencies = [
+    # kept minimal on purpose — the thesis says gains must come from the
+    # learning loop, not from a large model. add deps only as experiments need them.
+    "numpy>=1.24",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "ruff>=0.4",
+]
+experiments = [
+    "scikit-learn>=1.3",
+    "xgboost>=2.0",   # for the weekly-retrain baseline
+    "pandas>=2.0",
+]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
