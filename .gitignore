@@ -4,8 +4,12 @@ _private/
 # Large source PDFs of papers — keep notes, not the binaries
 research/papers/
 *.pdf
-# Datasets / pulled CI history
-data/
+# Datasets / pulled CI history — keep scripts + README, ignore the actual data
+data/rtptorrent/
+data/**/*.csv
+data/**/*.parquet
+data/**/*.db
+data/**/*.zip
 *.parquet
 *.db
 
