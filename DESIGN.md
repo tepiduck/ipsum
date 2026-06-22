@@ -76,7 +76,7 @@ DreamCoder and Voyager only add. Code drifts. Maintain per-abstraction:
 **Hypothesis to falsify:** `slope(ipsum) > slope(baseline)`, and the gap widens month 3 → month 6. If it doesn't, the thesis is wrong on this domain — and we've learned that cheaply.
 
 **Confounders to control:**
-- *more data, not better abstractions* → freeze data, ablate abstractions on/off.
+- *more data, not better abstractions* → **the primary control is "same model, same cumulative data, abstraction store OFF."** This is non-negotiable: the ICSME-2023 study (arXiv 2311.13413) found existing ML techniques' improvement over CI cycles comes *mainly from the growing amount of training data, not code evolution* — so naive "improves over time" is illusory. ipsum's slope is only meaningful if it exceeds the data-matched, abstraction-off control.
 - *bigger model* → keep the predictor small; any gain must come from `A_t`, not capacity.
 - *flaky labels* → de-flake before scoring.
 
@@ -84,8 +84,8 @@ DreamCoder and Voyager only add. Code drifts. Maintain per-abstraction:
 
 ## 6. Milestones
 
-1. Data: pull CI + commit history for a handful of suitable public repos; build the (change, test, outcome) dataset.
-2. Baseline: weekly-retrain XGBoost; reproduce sane TestRecall/SelectionRate numbers.
+1. Data: use **RTPTorrent** (20 Java projects, 100k+ Travis builds, per-test pass/fail, 9-yr history) rather than scraping CI from scratch. Pick 3–5 long-history, high-failure-density projects. See `research/10-datasets.md`.
+2. Baseline: stand up the **ICSME-2023 replication package** (arXiv 2311.13413, Zenodo 7036507) as the baseline harness; reproduce sane TestRecall/SelectionRate numbers. Define the **data-matched, abstraction-off control** as the primary comparison.
 3. Prior: CNP-style amortized predictor with uncertainty; online conditioning.
 4. Abstraction store + admission (3.1); ablation harness.
 5. Credit assignment (3.2) + consolidation/eviction (3.3).
