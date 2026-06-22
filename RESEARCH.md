@@ -22,10 +22,11 @@ hypothesis ─▶ simplest version ─▶ measure (isolating metric vs control) 
 
 Four rules make the loop actually work:
 
-1. **Instrument first.** You cannot tell whether a mechanism "works" without the
-   slope plot and the *data-matched, abstraction-off control* already running.
-   Milestone 1 (loader + baseline + control + slope harness) is the measuring
-   instrument, not pre-work. No mechanism is falsifiable until it exists.
+1. **Instrument the thing you are testing before judging it.** For synthetic
+   mechanism work, that means the synthetic generator, oracle metrics, and
+   per-card controls. For RTPTorrent, that means the loader, slope plot, and the
+   *data-matched, abstraction-off control*. Do not declare a mechanism successful
+   without the measuring instrument appropriate to that stage.
 
 2. **Debug on the synthetic testbed, not on RTPTorrent.** Build a generator where
    *you* control ground truth (which files truly co-vary, when drift happens, how
@@ -44,9 +45,10 @@ Four rules make the loop actually work:
    I've learned [X]." Log it (see §4). Solo research dies from forgetting what was
    already tried and why.
 
-**Sequence:** instrument → synthetic testbed → **admission** (easiest to isolate)
-→ **eviction** (needs drift; builds on the testbed) → **credit assignment**
-(hardest; do last, on the foundation of the other two).
+**Sequence:** synthetic testbed + oracle metrics → **admission** (easiest to
+isolate) → RTPTorrent instrument/data-matched control → **eviction** (needs drift;
+builds on the testbed) → **credit assignment** (hardest; do last, on the
+foundation of the other two).
 
 ---
 

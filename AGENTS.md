@@ -35,12 +35,15 @@ not progress. Full method + experiment cards are in `RESEARCH.md`.
 
 ## Order of work
 1. Implement `synth.py` (oracles kept strictly separate from `step()`). Cards A/B/C all depend on it.
-2. Build the **instrument**: data loader for RTPTorrent, the weekly-retrain
-   baseline (`experiments/baseline_weekly_retrain.py`), the **data-matched
+2. Run **Card A (admission)** on the synthetic testbed. This validates the
+   abstraction representation before real-data noise can obscure failures.
+3. Build the **instrument** in parallel or immediately after Card A: data loader
+   for RTPTorrent, the weekly-retrain baseline
+   (`experiments/baseline_weekly_retrain.py`), the **data-matched
    abstraction-off control**, and the slope harness (`experiments/compounding.py`).
-3. Card A (admission) → Card B (eviction) → Card C (credit assignment). Degenerate
+4. Card B (eviction) → Card C (credit assignment). Degenerate
    case before the hard case (zero-delay before delayed; no-noise before noisy).
-4. Wire a mechanism to RTPTorrent only after it passes on synth.
+5. Wire a mechanism to RTPTorrent only after it passes on synth.
 
 ## You MUST emit run artifacts (see INTERFACE.md)
 Every experiment run writes `experiments/runs/<run_id>/` with at least `meta.json`

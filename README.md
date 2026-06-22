@@ -28,7 +28,7 @@ We instantiate the idea on one task with a clean, objective signal: **given a co
 - **No enterprise sales** — train and measure on public GitHub repos.
 - **There is a real baseline to beat:** Facebook's Predictive Test Selection (Machalica et al., ICSE-SEIP 2019) retrains an XGBoost model *weekly, from scratch* — zero online update, zero compounding. That plateau is the bar.
 
-**Win condition:** on held-out commits, ipsum's selection quality (TestRecall at fixed SelectionRate) shows a *widening* gap over the weekly-retrain baseline from month 3 to month 6. The slope is the whole point.
+**Win condition:** on held-out commits, ipsum's selection quality (TestRecall at fixed SelectionRate) shows a *widening* gap over the **data-matched, abstraction-off control**. Beating the weekly-retrain baseline is useful; beating the data-matched control is the thesis.
 
 ## Architecture (see [DESIGN.md](DESIGN.md))
 
@@ -52,19 +52,26 @@ Three reusable pieces from the literature, assembled — we spend no novelty bud
 ipsum/
 ├── README.md            # this file
 ├── DESIGN.md            # architecture + the three open mechanisms + experiment design
+├── RESEARCH.md          # methodology + synthetic-testbed experiment cards
+├── INTERFACE.md         # backend/frontend JSON artifact contract
+├── AGENTS.md            # Codex/backend instructions
+├── CLAUDE.md            # Claude/frontend instructions
 ├── src/ipsum/           # prior / abstractions / consolidation / credit (skeletons)
 ├── experiments/         # the compounding-vs-baseline harness
-├── research/            # annotated notes on the 9 foundational papers
+├── data/                # RTPTorrent project selection + profiling script
+├── frontend/            # local dashboard scaffold consuming experiment artifacts
+├── research/            # paper notes + synthesis + dataset scouting
+├── RESEARCH_LOG.md      # append-only experiment log
 └── tests/
 ```
 
 ## Status
 
-Early. Research scaffold + lit review complete; core mechanisms are stubs with defined interfaces. Roadmap is in DESIGN.md.
+Early. Research scaffold, lit review, dataset scouting, backend/frontend agent boundaries, the frontend dashboard scaffold, and the synthetic-testbed interface are in place. Core mechanisms are still intentionally stubbed. The next backend step is to implement `src/ipsum/synth.py`, then validate Card A (admission under uncertainty) on synthetic data before touching RTPTorrent.
 
 ## Reading
 
-`research/` has annotated notes on the nine papers this is built on — MAML, Grant et al. (hierarchical Bayes), Neural Processes, HyperNetworks, DreamCoder, Voyager, EWC, AlphaZero, and Predictive Test Selection. Start with `research/00-synthesis.md`.
+Start with `AGENTS.md` (backend) or `CLAUDE.md` (frontend), then read `DESIGN.md`, `RESEARCH.md`, and `INTERFACE.md`. `research/` has the synthesis, annotated notes on the nine foundational papers, and dataset scouting for RTPTorrent. Start the literature pass with `research/00-synthesis.md`.
 
 ## License
 
