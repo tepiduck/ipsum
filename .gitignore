@@ -26,6 +26,17 @@ venv/
 env/
 .python-version
 
+# --- Frontend (Node/Vite) ---
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+# data is copied/symlinked in for dev — don't commit it
+frontend/public/runs/
+npm-debug.log*
+
+# --- Backend run artifacts (regenerable) ---
+experiments/runs/
+
 # --- Tooling ---
 .pytest_cache/
 .mypy_cache/

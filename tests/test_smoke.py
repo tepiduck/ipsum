@@ -4,7 +4,7 @@ Keeps CI green from day one without asserting on unimplemented mechanisms.
 """
 
 import ipsum
-from ipsum import abstractions, consolidation, credit, prior
+from ipsum import abstractions, consolidation, credit, prior, synth
 
 
 def test_version():
@@ -16,6 +16,7 @@ def test_constructs():
     abstractions.AbstractionStore()
     consolidation.Consolidator()
     credit.CreditAssigner()
+    synth.Synth(cfg=synth.SynthConfig())
 
 
 def test_abstraction_is_inspectable():
