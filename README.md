@@ -67,7 +67,19 @@ ipsum/
 
 ## Status
 
-Early. Research scaffold, lit review, dataset scouting, backend/frontend agent boundaries, the frontend dashboard scaffold, and the synthetic-testbed interface are in place. Core mechanisms are still intentionally stubbed. The next backend step is to implement `src/ipsum/synth.py`, then validate Card A (admission under uncertainty) on synthetic data before touching RTPTorrent.
+**v1 complete — banked as a clean negative result. See [RESULTS.md](RESULTS.md).**
+
+Short version: an online, inspectable co-change abstraction store **does not compound on
+CI predictive test selection**. The cause is identified and independently confirmed via
+RTPTorrent's own baselines — the task's predictable signal is dominated by a cheap
+historical-failure-rate feature, leaving no headroom for accumulated abstractions to add
+value. This is a *task-instantiation* failure (wrong task to demonstrate compounding), not
+an engineering failure (the pipeline works and the signal is real) and not a refutation of
+the broader thesis (only one weak instantiation was tested).
+
+What's reusable: a validated synthetic testbed, a measurement harness for compounding
+(slope vs a data-matched control, multi-seed, uncensored, pre-registered gates), verified
+literature notes, and the methodological lessons in `RESULTS.md` §6.
 
 ## Reading
 
