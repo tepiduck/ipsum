@@ -1,165 +1,174 @@
-# RESULTS — ipsum v1
+# Results: ipsum v1
 
-**Verdict: a clean, well-explained negative.** An online, inspectable abstraction
-store (co-change file/directory clusters with statistically-gated admission and active
-eviction) **does not produce compounding improvement on CI predictive test selection.**
-The cause is identified and independently confirmed: on this task the predictable signal
-is dominated by a trivially cheap feature (historical test-failure rate), leaving no
-headroom for accumulated abstractions to add value. This is a *task-instantiation*
-failure, not an engineering failure and not a refutation of the broader thesis.
+v1 ended as a clean negative result.
 
----
+An online, inspectable abstraction store did **not** produce compounding improvement
+on CI predictive test selection. The main reason was not mysterious: the task was
+mostly solved by a simple historical test-failure-rate feature. Co-change
+abstractions found real file-change signal, but that signal did not add much once the
+cheap baseline feature was already in the model.
 
-## 1. What was tested
+This means the v1 task was a poor place to demonstrate the larger idea. It does not
+prove that compounding through abstractions is impossible. It does say that CI test
+selection, at least in this RTPTorrent setup, does not have enough headroom for this
+particular abstraction store to matter.
 
-**Thesis.** A system can acquire domain expertise that *compounds* — its rate of
-improvement keeps climbing where a stateless model plateaus — by accumulating explicit,
-inspectable abstractions and reusing them.
+## What was tested
 
-**Instantiation (v1).** Domain = software CI. Task = predictive test selection (given a
-code change, predict which tests can fail). Abstractions = co-change file/directory
-clusters. Decision = which tests to run under a fixed budget. **Compounding metric** =
-does ipsum's TestRecall@SelectionRate gap over a **data-matched, abstraction-off control**
-*widen* with experience. Beating a weekly-retrain-from-scratch baseline is table stakes
-(it only shows online > batch); the thesis lives entirely in the gap over the
-data-matched control.
+The broad question was whether a system could improve over time by accumulating
+explicit, readable abstractions.
 
----
+The v1 task was predictive test selection:
 
-## 2. Synthetic phase — instrument validated, mechanisms marginal
+- Input: a code change.
+- Output: a ranked subset of tests to run.
+- Budget: fixed selection rate.
+- Metric: TestRecall at that fixed selection rate.
+- Abstractions: co-change file or directory clusters.
 
-A controllable synthetic testbed with ground-truth oracles was built first to debug
-mechanisms where the right answer is known.
+The important comparison was ipsum against a **data-matched, abstraction-off
+control**. That control saw the same stream and the same labels, but could not use
+the abstraction store.
 
-**Instrument self-check (Card I) — PASS.** On a drifting synth stream, the harness shows
-a widening ipsum-vs-control slope gap *only* when the abstraction store is enabled
-(early/mid/late gap `0.000 / 0.183 / 0.287`), and **exactly zero** when ipsum is
-byte-equivalent to the control (negative control parity). The measuring instrument is
-trustworthy — it detects planted compounding and does not fabricate it.
-(`runs/20260623-011049-instrument-*`)
+Weekly retraining was included as a baseline, but it was not the thesis test.
+Beating weekly retraining mostly shows that online cumulative data is useful. The
+real question was whether abstractions add anything beyond that.
 
-**Admission (Card A) — PASS, modest.** A one-standard-error lower bound on held-out
-log-likelihood gain minus a complexity cost recovers true clusters far better than
-admit-everything: mean cluster-F1 **0.783 vs 0.209**, with positive margins at every
-granularity (4→16 clusters). (`runs/20260623-002149-A-synth`)
+## Synthetic work
 
-**Eviction (Card B) — ITERATE.** Across 5 seeds and 7 drift epochs, an evicting store
-sustains post-drift accuracy where an append-only store degrades (mean plateau advantage
-**+0.046**, variance `0.000686` ≈ 1.7σ; better at every epoch after the first). But the
-multi-seed effect is smaller than the single-seed result and **eviction quality is poor
-(precision 0.568, recall 0.449)**. Directionally real, not strong.
-(`runs/20260623-045427-B-synth`)
+The synthetic testbed came first because it lets us know when a mechanism should
+work. The model never sees the oracle state; the oracles are only used for scoring.
 
-**Positivity/coverage guard (Card D, the "keystone") — NOT DEMONSTRATED.** The guard
-mechanism is correct (it reduces thin-region false admissions; a provisional variant
-avoids most of the strict guard's post-drift adaptation freeze). But a coverage-skew
-sweep showed the benefit **does not scale with coverage severity** — slope `-0.000138`,
-non-monotone, CIs crossing zero at the extreme. The hypothesized keystone curve was not
-found. (`runs/20260623-062919-D-skew-sweep-synth`)
+The synthetic phase gave mixed but useful results:
 
-**Pattern:** every mechanism passed *weakly or null* on synth. Each null was individually
-explainable; the accumulation lowered the prior going into real data.
+- **Instrument self-check: pass.** On drifted synthetic data, the harness detected a
+  planted abstraction advantage. With the abstraction store disabled, the negative
+  control stayed exactly flat. This made the measuring stick trustworthy.
+- **Admission: modest pass.** The held-out log-likelihood gate recovered true
+  clusters much better than admit-everything across the cluster sweep.
+- **Eviction: iterate.** Eviction helped post-drift plateau accuracy on average, but
+  the effect was not strong enough, and eviction precision/recall were weak.
+- **Coverage guard: not demonstrated.** The mechanism was implemented correctly, but
+  the expected benefit did not grow cleanly with coverage skew.
 
----
+The pattern mattered. Nothing exploded, but nothing became a strong result either.
+By the time the project moved to real data, the prior should already have been lower.
 
-## 3. Real-data phase — RTPTorrent
+## Real-data work
 
-Dataset: RTPTorrent (20 Java projects, 100k+ TravisCI build logs). Stream built by
-joining test results → `tr_all_built_commits.csv` (`tr_job_id`→`git_commit_id`) →
-project patches (`sha`→`name`), ordered by ascending `travisJobId`, de-flaked, large
-changes (>30 files) dropped.
+The real-data runs used RTPTorrent v1. The stream was built from three CSVs:
 
-**Two pipeline issues found and fixed first** (so the verdict is not an artifact):
-1. *Project coverage.* sling — picked for failure density — had only **16%**
-   job→commit coverage (worst in the dataset). Its initial null was a coverage artifact,
-   not a result. (`runs/20260623-074628-compounding-sling`)
-2. *Granularity.* Full file paths yield thousands of singleton files with no co-change
-   support. Coarsening to directory tokens (okhttp `971 → 64`) restored candidate proposal.
+1. per-project test results,
+2. `tr_all_built_commits.csv`,
+3. per-project patch files.
 
-**okhttp — the valid v1 test.** Coverage 52%, 9,703 build cycles.
-- Admission funnel: **9,691 candidates proposed → 12 admitted → 0 retained** (all evicted).
-- Abstraction held-out LL gain: **max 0.0033, mean −0.00006** across the run.
-- Result: ipsum ≡ data-matched control. **`ipsum_vs_data_matched_slope_gap = 0.0`**,
-  plateau gap 0.0. (ipsum/control plateau TestRecall ≈ 0.75; both beat weekly-retrain
-  0.48 — but that gap is online>batch, i.e. the data-accumulation confound, not the thesis.)
-  (`runs/20260623-081638-compounding-okhttp`)
-- sonarqube (second project, 31% coverage): **0 admitted** — admission-starved,
-  inconclusive. (`runs/20260623-082055-compounding-sonarqube`)
+Jobs were ordered by ascending `travisJobId`. Labels were de-flaked before counting.
+Jobs touching more than 30 files were dropped as large infra or merge noise.
 
-The store could never stay populated, because nothing in it actually improved prediction.
+Two issues had to be fixed before the real-data result meant anything:
 
----
+- **Project coverage.** sling looked attractive because it had many failing tests, but
+  only about 16% of jobs could be joined to changed files. Its null result was a
+  coverage artifact.
+- **Change granularity.** Full file paths were too sparse. Coarsening changed files
+  into directory tokens restored candidate proposal support.
 
-## 4. The decisive diagnostic — engineering or thesis?
+### okhttp
 
-To distinguish "our implementation is weak" from "the signal isn't there," we measured
-RTPTorrent's *own* shipped baseline strategies on okhttp — fraction of the suite run
-before the first failure (lower = better), over 749 failing builds:
+okhttp was the meaningful v1 real-data run.
 
-| strategy | first-failure at | signal type |
+- Raw jobs: `9,772`
+- Used cycles: `9,703`
+- Changed-file coverage: `52%`
+- Full paths collapsed to change tokens: `971 -> 64`
+- Candidates proposed: `9,691`
+- Abstractions admitted: `12`
+- Abstractions retained at the end: `0`
+- ipsum vs data-matched slope gap: `0.0`
+- plateau gap: `0.0`
+
+In other words, the pipeline worked and admissions happened, but the abstractions did
+not improve prediction.
+
+### sonarqube
+
+sonarqube was wired as the second project.
+
+- Raw jobs: `53,307`
+- Used cycles: `49,179`
+- Changed-file coverage: `31%`
+- Full paths collapsed to change tokens: `6,605 -> 159`
+- Candidates proposed: `2,734`
+- Abstractions admitted: `0`
+
+Because it admitted nothing, the sonarqube slope result is not a thesis result. It is
+an admission-starved diagnostic.
+
+## The decisive diagnostic
+
+To check whether this was an implementation failure or a task failure, we compared
+against RTPTorrent's own baseline strategies on okhttp. The metric was how much of
+the suite had to run before the first failing test was found. Lower is better.
+
+| strategy | first failure at | signal type |
 |---|---:|---|
-| `optimal-failure` (oracle) | 0.073 | ceiling |
-| `recently-failed` | **0.109** | historical failure-rate |
-| `matrix-naive` | **0.187** | file-change |
-| `matrix-conditional-prob` | 0.287 | file-change |
-| `random` / `untreated` | ~0.51 | none |
+| `optimal-failure` | 0.073 | oracle ceiling |
+| `recently-failed` | 0.109 | historical failure rate |
+| `matrix-naive` | 0.187 | file-change signal |
+| `matrix-conditional-prob` | 0.287 | file-change signal |
+| `random` / `untreated` | ~0.51 | no useful signal |
 
-This isolates the cause unambiguously:
-- **File-change signal is real** — `matrix-naive` (0.187) ≫ random (0.51). The
-  abstractions were chasing genuine signal; this is **not an engineering failure**.
-- **But historical failure-rate (0.109) is much stronger and nearly hits the ceiling
-  (0.073).** A trivially cheap feature already captures the predictable signal.
-- **So co-change abstractions are real but redundant** — they add ~nothing *on top of*
-  historical rates, which is exactly what ipsum's funnel found (LL gain ≈ 0).
+This explains the outcome:
 
-**Conclusion: test selection is a task with almost no headroom.** The thesis was not
-tested fairly here — not because the code is wrong, but because a cheap baseline dominates.
+- File-change signal exists.
+- Historical failure rate is much stronger.
+- Historical failure rate is already close to the oracle ceiling.
+- Co-change abstractions are therefore mostly redundant on this task.
 
----
+That matches the admission funnel: held-out LL gains were near zero.
 
-## 5. What this does and does not establish
+## What the result means
 
-**Establishes:**
-- Co-change abstractions do not compound on CI test selection, with a precise,
-  independently-confirmed mechanism (redundancy with historical failure rates).
-- A trustworthy methodology and instrument for measuring compounding (slope vs a
-  data-matched control, multi-seed, uncensored metrics, pre-registered gates).
+This result supports a narrow claim:
 
-**Does NOT establish:**
-- That compounding-via-abstractions is impossible. Only one weak instantiation was tested,
-  on a task without headroom. A fair test needs a task where cheap features do *not*
-  already saturate the signal (e.g., regression/incident prediction, review routing) and,
-  possibly, a richer abstraction substrate than co-change.
-- External validity beyond two old Java/Travis-era (2007–2016) public repos.
+> Co-change abstractions do not compound on this CI test-selection setup.
 
----
+It does not support the broader claim:
 
-## 6. Methodological lessons (the part that transfers)
+> Explicit abstractions can never create compounding expertise.
 
-Repeatedly, an early "pass" evaporated under honest measurement, and each was caught:
-- **Card I:** a stationary positive control showed a level *shift*, not a widening slope —
-  fixed by requiring drift and gating on sustained level-growth, not a censored slope scalar.
-- **Card B:** a single-seed recovery-time trend was an artifact of where censored "never
-  recovered" values fell — fixed with 5 seeds, uncensored plateau accuracy, and
-  recovered-fraction + median-recovery instead of an OLS slope on capped values.
-- **Card D:** a "provisional guard" that improved a metric by redefining its denominator
-  was cosmetic — fixed by measuring harm, not a gameable count; then the skew sweep showed
-  the benefit was within noise.
-- **Real data:** the first "does not compound" was a 16%-coverage artifact; the second was
-  a granularity artifact; only after both were fixed was the negative result real.
+A fairer next task would need more headroom: something where cheap historical-rate
+features do not already capture most of the predictable signal. Incident prediction,
+review routing, flaky-test diagnosis, or regression triage might be better candidates.
 
-Standing rule that would have caught all of them: **report mean ± SE and the worst seed,
-gate on significance not the mean, and when a new variant "passes," diff its predictions
-against the control — if they're identical, the win is in the metric, not the mechanism.**
+## Lessons worth keeping
 
----
+A few failure modes showed up repeatedly:
 
-## 7. Status
+- A positive control can show a one-time level shift without showing compounding.
+- Recovery-time slopes are dangerous when unrecovered epochs are censored.
+- A metric can improve because its denominator changed, not because the mechanism did.
+- Real-data nulls are meaningless until coverage and candidate proposal are visible.
+- When a variant "wins," diff its predictions against the control. If predictions are
+  identical, the win is in the measurement, not the mechanism.
 
-v1 is **complete and banked as a negative result.** No further mechanism work is justified
-on this instantiation — the signal isn't there to tune toward. The synthetic testbed,
-the measurement harness, and the design/research notes remain reusable for any future
-instantiation on a headroom-rich task.
+The standing rule for future work is simple:
 
-*Artifacts referenced above live under `experiments/runs/`. Full per-experiment record in
-`RESEARCH_LOG.md`. Design rationale and verified literature in `research/`.*
+> Report uncertainty, report worst seeds, and do not trust a pass until the control
+> comparison is visibly different in predictions, not just in labels or bookkeeping.
+
+## Status
+
+v1 is complete. No further mechanism tuning is justified on this task.
+
+Reusable pieces remain:
+
+- synthetic testbed,
+- compounding harness,
+- RTPTorrent loader,
+- artifact format,
+- research notes,
+- and the experimental scars in `RESEARCH_LOG.md`.
+
+Artifacts live under `experiments/runs/`. The detailed experiment record is in
+`RESEARCH_LOG.md`.

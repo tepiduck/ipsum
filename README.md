@@ -1,89 +1,126 @@
 # ipsum
 
-> Expertise is not the accumulation of facts. It is the accumulation of useful, inspectable abstractions — updated cheaply as experience arrives.
+ipsum was a small research project about one question:
 
-**ipsum** is a research project testing one hypothesis: a system that maintains an explicit, cheaply-updated **prior** over "what matters in a domain" can *compound* — its rate of improvement keeps climbing where a stateless model (even a large one with retrieval) plateaus.
+> Can a system get better over time by keeping explicit, readable abstractions about
+> a domain, instead of only retraining a predictor or retrieving more context?
 
-The bet is on the **learning loop**, not model size. The headline result we're chasing is not a higher accuracy number; it's a **steeper slope over time** than a strong frozen baseline.
+The v1 answer, for the task we tried, was **no**.
 
-## The idea in one diagram
+That is still a useful result. The codebase now contains a synthetic testbed, a
+real-data replay harness, experiment artifacts, and a fairly clear record of why this
+particular task did not work.
+
+## What we tested
+
+The first target was predictive test selection for CI:
+
+Given a code change, pick the tests most likely to fail, while running only a fixed
+fraction of the suite.
+
+The idea was that ipsum would learn reusable co-change abstractions, such as groups
+of files or directories that tend to move together and affect related tests. If those
+abstractions were useful, ipsum should improve faster than a control that saw the
+same data but had the abstraction store turned off.
+
+The key comparison was always:
 
 ```
-experience ──▶ update a learned prior (cheap, recursive)
-                     │
-                     ▼
-            inspectable abstraction store ──▶ better decisions
-                     ▲                              │
-                     └──── outcomes ◀───────────────┘
+ipsum
+vs.
+data-matched control with abstractions disabled
 ```
 
-A frozen LLM + retrieval starts every task cold. ipsum doesn't: it carries a per-domain prior that gets revised by each outcome, and the abstractions it forms are explicit objects you can read, not weights you can't.
+Beating a weekly retrain baseline is not enough. That mostly shows online learning
+beats batch retraining. The thesis needed ipsum to beat the data-matched control.
 
-## v1 wedge: predictive test selection
+It did not.
 
-We instantiate the idea on one task with a clean, objective signal: **given a code change, predict which tests can fail, and run only those.**
+## Current status
 
-- **Signal is unambiguous** — did the selected subset catch the failure? yes/no.
-- **ROI is concrete** — CI minutes saved.
-- **No enterprise sales** — train and measure on public GitHub repos.
-- **There is a real baseline to beat:** Facebook's Predictive Test Selection (Machalica et al., ICSE-SEIP 2019) retrains an XGBoost model *weekly, from scratch* — zero online update, zero compounding. That plateau is the bar.
+v1 is complete and banked as a negative result. See [RESULTS.md](RESULTS.md).
 
-**Win condition:** on held-out commits, ipsum's selection quality (TestRecall at fixed SelectionRate) shows a *widening* gap over the **data-matched, abstraction-off control**. Beating the weekly-retrain baseline is useful; beating the data-matched control is the thesis.
+Short version:
 
-## Architecture (see [DESIGN.md](DESIGN.md))
+- The synthetic harness works and catches both real signal and fake wins.
+- Admission, eviction, and coverage guards all produced useful diagnostics on synth,
+  but none became a strong mechanism.
+- On RTPTorrent real data, co-change abstractions did not add predictive value beyond
+  simple historical test failure rates.
+- okhttp was the meaningful real-data run: it had usable changed-file coverage and
+  nonzero admissions, but ipsum still matched the data-matched control exactly.
+- sonarqube was wired up as a second project, but its v1 run admitted nothing, so it
+  remains an admission-starved diagnostic rather than a thesis result.
 
-Three reusable pieces from the literature, assembled — we spend no novelty budget here:
+The failure mode is pretty concrete: for CI test selection, recent/historical failure
+rate is already a very strong cheap feature. The abstractions were chasing real file
+change signal, but that signal was mostly redundant once historical failure rate was
+available.
 
-- **Amortized prior** (Conditional Neural Process style): encode each experience, aggregate into a latent in one forward pass, decode predictions with uncertainty. Conditioning on new experience is an O(1) update — the cheap recursive step.
-- **Consolidation** (EWC style): a Fisher-weighted anchor so the prior updates without catastrophically forgetting — "posterior of yesterday becomes prior for today."
-- **Inspectable abstraction store** (DreamCoder / Voyager style): explicit, named abstractions admitted only when they earn their keep.
+## What is reusable
 
-…plus the three things the literature does **not** solve for noisy, delayed, real-world outcomes — which is where the actual research is.
+Even though the v1 task failed, a few pieces are worth keeping:
 
-## The three open problems (the real work)
-
-1. **Admission under uncertainty** — DreamCoder admits an abstraction by exact description-length compression. With statistical outcomes this must become Bayesian model selection: keep an abstraction iff it improves held-out predictive likelihood by more than its complexity cost.
-2. **Delayed credit assignment** — CI outcomes land minutes-to-hours later and are noisy. Which abstraction(s) get reinforced for a good outcome?
-3. **Eviction / anti-staleness** — code drifts, so abstractions go stale. DreamCoder and Voyager only ever *add*. ipsum must decay and evict.
+- `src/ipsum/synth.py`: a seeded synthetic CI world with ground-truth oracles.
+- `experiments/`: slope and artifact harnesses for comparing an online system against
+  a data-matched control.
+- `data/rtptorrent.py`: loader for the actual RTPTorrent v1 CSV schema.
+- `experiments/runs/`: JSON artifacts consumed by the dashboard.
+- `RESEARCH_LOG.md`: append-only record of experiments and verdicts.
+- `research/`: notes on the related work and dataset scouting.
 
 ## Repo layout
 
-```
+```text
 ipsum/
-├── README.md            # this file
-├── DESIGN.md            # architecture + the three open mechanisms + experiment design
-├── RESEARCH.md          # methodology + synthetic-testbed experiment cards
-├── INTERFACE.md         # backend/frontend JSON artifact contract
-├── AGENTS.md            # Codex/backend instructions
-├── CLAUDE.md            # Claude/frontend instructions
-├── src/ipsum/           # prior / abstractions / consolidation / credit (skeletons)
-├── experiments/         # the compounding-vs-baseline harness
-├── data/                # RTPTorrent project selection + profiling script
-├── frontend/            # local dashboard scaffold consuming experiment artifacts
-├── research/            # paper notes + synthesis + dataset scouting
-├── RESEARCH_LOG.md      # append-only experiment log
+├── README.md
+├── RESULTS.md           # final v1 result and lessons
+├── DESIGN.md            # original architecture and research plan
+├── RESEARCH.md          # experiment cards and method notes
+├── INTERFACE.md         # JSON artifact contract for the dashboard
+├── AGENTS.md            # backend/Codex instructions
+├── CLAUDE.md            # frontend/Claude instructions
+├── src/ipsum/           # synthetic testbed and mechanism code
+├── experiments/         # experiment harnesses and artifact writers
+├── data/                # RTPTorrent loader and profiling notes
+├── frontend/            # local dashboard scaffold
+├── research/            # paper notes and synthesis
+├── RESEARCH_LOG.md
 └── tests/
 ```
 
-## Status
+## Running the project
 
-**v1 complete — banked as a clean negative result. See [RESULTS.md](RESULTS.md).**
+Install in editable mode:
 
-Short version: an online, inspectable co-change abstraction store **does not compound on
-CI predictive test selection**. The cause is identified and independently confirmed via
-RTPTorrent's own baselines — the task's predictable signal is dominated by a cheap
-historical-failure-rate feature, leaving no headroom for accumulated abstractions to add
-value. This is a *task-instantiation* failure (wrong task to demonstrate compounding), not
-an engineering failure (the pipeline works and the signal is real) and not a refutation of
-the broader thesis (only one weak instantiation was tested).
+```bash
+pip install -e '.[dev]'
+pip install -e '.[experiments]'
+```
 
-What's reusable: a validated synthetic testbed, a measurement harness for compounding
-(slope vs a data-matched control, multi-seed, uncensored, pre-registered gates), verified
-literature notes, and the methodological lessons in `RESULTS.md` §6.
+Run the checks:
 
-## Reading
+```bash
+pytest -q
+ruff check .
+```
 
-Start with `AGENTS.md` (backend) or `CLAUDE.md` (frontend), then read `DESIGN.md`, `RESEARCH.md`, and `INTERFACE.md`. `research/` has the synthesis, annotated notes on the nine foundational papers, and dataset scouting for RTPTorrent. Start the literature pass with `research/00-synthesis.md`.
+The project declares Python 3.10 support, so use Python 3.10 when validating final
+changes.
+
+## Reading order
+
+For the final outcome, start with [RESULTS.md](RESULTS.md).
+
+For the original research design, read:
+
+1. [DESIGN.md](DESIGN.md)
+2. [RESEARCH.md](RESEARCH.md)
+3. [INTERFACE.md](INTERFACE.md)
+4. [research/00-synthesis.md](research/00-synthesis.md)
+
+For backend work, also read [AGENTS.md](AGENTS.md). For frontend work, read
+[CLAUDE.md](CLAUDE.md).
 
 ## License
 

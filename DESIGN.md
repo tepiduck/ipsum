@@ -1,96 +1,151 @@
-# DESIGN
+# Design
 
-This document is the working architecture and research roadmap. It is deliberately honest about what is borrowed (solved) and what is novel (open).
+This is the original architecture and research plan for ipsum. It is kept because
+the pieces are still useful, even though v1 ended as a negative result on predictive
+test selection.
 
-## 1. Thesis, stated precisely
+For the final outcome, read [RESULTS.md](RESULTS.md). This file explains what we
+were trying to build and why.
 
-Let a domain produce a stream of experiences `e_1, e_2, …`. Maintain a prior `θ_t` and an abstraction set `A_t`. On each new experience:
+## The basic idea
 
+Most predictors start each example from the same learned weights, plus whatever
+context is retrieved at inference time. ipsum tried a different shape:
+
+```text
+experience -> update prior and abstraction store -> make better decisions next time
 ```
-(θ_t, A_t) ──▶ decision d_t ──▶ outcome o_t ──▶ (θ_{t+1}, A_{t+1})
-```
 
-**Claim:** with the right update rule, decision quality `Q_t` improves with a *slope* that a stateless predictor `f(e_t)` — including a strong LLM + retrieval — cannot match, because the stateless predictor has no `(θ_t, A_t)` to accumulate.
+The bet was not "make the model bigger." The bet was that a system could carry a
+small amount of domain-specific state forward:
 
-The empirical object we report is `dQ/dt`, measured against a frozen baseline, on held-out future experiences.
+- a learned prior,
+- a set of explicit abstractions,
+- and a cheap update rule after each outcome.
 
-## 2. What we borrow (do not innovate here)
+The measurement target was slope over time. If the system really compounds, its
+quality should improve faster than a control that sees the same data but has no
+abstraction store.
 
-| Component | Borrowed from | Role |
+## Borrowed pieces
+
+Several parts of the design were intentionally borrowed. They were not where the
+novelty was supposed to be.
+
+| Piece | Source of the idea | Why it was useful |
 |---|---|---|
-| Prior as a network | MAML | the prior is parameters; adaptation is cheap |
-| Bayesian grounding | Grant et al. 2018 | the init *is* an empirical-Bayes prior mean; inner optimizer is its covariance |
-| Amortized O(1) conditioning | Conditional Neural Processes | encode→mean-pool→decode; new experience updates the latent in one pass, with uncertainty |
-| Consolidation w/o forgetting | EWC | Fisher-weighted anchor; "posterior → next prior" |
-| Inspectable abstraction store | Voyager | explicit, readable abstractions; updated without weight training |
-| Admission criterion (exact case) | DreamCoder | add an abstraction iff it compresses solved tasks more than it costs |
-| Compounding loop shape | AlphaZero | learned prior + search + clean signal; the slope is the proof |
+| Prior as network parameters | MAML | adaptation starts from a learned prior |
+| Bayesian interpretation | Grant et al. 2018 | the initialization can be read as an empirical-Bayes prior |
+| Fast conditioning | Conditional Neural Processes | new experience can update a latent summary cheaply |
+| Consolidation | EWC | old knowledge can be protected during updates |
+| Explicit abstractions | Voyager | reusable objects can be inspected and edited |
+| Admission by usefulness | DreamCoder | abstractions should earn their cost |
+| Compounding loop | AlphaZero | the proof is a learning curve, not a static score |
 
-The prior + consolidation stack (CNP + EWC + FOMAML) is a complete, buildable recipe. Assemble and move on.
+The intent was to assemble these pieces conservatively and spend the research effort
+on the parts that are not already solved.
 
-## 3. What we must build (the open mechanisms)
+## The open mechanisms
 
-### 3.1 Admission under uncertainty
-DreamCoder's MDL admission assumes outcomes are binary/exact. ipsum admits on **held-out predictive log-likelihood gain** `ΔLL(a)` minus a complexity penalty `c(a)`, which doubles as the core ablation metric. Two refinements make this rigorous (see `research/ipsum-design.md` §3 for the verified details):
-- **Statistical gate under dependence:** candidate abstractions are nested/overlapping → their test statistics are strongly dependent, so p-value online-FDR (SAFFRON/ADDIS) controls only **mFDR, not FDR**. The dependence-robust gate is **e-values + e-LOND** (FDR under arbitrary dependence); the natural e-value is a held-out likelihood-ratio test-martingale. Do not claim plain FDR with p-values here.
-- **Positivity / coverage guard (the keystone):** ipsum is observational on a non-uniformly covered Boolean cube, so coefficients in thinly-covered regions are **unidentifiable** (positivity/overlap failure; D'Amour et al. 2021). Admit only where coverage suffices to estimate to ±ε; post-drift, **provisionally admit** under a wide band so the guard doesn't freeze adaptation. Built and measured as **Card D** in `RESEARCH.md`.
+### 1. Admission under uncertainty
 
-v1 ships a one-SE `ΔLL − c(a)` threshold as an honest stand-in; e-LOND and the guard layer on after the first compounding result.
+DreamCoder admits abstractions when they compress solved tasks. That is clean when
+outcomes are exact. CI outcomes are noisy and statistical, so ipsum used held-out
+predictive log-likelihood instead:
 
-### 3.2 Delayed, noisy credit assignment
-CI outcomes are delayed (minutes–hours) and label-noisy (flaky tests). Need:
-- an **eligibility structure** mapping a landed outcome back to the abstractions that informed the decision;
-- **de-flaking** before an outcome counts as a label (retry / consistency check — Predictive Test Selection retries up to 10x);
-- outcome-weighted reinforcement of abstractions, not embedding-similarity reuse (Voyager's gap).
-
-### 3.3 Eviction / anti-staleness
-DreamCoder and Voyager only add. Code drifts. Maintain per-abstraction:
-- a **usefulness trace** (recent `ΔLL` contribution);
-- a **decay**; evict when the trace falls below `c(a)`.
-- EWC Fisher importance is a candidate signal for what to protect vs. release.
-
-## 4. Reference architecture
-
-```
-                 ┌─────────────────────────────────────────┐
-   experience ──▶│ encoder  h_θ(change, test, context) → r_i│
-                 └─────────────────────────────────────────┘
-                                  │  mean-pool (O(1) streaming)
-                                  ▼
-                       latent prior  z_t  ──────────────┐
-                                  │                     │
-            ┌─────────────────────┼─────────────┐       │ consolidation
-            ▼                     ▼              ▼       │  (EWC anchor)
-   abstraction store A_t   decoder g_θ(test,z)   credit  │
-   (admit / evict)         → P(fail), σ          assigner│
-            │                     │              ▲       │
-            └─────── outcomes o_t ◀──────────────┴───────┘
+```text
+admit abstraction a if DeltaLL(a) - complexity(a) is positive enough
 ```
 
-## 5. v1 experiment: compounding vs. weekly-retrain
+The v1 implementation used a simple held-out LL gate. The design notes also sketch
+stronger versions: likelihood-ratio e-values, e-LOND for dependent candidate tests,
+and a coverage guard for positivity failures.
 
-**Task:** predictive test selection on public GitHub repos with CI history.
+### 2. Delayed and noisy credit
 
-**Baseline:** reimplement Predictive Test Selection — XGBoost over (change, test) pairs, features = build-dependency-graph distance, historical per-test failure rate, file-change history windows, etc. Retrain weekly from scratch. (This is the plateau.)
+CI outcomes arrive later, and tests can be flaky. A useful system needs to know which
+decision or abstraction should be credited when an outcome finally lands.
 
-**ipsum:** the architecture above, updated online per CI run.
+The planned version had three parts:
 
-**Metric:** TestRecall at fixed SelectionRate (≤ 0.33), on a rolling held-out future window. Plot both systems' metric vs. wall-clock/repo-age.
+- an eligibility buffer for in-flight decisions,
+- de-flaking before labels count,
+- and outcome-weighted reinforcement of the abstractions that actually informed the
+  decision.
 
-**Hypothesis to falsify:** `slope(ipsum) > slope(baseline)`, and the gap widens month 3 → month 6. If it doesn't, the thesis is wrong on this domain — and we've learned that cheaply.
+v1 did not reach the full delayed-credit card.
 
-**Confounders to control:**
-- *more data, not better abstractions* → **the primary control is "same model, same cumulative data, abstraction store OFF."** This is non-negotiable: the ICSME-2023 study (arXiv 2311.13413) found existing ML techniques' improvement over CI cycles comes *mainly from the growing amount of training data, not code evolution* — so naive "improves over time" is illusory. ipsum's slope is only meaningful if it exceeds the data-matched, abstraction-off control.
-- *bigger model* → keep the predictor small; any gain must come from `A_t`, not capacity.
-- *flaky labels* → de-flake before scoring.
+### 3. Eviction and staleness
 
-**Public-repo caveats:** build-dependency graph (the baseline's strongest feature) must be reconstructed from imports/manifests; small repos lack history volume; flakiness retry logs are usually unavailable. Pick repos accordingly.
+DreamCoder and Voyager mostly add abstractions. Codebases drift. An abstraction that
+was useful last month can become noise later.
 
-## 6. Milestones
+The store therefore tracks recent usefulness, decays it, and evicts abstractions when
+their usefulness falls below their complexity cost. On synthetic drift this helped in
+some settings, but not strongly enough to count as a finished mechanism.
 
-1. Data: use **RTPTorrent** (20 Java projects, 100k+ Travis builds, per-test pass/fail, 9-yr history) rather than scraping CI from scratch. Pick 3–5 long-history, high-failure-density projects. See `research/10-datasets.md`.
-2. Baseline: stand up the **ICSME-2023 replication package** (arXiv 2311.13413, Zenodo 7036507) as the baseline harness; reproduce sane TestRecall/SelectionRate numbers. Define the **data-matched, abstraction-off control** as the primary comparison.
-3. Prior: CNP-style amortized predictor with uncertainty; online conditioning.
-4. Abstraction store + admission (3.1); ablation harness.
-5. Credit assignment (3.2) + consolidation/eviction (3.3).
-6. The slope plot. This is the deliverable.
+## Reference architecture
+
+```text
+                 experience
+                     |
+                     v
+        encoder(change, test, context)
+                     |
+                     v
+              latent prior z_t
+              /       |       \
+             /        |        \
+            v         v         v
+ abstraction store   decoder   credit assigner
+  admit / evict     P(fail)      delayed outcomes
+            \         |         /
+             \        v        /
+              outcomes and updates
+```
+
+In v1, the practical center of gravity became the abstraction store and experiment
+harness. The neural prior stack stayed more as design scaffolding than as the main
+result.
+
+## v1 task: predictive test selection
+
+The first task was:
+
+> Given a code change, rank tests by failure probability and run only the top subset.
+
+The metric was TestRecall at a fixed SelectionRate. The control that mattered was a
+data-matched system with the abstraction store turned off.
+
+The hoped-for result was a widening gap:
+
+```text
+TestRecall(ipsum) - TestRecall(data-matched control)
+```
+
+That did not happen on the valid real-data run. See [RESULTS.md](RESULTS.md).
+
+## Confounders the design tried to control
+
+- **More data, not better abstractions.** This is why the data-matched,
+  abstraction-off control is primary.
+- **Bigger model, not better memory.** The predictor was kept small so any gain had to
+  come from the abstraction store.
+- **Flaky labels.** Outcomes were de-flaked before they counted.
+- **Sparse changed-file coverage.** Real-data runs report the admission funnel so a
+  zero-admit result can be diagnosed.
+
+## Milestones
+
+The intended order was:
+
+1. build the synthetic testbed,
+2. validate admission,
+3. validate the measurement instrument with positive and negative controls,
+4. test eviction under drift,
+5. test the coverage guard,
+6. move to RTPTorrent,
+7. only then judge compounding on real data.
+
+That order turned out to be the right call. It did not save the thesis on this task,
+but it did keep the negative result from being a pile of ambiguous failures.
