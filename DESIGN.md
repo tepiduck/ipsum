@@ -31,7 +31,11 @@ The prior + consolidation stack (CNP + EWC + FOMAML) is a complete, buildable re
 ## 3. What we must build (the open mechanisms)
 
 ### 3.1 Admission under uncertainty
-DreamCoder's MDL admission assumes outcomes are binary/exact. Replace with **Bayesian model selection**: maintain, for each candidate abstraction `a`, an estimate of held-out predictive log-likelihood gain `ΔLL(a)` minus a complexity penalty `c(a)`. Admit iff `ΔLL(a) − c(a) > 0` with sufficient posterior confidence. This doubles as the project's core ablation metric.
+DreamCoder's MDL admission assumes outcomes are binary/exact. ipsum admits on **held-out predictive log-likelihood gain** `ΔLL(a)` minus a complexity penalty `c(a)`, which doubles as the core ablation metric. Two refinements make this rigorous (see `research/ipsum-design.md` §3 for the verified details):
+- **Statistical gate under dependence:** candidate abstractions are nested/overlapping → their test statistics are strongly dependent, so p-value online-FDR (SAFFRON/ADDIS) controls only **mFDR, not FDR**. The dependence-robust gate is **e-values + e-LOND** (FDR under arbitrary dependence); the natural e-value is a held-out likelihood-ratio test-martingale. Do not claim plain FDR with p-values here.
+- **Positivity / coverage guard (the keystone):** ipsum is observational on a non-uniformly covered Boolean cube, so coefficients in thinly-covered regions are **unidentifiable** (positivity/overlap failure; D'Amour et al. 2021). Admit only where coverage suffices to estimate to ±ε; post-drift, **provisionally admit** under a wide band so the guard doesn't freeze adaptation. Built and measured as **Card D** in `RESEARCH.md`.
+
+v1 ships a one-SE `ΔLL − c(a)` threshold as an honest stand-in; e-LOND and the guard layer on after the first compounding result.
 
 ### 3.2 Delayed, noisy credit assignment
 CI outcomes are delayed (minutes–hours) and label-noisy (flaky tests). Need:

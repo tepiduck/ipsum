@@ -46,9 +46,11 @@ Four rules make the loop actually work:
    already tried and why.
 
 **Sequence:** synthetic testbed + oracle metrics → **admission** (easiest to
-isolate) → **instrument self-check (Card I, both controls)** → RTPTorrent instrument/data-matched control → **eviction** (needs drift;
-builds on the testbed) → **credit assignment** (hardest; do last, on the
-foundation of the other two).
+isolate) → **instrument self-check (Card I, both controls)** → **eviction** (Card B,
+needs drift) → **positivity/coverage guard (Card D — the keystone)** → **credit
+assignment** (Card C, hardest) → RTPTorrent instrument/data-matched control. The
+rigorous admission gate (e-LOND + held-out-LR e-values, design §3) and the v2
+uncertainty layer are upgrades layered on *after* the first clean compounding result.
 
 ---
 
@@ -117,6 +119,11 @@ ends with concrete sub-tasks suitable to hand to a coding agent.
 - **Agent sub-tasks:** implement candidate proposal (co-change clustering over
   recent commits); implement held-out ΔLL estimator; implement the admit rule;
   write a synth experiment that sweeps `n_clusters` and reports cluster-F1 + ΔLL.
+- **Status / upgrade:** v1 passed with a one-SE held-out-LL-gain threshold. The
+  *rigorous* gate (design §3) is **e-values + e-LOND** for FDR under the dependent,
+  overlapping candidate hypotheses (a held-out likelihood-ratio test-martingale is the
+  e-value), plus the **Card D coverage guard**. Layer these after the first compounding
+  result; the simple threshold is an honest v1 stand-in, not the final rule.
 
 ### Card I — Instrument self-check (positive + negative control) — DO BEFORE Card B
 The compounding harness must be trusted before Cards B/C are judged by it. This is
@@ -226,14 +233,69 @@ store that stays useful across MANY drifts while a never-evicting store rots.
 - **Testbed config:** start delay=0, noise off (validate attribution recovers the
   oracle), then turn up `delay` and `p_flaky` one at a time.
 - **Borrow from:** **delayed-feedback learning** from ad-click prediction
-  (Chapelle's delayed-feedback model) — the closest match: label arrives hours
-  later, attribute it back. RL eligibility traces / TD as secondary intuition.
+  (Chapelle, KDD 2014) — survival-weighted EM over a conversion model + a delay
+  model; weight a not-yet-failed test by `w = p(x)·exp(−λ(x)·elapsed)` = prob the
+  failure is merely pending. RL eligibility traces / TD as secondary intuition.
+- **Delay model (build it right):** exponential delay = constant hazard, wrong for
+  CI (queue wait + ~fixed runtime). Use a **flexible hazard (Weibull/Gamma)**; but a
+  single Weibull is **unimodal**, so if the resolved-delay histogram is genuinely
+  **bimodal**, use a **mixture** (mixture of exponentials/Weibulls) — do *not* call a
+  single Weibull "bimodal". A **max-wait window** `T` closes the loop: after `T`,
+  absence-of-failure = true pass. See `research/ipsum-design.md` §5.
+- **De-flake is a separate axis from delay.** Flakiness is label *noise*, not late
+  arrival — require retry/consistency before an outcome counts; never reinforce on a
+  flaky or unresolved signal.
 - **Keep / kill:** keep iff attribution accuracy stays high as delay/noise rise,
   and reinforcement beats similarity-reuse end-to-end. This is the hardest card;
   expect it to fail first and teach the most.
 - **Agent sub-tasks:** implement the eligibility buffer; a de-flaking resolver
-  (retry/consistency model — synth can emit repeated trials); the settle/credit
-  map; a synth experiment sweeping `delay` and `p_flaky` and reporting attribution accuracy.
+  (retry/consistency model — synth can emit repeated trials); the survival-weighted
+  settle/credit map with the delay model above; a synth experiment sweeping `delay`
+  and `p_flaky` and reporting attribution accuracy.
+
+### Card D — Positivity / coverage guard (the keystone) — v1 coarse-coverage only
+The design doc's single most novel contribution (`research/ipsum-design.md` §3), and
+the build slot it was missing. ipsum learns on a **non-uniformly covered** Boolean
+cube; abstractions whose support is barely observed are **unidentifiable** (positivity/
+overlap failure — D'Amour et al. 2021). Admitting from thin coverage yields confident-
+but-wrong structure. This also targets Card B's measured weakness (eviction precision).
+
+- **Hypothesis (two parts):**
+  1. A coverage-gated admission rule reduces false admissions and improves held-out
+     accuracy vs a no-guard control — *specifically in thin-coverage regions* — when
+     the cube is covered non-uniformly.
+  2. *Guard ⟂ drift resolution:* post-drift, **provisional** admission under a wide band
+     recovers adaptation speed a **strict** guard would freeze — provisional ≈ no-guard
+     on post-drift recovery latency, while still beating no-guard on false-admission rate.
+- **Mechanism / module:** admission path in `abstractions.AbstractionStore` (a coverage
+  gate before `admit`).
+- **Coverage statistic — v1 COARSE ONLY:** for a candidate file-subset, count observed
+  commits whose changed-files cover its support (or a sufficient-statistic proxy) and
+  gate on a finite-sample standard-error / count threshold for identifiability to ±ε.
+  **Do NOT build the per-coefficient Bayesian posterior — that is the v2 uncertainty
+  layer, explicitly parked.** One coverage rule.
+- **Systems / controls:** `no_guard` (current Card A — LL-gain alone); `strict_guard`
+  (refuse below coverage threshold); `provisional_guard` (refuse *or* provisionally admit
+  under a wide band + wider eviction tolerance, tightening as coverage accrues).
+- **Testbed config:** add a **coverage-skew knob** to synth (commits hit some true
+  clusters far more than others, so some abstractions are well-covered and others thin —
+  you control which). Run with and without drift.
+- **Isolating metrics:** false-admission rate in thin-coverage regions vs `no_guard`
+  (scored against synth oracles, eval-only); held-out accuracy **split by well- vs
+  thin-covered regions**; post-drift admission latency (`provisional` must not inflate it
+  vs `no_guard` — the tension test); bonus: effect on Card B eviction precision/recall.
+- **Borrow from:** positivity/overlap (Rosenbaum–Rubin 1983; Hernán & Robins 2020);
+  high-dimensional overlap failure (D'Amour et al. 2021, arXiv:1711.02582).
+- **Keep / kill:** keep iff (1) the guard reduces false admissions / improves thin-region
+  accuracy vs `no_guard`, and (2) the provisional variant does NOT freeze post-drift
+  adaptation. If strict improves precision but kills adaptation, that's the documented
+  tension — provisional is the resolution and the data should show it.
+- **Guardrails:** v1 coarse coverage only (no Bayesian posterior, no active probing —
+  both v2); small predictor; oracles eval-only; verify on Python 3.10.
+- **Agent sub-tasks:** coverage-skew knob on synth; coverage statistic + guard (strict +
+  provisional); the non-uniform-coverage experiment with the three controls; metrics incl.
+  thin/thick split + post-drift latency; tests (guard refuses a hand-built thin candidate;
+  provisional admits post-drift without latency blowup); `RESEARCH_LOG.md` entry.
 
 ---
 
