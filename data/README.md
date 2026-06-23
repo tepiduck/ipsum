@@ -60,3 +60,22 @@ confirm these numbers on the actual CSVs:
 cd ~/issum/ipsum
 python data/profile_rtptorrent.py /path/to/rtptorrent
 ```
+
+Use `data/rtptorrent.py` to load one project CSV into chronological CI cycles
+with per-test outcomes. Pass `changes_csv=` when you have job- or commit-keyed
+changed-file metadata; the loader supports common `job_id` / `commit_id` and
+`file_path` / `changed_files` aliases. The RTPTorrent per-test CSV alone does not
+include changed-file sets, so change-aware baseline features and ipsum
+abstractions require that metadata join.
+
+Once a project CSV and changed-file metadata are available, run the three-line
+slope harness with:
+
+```bash
+python experiments/compounding.py \
+  --rtptorrent /path/to/rtptorrent/okhttp.csv \
+  --changes-csv /path/to/okhttp_changed_files.csv
+```
+
+The command writes `experiments/runs/<run_id>/` artifacts for weekly-retrain,
+data-matched abstraction-off control, and ipsum.

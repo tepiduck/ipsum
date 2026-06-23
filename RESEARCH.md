@@ -46,7 +46,7 @@ Four rules make the loop actually work:
    already tried and why.
 
 **Sequence:** synthetic testbed + oracle metrics → **admission** (easiest to
-isolate) → RTPTorrent instrument/data-matched control → **eviction** (needs drift;
+isolate) → **instrument self-check (Card I, both controls)** → RTPTorrent instrument/data-matched control → **eviction** (needs drift;
 builds on the testbed) → **credit assignment** (hardest; do last, on the
 foundation of the other two).
 
@@ -117,6 +117,55 @@ ends with concrete sub-tasks suitable to hand to a coding agent.
 - **Agent sub-tasks:** implement candidate proposal (co-change clustering over
   recent commits); implement held-out ΔLL estimator; implement the admit rule;
   write a synth experiment that sweeps `n_clusters` and reports cluster-F1 + ΔLL.
+
+### Card I — Instrument self-check (positive + negative control) — DO BEFORE Card B
+The compounding harness must be trusted before Cards B/C are judged by it. This is
+a positive control for the *instrument*, not a new mechanism. The synth slope is
+currently ≈ 0; we don't yet know if that's "no signal" or "blind instrument."
+
+- **Hypothesis:** if `ipsum` is given a structural predictive edge the controls
+  lack (the Card-A admitted abstraction store) and that edge accumulates as more
+  abstractions are admitted over cycles, the harness will show ipsum's
+  TestRecall@SelectionRate slope exceeding the data-matched control's, with the gap
+  *widening*. If it doesn't show this on synth where we planted the advantage, the
+  instrument is broken and must be fixed before any mechanism is trusted.
+- **Setup:** synth (noise low, no delay, no drift) → chronological `(commit,
+  per-test outcomes)` stream. Task: rank tests by predicted failure prob, select
+  top subset under the SelectionRate cap, score TestRecall = fraction of
+  actually-failing tests selected. Three systems consume the **same** stream
+  (data-matched): `weekly_retrain` (refit from scratch every K cycles, no carried
+  state); `data_matched_control` (same model, same cumulative data online,
+  abstraction store OFF); `ipsum` (identical to control PLUS the admitted store —
+  when a commit touches an admitted cluster's files, raise failure prob for tests
+  with observed co-failure history; **no oracle**).
+- **Run BOTH controls (the non-negotiable rigor):**
+  - *Positive (signal present):* ipsum MUST show a clearly widening gap over
+    `data_matched_control`.
+  - *Negative (signal absent):* disable ipsum's store (or feed useless/shuffled
+    abstractions) so it is equivalent to the control. The harness MUST then show
+    **no** meaningful gap. This catches an instrument that fabricates a gap from
+    implementation asymmetry (extra data, RNG drift, leakage). A stick that always
+    shows ipsum winning is as useless as one that never does — most people build
+    only the positive control.
+- **Isolating metric:** per-window TestRecall@SelectionRate series per system; fit
+  a slope each; report `slope_ipsum − slope_control` and a widening test (final-window
+  gap > early-window gap). Pos-control gap must clearly exceed neg-control gap.
+- **Keep / kill (for the INSTRUMENT):** PASS iff positive control widens AND
+  negative control is flat. Positive flat → harness can't see compounding that
+  exists; fix windowing/metric/online-state plumbing before Card B. Negative shows
+  a gap → harness fabricates differences; find and remove the asymmetry.
+- **Artifacts:** two runs, `card="instrument-poscontrol"` and
+  `card="instrument-negcontrol"`, `dataset="synth"`; `slope.json`
+  `metric_name="test_recall_at_selrate"`; `metrics.json` with per-system slopes,
+  gap-widening boolean, pos-vs-neg summary; update `index.json`.
+- **Agent sub-tasks:** TestRecall@SelectionRate scorer; the three systems sharing
+  one stream with strict data-matched parity (only the store differs); wire admitted
+  abstractions into ipsum's predictor via observed co-failure stats; run both modes;
+  `RESEARCH_LOG.md` entry with both results + PASS/FAIL verdict; a **parity unit
+  test** asserting the negative control yields a near-zero gap at a fixed seed.
+- **Guardrails:** keep the predictor small (edge from abstractions, not capacity);
+  oracles are evaluation-only; data-matched parity is sacrosanct; verify on Python
+  3.10 (the declared minimum), not just the local interpreter.
 
 ### Card B — Eviction / anti-staleness
 - **Hypothesis:** with a usefulness trace + decay + eviction rule, after an
