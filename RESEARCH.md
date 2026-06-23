@@ -168,23 +168,50 @@ currently ≈ 0; we don't yet know if that's "no signal" or "blind instrument."
   3.10 (the declared minimum), not just the local interpreter.
 
 ### Card B — Eviction / anti-staleness
-- **Hypothesis:** with a usefulness trace + decay + eviction rule, after an
-  injected drift the system prunes the now-stale abstraction and recovers accuracy
-  *faster* than a no-eviction (append-only, à la DreamCoder/Voyager) control.
+Build on the validated Card I harness (drift already plumbed). The question is not
+"does eviction run" but whether it produces the *compounding-relevant* behavior: a
+store that stays useful across MANY drifts while a never-evicting store rots.
+
+- **Hypothesis (two parts, both falsifiable):**
+  1. *Eviction helps recovery:* after a drift, an evicting store recovers prior
+     accuracy faster than an append-only (never-evict) store.
+  2. *The benefit compounds across drifts:* over many successive drifts, the
+     evicting store **holds or improves** post-drift recovery while the append-only
+     store **degrades** as stale abstractions accumulate and clutter prediction.
+     This trend — recovery quality vs. drift-epoch number — is the headline, because
+     it separates true anti-staleness from "the bag just kept filling."
 - **Mechanism / module:** `abstractions.AbstractionStore.decay_and_evict`,
-  `.reinforce`.
-- **Isolating metric:** post-drift **recovery time** (cycles to return to within
-  ε of pre-drift accuracy); and stale-abstraction **eviction latency** vs
-  `synth.drift_schedule()`.
-- **Control:** append-only store (never evicts).
-- **Testbed config:** noise low, no delay, **drift on** (a few scheduled rewires).
+  `.reinforce`. Usefulness trace updated by immediate held-out-LL contribution;
+  decay each cycle; evict when usefulness < complexity cost; optional drift-suspicion
+  trigger to evict faster post-change. EWC Fisher importance (`consolidation.py`) is
+  an optional "what to protect" signal — start with decay/threshold, don't over-engineer.
+- **Systems / controls:** `ipsum_evict` (the mechanism); `append_only` (identical
+  but never evicts — isolates eviction's effect); `no_store` (raw predictor floor).
+- **Isolating metrics:**
+  - recovery time per drift epoch (cycles to return within ε of pre-drift accuracy);
+  - **headline — recovery quality vs. drift-epoch #** for evict vs append-only
+    (evict flat/improving, append-only worsening);
+  - eviction latency vs `synth.drift_schedule()` (and check evicted abstractions were
+    actually stale, via `true_clusters()` pre/post — evaluation-only);
+  - stable-period cost: no-drift accuracy must not be worse than append-only.
+- **Testbed config:** noise low, no delay (degenerate first — immediate reinforcement;
+  delayed credit is Card C). **≥6–8 drift epochs** so the cross-drift trend is visible;
+  a single drift can't distinguish eviction-helps from noise.
 - **Borrow from:** concept-drift detection (ADWIN, DDM) for *when* to suspect
-  staleness; EWC Fisher importance (`consolidation.py`) as the *what to protect* signal.
-- **Keep / kill:** keep iff recovery is faster than append-only with no loss of
-  pre-drift accuracy. If eviction also hurts stable periods, the decay is too aggressive.
-- **Agent sub-tasks:** implement usefulness trace + decay; a drift-suspicion
-  trigger; the eviction rule; a synth experiment plotting accuracy vs cycle for
-  evict vs append-only across a drift.
+  staleness; EWC Fisher importance as the *what to protect* signal.
+- **Keep / kill:** keep iff (1) `ipsum_evict` recovers faster than `append_only`
+  after drifts, (2) the cross-drift trend favors eviction (append-only degrades,
+  evict doesn't), and (3) no stable-period accuracy loss. If eviction hurts stable
+  periods, decay is too aggressive — tune and re-run, don't ship. Do NOT mark passed
+  on "eviction runs" or "recovers faster once"; it passes only on the sustained trend.
+- **Artifacts:** `card="B"`; `slope.json` `metric_name="post_drift_recovery"` for
+  `ipsum_evict` / `append_only`; `events.json` admit/evict/drift timeline;
+  `metrics.json` per-epoch recovery times, cross-drift trend slope, eviction latency,
+  stable-period delta. Update `index.json`.
+- **Agent sub-tasks:** recovery-time estimator; append-only as a store config flag;
+  drift-suspicion trigger; cross-drift trend computation; `RESEARCH_LOG.md` entry with
+  the per-epoch table and verdict; tests — eviction latency on a hand-built drift, and
+  a stable-period parity test (evict ≈ append-only with no drift).
 
 ### Card C — Delayed, noisy credit assignment
 - **Hypothesis:** an eligibility structure that holds in-flight decisions until

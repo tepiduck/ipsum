@@ -88,6 +88,7 @@ def test_instrument_negative_control_has_near_zero_gap():
         n_tests=16,
         n_clusters=4,
         cycles=160,
+        drift_schedule=(80, 120),
         eval_interval=40,
         eval_window=40,
         admission_warmup=60,
@@ -100,6 +101,7 @@ def test_instrument_negative_control_has_near_zero_gap():
 
     assert abs(result["metrics"]["ipsum_vs_data_matched_slope_gap"]) <= 1e-12
     assert abs(result["metrics"]["final_gap"]) <= 1e-12
+    assert abs(result["metrics"]["half_gap_delta"]) <= 1e-12
     assert result["metrics"]["negative_control_passed"] == 1.0
 
 

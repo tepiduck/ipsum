@@ -62,6 +62,7 @@ class SynthCompoundingConfig:
     selection_rate_cap: float = 0.33
     p_hit: float = 0.9
     p_flaky: float = 0.01
+    drift_schedule: tuple[int, ...] = ()
     seed: int = 300
     admission_interval: int = 40
     admission_warmup: int = 120
@@ -523,6 +524,7 @@ def _synth_timeline(config: SynthCompoundingConfig) -> list[Cycle]:
             n_clusters=config.n_clusters,
             p_hit=config.p_hit,
             p_flaky=config.p_flaky,
+            drift_schedule=config.drift_schedule,
             seed=config.seed,
         )
     )
