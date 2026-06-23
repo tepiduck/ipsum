@@ -13,7 +13,7 @@ how many positive examples the whole replay yields.
 
 | Project | Builds (CI cycles) | TM failing / build | ≈ Total positives | Lines | Notes |
 |---|---:|---:|---:|---:|---|
-| **sling** | 8,552 | 7.38 | **~63,100** | 673k | best overall: high cycles AND high signal |
+| sling | 8,552 | 7.38 | **~63,100** | 673k | high raw signal, but poor v1 job→commit→file coverage; drop for compounding v1 |
 | **sonarqube** | 53,307 | 0.68 | ~36,200 | 661k | most CI cycles by far → best slope resolution; heavy |
 | **okhttp** | 9,772 | 1.62 | ~15,800 | 69k | clean, well-known, mid-size; great starter |
 | DSpace | 3,338 | 2.37 | ~7,900 | 384k | balanced mid-size |
@@ -31,16 +31,17 @@ jetty.project, jsprit, optiq — generally lower on one axis. Full set is 20 pro
 
 ## Recommended picks
 
-**Tier 1 — start here (3 projects):**
-- **sling** — the standout; most positive labels *and* plenty of cycles.
-- **okhttp** — clean, well-known, mid-size; the easy one to get the pipeline right on first.
-- **sonarqube** — 53k builds gives the finest-grained slope curve; use it as the headline compounding plot (it's heavier to process).
+**Tier 1 — start here (2 projects):**
+- **okhttp** — clean, well-known, mid-size, and the best v1 changed-file coverage among the current real-data runs.
+- **sonarqube** — 53k builds gives the finest-grained slope curve; use it as the heavier second project.
 
 **Tier 2 — add for breadth:**
 - **DSpace** (balanced) and **Achilles** or **jade4j** (small + dense → fast debug loops).
 
-**Avoid** for v1: graylog2-server, cloudify, jOOQ — too few failures per build; the
-positive class is too thin to learn or to measure improvement reliably.
+**Avoid** for v1: sling, graylog2-server, cloudify, jOOQ. Sling has many raw
+positive labels, but the RTPTorrent v1 job→commit→patch join covers too few jobs
+for a change-aware abstraction test; the others have too few failures per build,
+so the positive class is too thin to learn or to measure improvement reliably.
 
 ## Caveats (carry into analysis)
 - Travis logs span 2007–2016; logging/config changes can make pre/post test runs
@@ -68,14 +69,26 @@ changed-file metadata; the loader supports common `job_id` / `commit_id` and
 include changed-file sets, so change-aware baseline features and ipsum
 abstractions require that metadata join.
 
-Once a project CSV and changed-file metadata are available, run the three-line
-slope harness with:
+Once the project CSV, `tr_all_built_commits.csv`, and project patches CSV are
+available, run the real-data compounding harness with:
 
 ```bash
-python experiments/compounding.py \
-  --rtptorrent /path/to/rtptorrent/okhttp.csv \
-  --changes-csv /path/to/okhttp_changed_files.csv
+python experiments/compounding_rtptorrent.py \
+  --dataset okhttp \
+  --project-csv /path/to/rtptorrent/square@okhttp/square@okhttp.csv \
+  --built-commits-csv /path/to/rtptorrent/tr_all_built_commits.csv \
+  --patches-csv /path/to/rtptorrent/square@okhttp/square@okhttp-patches.csv \
+  --change-granularity directory \
+  --change-depth 3 \
+  --min-support 2 \
+  --cochange-threshold 0.02
 ```
 
 The command writes `experiments/runs/<run_id>/` artifacts for weekly-retrain,
-data-matched abstraction-off control, and ipsum.
+data-matched abstraction-off control, and ipsum. Changed files are joined from
+RTPTorrent v1 metadata as
+`travisJobId -> tr_all_built_commits.git_commit_id -> patches.name`; jobs whose
+changed-file union exceeds 30 files are dropped as infra/merge noise. The harness
+coarsens changed files before candidate proposal, for example
+`a/b/c/Foo.java -> a/b/c` at directory depth 3, and logs the admission funnel so
+zero-admit runs distinguish proposal starvation from strict admission.

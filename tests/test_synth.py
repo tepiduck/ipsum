@@ -85,6 +85,28 @@ def test_scheduled_drift_changes_oracle_state():
     assert world.drift_schedule() == (1,)
 
 
+def test_coverage_skew_biases_commit_clusters():
+    cfg = SynthConfig(
+        n_files=40,
+        n_tests=20,
+        n_clusters=4,
+        coverage_skew=(12.0, 1.0, 1.0, 1.0),
+        seed=9,
+    )
+    world = Synth(cfg)
+    counts = [0, 0, 0, 0]
+
+    for _ in range(200):
+        commit, _ = world.step()
+        overlaps = [
+            len(commit.changed_files & cluster)
+            for cluster in world.true_clusters()
+        ]
+        counts[max(range(len(overlaps)), key=lambda idx: overlaps[idx])] += 1
+
+    assert counts[0] > max(counts[1:]) * 3
+
+
 def test_cause_history_can_be_bounded():
     cfg = SynthConfig(
         n_files=12,

@@ -8,6 +8,11 @@ from experiments.compounding import (
     run_synth,
     slope_gap,
 )
+from experiments.compounding_rtptorrent import (
+    RTPTorrentRealDataConfig,
+    _coarsen_changed_files,
+    run as run_rtptorrent_real,
+)
 from experiments.compounding import _synth_timeline
 from experiments.instrument_self_check import (
     InstrumentSelfCheckConfig,
@@ -171,6 +176,80 @@ def test_run_rtptorrent_emits_three_system_slope_series(tmp_path, monkeypatch):
     assert "weekly_retrain" in slope_text
     assert "data_matched_control" in slope_text
     assert "ipsum" in slope_text
+
+
+def test_real_rtptorrent_run_joins_v1_schema_and_emits_compounding(tmp_path, monkeypatch):
+    monkeypatch.setattr(artifacts, "RUNS_DIR", tmp_path / "runs")
+    project_rows = ["job_id,commit_id,test,failures"]
+    built_rows = ["tr_job_id,git_commit_id"]
+    patch_rows = ["sha,name"]
+    for cycle in range(1, 61):
+        commit = f"c{cycle}"
+        changed_file = "src/Auth.java" if cycle <= 30 else "src/Billing.java"
+        built_rows.append(f"{cycle},{commit}")
+        patch_rows.append(f"{commit},{changed_file}")
+        project_rows.extend(
+            [
+                f"{cycle},{commit},AuthTest,{int(cycle <= 30 and cycle % 3 == 0)}",
+                f"{cycle},{commit},BillingTest,{int(cycle > 30 and cycle % 3 == 0)}",
+                f"{cycle},{commit},SmokeTest,0",
+            ]
+        )
+    project_csv = tmp_path / "okhttp.csv"
+    built_csv = tmp_path / "tr_all_built_commits.csv"
+    patches_csv = tmp_path / "okhttp-patches.csv"
+    project_csv.write_text("\n".join(project_rows) + "\n")
+    built_csv.write_text("\n".join(built_rows) + "\n")
+    patches_csv.write_text("\n".join(patch_rows) + "\n")
+
+    config = RTPTorrentRealDataConfig(
+        dataset="okhttp",
+        project_csv=str(project_csv),
+        built_commits_csv=str(built_csv),
+        patches_csv=str(patches_csv),
+        eval_interval=20,
+        eval_window=20,
+        admission_warmup=20,
+        admission_interval=20,
+        validation_cycles=10,
+        adaptation_window=30,
+        weekly_retrain_interval=20,
+        weekly_retrain_window=40,
+        change_path_depth=1,
+        min_support=2,
+        cochange_threshold=0.5,
+    )
+
+    result = run_rtptorrent_real(config)
+
+    assert result["metrics"]["used_cycles"] == 60.0
+    assert result["metrics"]["changed_file_coverage"] > 0.9
+    assert result["metrics"]["distinct_change_tokens"] == 1.0
+    assert result["metrics"]["admission_funnel_cycles"] > 0.0
+    assert result["metrics"]["candidates_proposed_total"] >= 0.0
+    slope_text = (tmp_path / "runs" / result["run_id"] / "slope.json").read_text()
+    meta_text = (tmp_path / "runs" / result["run_id"] / "meta.json").read_text()
+    assert '"card": "compounding"' in meta_text
+    assert "weekly_retrain" in slope_text
+    assert "data_matched_control" in slope_text
+    assert "ipsum" in slope_text
+
+
+def test_rtptorrent_change_coarsening_supports_directory_and_java_package():
+    files = frozenset(
+        {
+            "src/main/java/com/squareup/okhttp/Call.java",
+            "src/test/java/com/squareup/okhttp/CallTest.java",
+            "okhttp/src/main/java/okhttp3/internal/http/Retry.java",
+        }
+    )
+
+    assert _coarsen_changed_files(files, granularity="directory", depth=3) == frozenset(
+        {"src/main/java", "src/test/java", "okhttp/src/main"}
+    )
+    assert _coarsen_changed_files(files, granularity="java_package", depth=3) == frozenset(
+        {"com.squareup.okhttp", "okhttp3.internal.http"}
+    )
 
 
 def _point(cycle: int, recall: float):

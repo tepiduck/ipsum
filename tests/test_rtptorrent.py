@@ -1,6 +1,11 @@
 import pytest
 
-from data.rtptorrent import attach_changed_files, load_changed_files_csv, load_project_csv
+from data.rtptorrent import (
+    attach_changed_files,
+    load_changed_files_csv,
+    load_project_csv,
+    load_rtptorrent_v1_project,
+)
 
 
 def test_load_project_csv_groups_rows_into_sorted_cycles(tmp_path):
@@ -76,6 +81,63 @@ def test_load_project_csv_joins_changed_files_by_commit(tmp_path):
 
     assert cycles[0].changed_files == frozenset({"src/A.java"})
     assert cycles[1].changed_files == frozenset({"src/B.java", "src/C.java"})
+
+
+def test_load_rtptorrent_v1_schema_joins_commits_and_patches(tmp_path):
+    project_csv = tmp_path / "apache@sling.csv"
+    built_csv = tmp_path / "tr_all_built_commits.csv"
+    patches_csv = tmp_path / "apache@sling-patches.csv"
+    project_csv.write_text(
+        "\n".join(
+            [
+                "travisJobId,testName,index,duration,count,failures,errors,skipped",
+                "3,TestA,0,0.1,1,0,0,0",
+                "1,TestB,0,0.1,1,1,0,0",
+                "2,TestC,0,0.1,1,0,1,0",
+            ]
+        )
+        + "\n"
+    )
+    built_csv.write_text(
+        "\n".join(
+            [
+                "tr_job_id,git_commit_id",
+                "1,c1",
+                "2,c2",
+                "2,c3",
+                "3,c4",
+            ]
+        )
+        + "\n"
+    )
+    patches_csv.write_text(
+        "\n".join(
+            [
+                "sha,name",
+                "c1,src/A.java",
+                "c2,src/B.java",
+                "c3,src/C.java",
+                *[f"c4,infra/{idx}.yml" for idx in range(31)],
+            ]
+        )
+        + "\n"
+    )
+
+    cycles, stats = load_rtptorrent_v1_project(
+        project_csv,
+        built_csv,
+        patches_csv,
+        max_changed_files=30,
+    )
+
+    assert [cycle.job_id for cycle in cycles] == ["1", "2"]
+    assert cycles[0].changed_files == frozenset({"src/A.java"})
+    assert cycles[1].changed_files == frozenset({"src/B.java", "src/C.java"})
+    assert cycles[0].outcomes[0].test_name == "TestB"
+    assert cycles[0].outcomes[0].failed
+    assert cycles[1].outcomes[0].failed
+    assert stats.raw_jobs == 3
+    assert stats.dropped_large_change_jobs == 1
 
 
 def test_attach_changed_files_prefers_job_specific_metadata(tmp_path):

@@ -133,15 +133,18 @@ class AbstractionStore:
         item = self._items[name]
         item.usefulness = self.decay * item.usefulness + ll_gain
 
-    def decay_and_evict(self) -> list[str]:
+    def decay_and_evict(self, protected: set[str] | None = None) -> list[str]:
         """Decay all usefulness traces; evict those that fall below their cost.
 
         Returns the names evicted. This is the anti-staleness mechanism that
         neither DreamCoder nor Voyager has.
         """
+        protected = protected or set()
         evicted: list[str] = []
         for name, item in list(self._items.items()):
             item.usefulness *= self.decay
+            if name in protected:
+                continue
             if item.usefulness < item.complexity:
                 evicted.append(name)
                 del self._items[name]

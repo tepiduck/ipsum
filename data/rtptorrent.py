@@ -32,6 +32,17 @@ class RTPTorrentCycle:
     changed_files: frozenset[str] = field(default_factory=frozenset)
 
 
+@dataclass(frozen=True)
+class RTPTorrentV1JoinStats:
+    raw_jobs: int
+    emitted_jobs: int
+    jobs_with_commits: int
+    jobs_with_changed_files: int
+    dropped_large_change_jobs: int
+    missing_commit_jobs: int
+    missing_patch_jobs: int
+
+
 def load_project_csv(
     csv_path: str | Path,
     max_cycles: int | None = None,
@@ -83,6 +94,107 @@ def load_project_csv(
     if changes_csv is None:
         return cycles
     return attach_changed_files(cycles, changes_csv)
+
+
+def load_rtptorrent_v1_project(
+    project_csv: str | Path,
+    built_commits_csv: str | Path,
+    patches_csv: str | Path,
+    *,
+    max_cycles: int | None = None,
+    max_changed_files: int = 30,
+) -> tuple[list[RTPTorrentCycle], RTPTorrentV1JoinStats]:
+    """Load actual RTPTorrent v1 CSVs joined through commit patches.
+
+    RTPTorrent v1 stores test outcomes, job->commit edges, and commit->file
+    patches separately. Jobs may map to several commits; the changed-file set is
+    the union of all patch names for those commits. Jobs whose union exceeds
+    ``max_changed_files`` are dropped as infra/merge noise.
+    """
+    cycles = load_project_csv(project_csv, max_cycles=max_cycles)
+    commits_by_job = load_built_commits_csv(built_commits_csv)
+    files_by_commit = load_patches_csv(patches_csv)
+
+    joined = []
+    jobs_with_commits = 0
+    jobs_with_changed_files = 0
+    dropped_large = 0
+    missing_commit = 0
+    missing_patch = 0
+    for cycle in cycles:
+        commits = commits_by_job.get(cycle.job_id, ())
+        if not commits:
+            missing_commit += 1
+        else:
+            jobs_with_commits += 1
+        changed_files: set[str] = set()
+        missing_any_patch = False
+        for commit in commits:
+            files = files_by_commit.get(commit)
+            if files is None:
+                missing_any_patch = True
+                continue
+            changed_files.update(files)
+        if commits and missing_any_patch and not changed_files:
+            missing_patch += 1
+        if len(changed_files) > max_changed_files:
+            dropped_large += 1
+            continue
+        if changed_files:
+            jobs_with_changed_files += 1
+        joined.append(
+            RTPTorrentCycle(
+                cycle=len(joined),
+                job_id=cycle.job_id,
+                commit_id=";".join(commits) if commits else None,
+                outcomes=cycle.outcomes,
+                changed_files=frozenset(changed_files),
+            )
+        )
+
+    return joined, RTPTorrentV1JoinStats(
+        raw_jobs=len(cycles),
+        emitted_jobs=len(joined),
+        jobs_with_commits=jobs_with_commits,
+        jobs_with_changed_files=jobs_with_changed_files,
+        dropped_large_change_jobs=dropped_large,
+        missing_commit_jobs=missing_commit,
+        missing_patch_jobs=missing_patch,
+    )
+
+
+def load_built_commits_csv(path: str | Path) -> dict[str, tuple[str, ...]]:
+    """Load RTPTorrent v1 ``tr_all_built_commits.csv``."""
+    commits: dict[str, list[str]] = {}
+    with Path(path).open(newline="") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames is None:
+            raise ValueError(f"{path} has no CSV header")
+        lower = {name.lower(): name for name in reader.fieldnames}
+        job_col = _pick_column(lower, "tr_job_id", "travisjobid", "job_id")
+        commit_col = _pick_column(lower, "git_commit_id")
+        for row in reader:
+            job_id = _required(row, job_col, "job id")
+            commit_id = _required(row, commit_col, "git commit id")
+            commits.setdefault(job_id, []).append(commit_id)
+    return {job_id: tuple(values) for job_id, values in commits.items()}
+
+
+def load_patches_csv(path: str | Path) -> dict[str, frozenset[str]]:
+    """Load RTPTorrent v1 ``<owner>@<project>-patches.csv``."""
+    patches: dict[str, set[str]] = {}
+    with Path(path).open(newline="") as f:
+        reader = csv.DictReader(f)
+        if reader.fieldnames is None:
+            raise ValueError(f"{path} has no CSV header")
+        lower = {name.lower(): name for name in reader.fieldnames}
+        sha_col = _pick_column(lower, "sha")
+        name_col = _pick_column(lower, "name")
+        for row in reader:
+            sha = _required(row, sha_col, "patch sha")
+            name = _required(row, name_col, "patch file name")
+            patches.setdefault(sha, set()).add(name)
+    return {sha: frozenset(files) for sha, files in patches.items()}
 
 
 def attach_changed_files(
@@ -147,9 +259,9 @@ def load_changed_files_csv(
 class _Columns:
     def __init__(self, fieldnames: Iterable[str]) -> None:
         self._lower = {name.lower(): name for name in fieldnames}
-        self.job = self.pick("job_id", "tr_job_id", "build", "build_id")
+        self.job = self.pick("travisjobid", "job_id", "tr_job_id", "build", "build_id")
         self.commit = self.pick("commit_id", "commit", "sha", "git_sha", required=False)
-        self.test = self.pick("test", "test_name", "testcase", "test_case")
+        self.test = self.pick("testname", "test", "test_name", "testcase", "test_case")
         self.failures = self.pick("failures", "failed", "failure", required=False)
         self.errors = self.pick("errors", "error", required=False)
         self.skipped = self.pick("skipped", "skip", required=False)
@@ -231,6 +343,14 @@ def _files_from_row(row: dict[str, str], column: str) -> set[str]:
         return set()
     normalized = raw.replace("\n", ";").replace("|", ";").replace(",", ";")
     return {part.strip() for part in normalized.split(";") if part.strip()}
+
+
+def _pick_column(lower: dict[str, str], *candidates: str) -> str:
+    for candidate in candidates:
+        if candidate in lower:
+            return lower[candidate]
+    names = ", ".join(candidates)
+    raise ValueError(f"missing required RTPTorrent column; expected one of: {names}")
 
 
 def _job_sort_key(job_id: str) -> tuple[int, int | str]:

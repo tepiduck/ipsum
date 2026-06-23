@@ -29,6 +29,7 @@ class SynthConfig:
     delay_mean: float = 0.0       # feedback delay in cycles (Card C)
     delay_var: float = 0.0
     drift_schedule: tuple[int, ...] = ()   # cycles at which deps/clusters mutate (Card B)
+    coverage_skew: tuple[float, ...] = ()  # relative commit mass per true cluster (Card D)
     cause_history_cycles: int | None = 10_000
     seed: int = 0
 
@@ -155,6 +156,13 @@ class Synth:
             raise ValueError("delay_var must be non-negative")
         if any(cycle < 0 for cycle in self.cfg.drift_schedule):
             raise ValueError("drift_schedule cycles must be non-negative")
+        if self.cfg.coverage_skew:
+            if len(self.cfg.coverage_skew) != self.cfg.n_clusters:
+                raise ValueError("coverage_skew length must match n_clusters")
+            if any(weight < 0.0 for weight in self.cfg.coverage_skew):
+                raise ValueError("coverage_skew weights must be non-negative")
+            if sum(self.cfg.coverage_skew) <= 0.0:
+                raise ValueError("coverage_skew must have positive mass")
         if self.cfg.cause_history_cycles is not None and self.cfg.cause_history_cycles < 1:
             raise ValueError("cause_history_cycles must be positive or None")
 
@@ -179,7 +187,7 @@ class Synth:
         return frozenset(deps)
 
     def _sample_commit(self, cycle: int) -> Commit:
-        primary = int(self._rng.integers(0, self.cfg.n_clusters))
+        primary = self._sample_primary_cluster()
         active_clusters = {primary}
         for cluster_id in range(self.cfg.n_clusters):
             if cluster_id != primary and self._rng.random() < 0.08:
@@ -199,6 +207,13 @@ class Synth:
                 changed.add(file_id)
 
         return Commit(cycle=cycle, changed_files=frozenset(changed))
+
+    def _sample_primary_cluster(self) -> int:
+        if not self.cfg.coverage_skew:
+            return int(self._rng.integers(0, self.cfg.n_clusters))
+        weights = np.array(self.cfg.coverage_skew, dtype=float)
+        probabilities = weights / weights.sum()
+        return int(self._rng.choice(range(self.cfg.n_clusters), p=probabilities))
 
     def _sample_outcome(self, commit: Commit, test: int) -> Outcome:
         hit_files = commit.changed_files & self._deps[test]
