@@ -64,13 +64,17 @@ def test_reduction_rejects_candidates_that_also_break_the_baseline(tmp_path, mon
     assert any(item["status"] == "baseline_rejected" for item in evidence["history"])
 
 
-def test_upgrade_gate_runs_real_workers_and_exports_reproducers(tmp_path):
+def test_upgrade_gate_runs_real_workers_and_exports_reproducers(tmp_path, monkeypatch):
+    # Hosted Windows can put Python and the checkout on different drives.
+    # Start next to Python so this deliberately relative path is valid on every OS.
+    monkeypatch.chdir(os.path.dirname(sys.executable))
+    relative_python = os.path.join(os.curdir, os.path.basename(sys.executable))
     settings = Settings(backend="eager", repeats=2)
     result = compare_envs.compare_environments(
         corpus()[:1],
         tmp_path / "comparison",
-        os.path.relpath(sys.executable),
-        os.path.relpath(sys.executable),
+        relative_python,
+        relative_python,
         settings,
         replace(settings, backend="mutant:sum-as-mean"),
         reduce=True,
