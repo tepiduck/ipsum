@@ -31,6 +31,7 @@ MUTANTS = {
     "hang",
     "worker-exit",
     "gradient-scale",
+    "aot-backward-scale",
     "sequence-cache",
 }
 
@@ -84,6 +85,8 @@ def evaluate(case, settings):
     from .trace import Trace
 
     settings.validate()
+    if settings.backend == "mutant:aot-backward-scale":
+        raise ValueError("aot-backward-scale is only supported by native AOT workloads")
     case.validate()
     is_trace = isinstance(case, Trace)
     steps = case.steps if is_trace else (case,)

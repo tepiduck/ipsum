@@ -156,6 +156,47 @@ Each reduced finding has `baseline-reproducer/`, `candidate-reproducer/`, and `r
 Use a fresh output directory. Comparisons currently have no resume command. CI runs real CPU
 compiler checks across pinned releases and separately verifies controlled regression detection.
 
+## Backward graph debugging
+
+For native model bundles, `model run` and `model compare` accept `--aot` with `--gradients`.
+It records AOT forward/backward graphs and their runtime inputs under `run/graphs/` (or
+`baseline/graphs/` and `candidate/graphs/` for comparisons). `aot-graphs.json` maps each graph to
+its parent Dynamo graph, stage, execution count, and whether independent export succeeded.
+`model replay`, `model reduce`, and `model export` retain this saved policy.
+
+```bash
+faultline model run workloads/my-model --gradients --aot --output faultline-runs/backward
+faultline model reduce faultline-runs/backward --max-evaluations 32 --output faultline-runs/backward-reduced
+python faultline-runs/backward-reduced/reproducer/repro.py
+```
+
+For a version comparison, use `model compare ... --gradients --aot --reduce`; the reduction
+requires a passing baseline for every accepted proposal and the final confirmation. A standalone
+backward graph already contains derivative operations. Its saved cotangents and activations are
+ordinary inputs, and its outputs are compared without computing second derivatives.
+
+AOT capture disables the AOTAutograd cache for that diagnostic run, retaining kernel caching.
+Unsupported PyTorch hook versions or a missing backward capture are inconclusive (exit 2), not
+successful compiler checks. All graph bundles still contain exact tensor data; review before sharing.
+
+## Device checks
+
+```bash
+faultline qualify --device cuda:0 --require-rocm --output faultline-runs/rocm
+faultline qualify --device cpu --dtype float32 --workload attention --output faultline-runs/cpu-attention
+```
+
+`qualify` defaults to `--device cuda:0`, `--backend inductor`, gradient checking, a 300-second
+per-worker timeout, and MLP/convolution/attention in float32/float16/bfloat16. Repeated `--dtype`
+and `--workload` options select a subset. Standard repeat, thread, tolerance, and memory flags
+apply. `--require-rocm` rejects environments without a selected ROCm runtime and GPU device.
+It does not install drivers or change PyTorch. The command never falls back to CPU.
+
+`summary.json` and `report.html` link each case to its run, captured graphs, logs, and reproducer.
+Exit 0 means every selected case agreed; 1 means a stable discrepancy; 2 means at least one
+inconclusive or unavailable check, including when other cases disagreed. These are fixed synthetic
+component tests, not a claim of correctness for arbitrary models or GPU performance measurements.
+
 ## Useful recipes
 
 ```bash

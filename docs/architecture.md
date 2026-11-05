@@ -54,6 +54,47 @@ different eager and compiled RNG algorithms even with the same seed; this is a n
 comparison tool, not a statistical equivalence test. Complex tensors are unsupported. CPU
 validation does not establish GPU correctness.
 
+### AOT forward/backward capture
+
+`model run/compare --gradients --aot` observes the graphs produced by the selected backend's
+AOTAutograd pipeline. Inductor retains its decompositions, partitioner, and original compiler
+options. The adapter wraps the `CompiledFxGraph.current_callable` execution boundary, preserving
+the OutputCode object and its runtime hooks. AOT-eager uses boxed forward/backward compiler
+callbacks. Both record actual arguments before execution, including backward activations and
+cotangents; fake compile-time tensors are not used as numerical evidence.
+
+Diagnostic capture disables `enable_autograd_cache` so cache hits cannot bypass these callbacks.
+Inductor's generated-kernel cache stays enabled. This is an explicitly modified diagnostic
+execution mode, not an observation of unmodified cache behavior. Unsupported adapter controls
+produce `unsupported_aot`, and a passing run with no backward graph produces `aot_capture_missing`.
+Both are inconclusive. The Inductor adapter depends on private PyTorch APIs; tests and environment
+metadata identify the versions actually exercised.
+
+Each AOT graph is associated with its parent Dynamo graph, stage, and compilation ordinal. Stage
+isolation compiles only the selected stage, using eager execution for the others, and requires
+the original whole-model failure signature to recur. An independent backward graph consumes the
+captured inputs and returns gradients as ordinary outputs. It is never differentiated again.
+The manifest records `aot_stage`, static-input roles by placeholder name, and inference mode.
+Graph metadata retains output visibility and static-input flags, while binary storage preserves
+input aliases and strides. Naming static inputs avoids index drift when reduction prunes arguments.
+
+AOT graph manifests use schema version 2 so older readers reject their changed execution semantics.
+Graph JSON also uses version 2 when compiler metadata is present; existing version-1 workloads and
+job identities remain supported. Replay reports `aot_backward_outputs` or `aot_forward_outputs`.
+The backward output comparison maps numerical discrepancies to `gradient_mismatch`.
+
+Compiler metadata is deliberately limited to the fields needed by the tested adapter. A graph may
+depend on surrounding state or layout context that cannot be independently reconstructed. The
+reducer must observe a stable independent failure and a passing baseline before adopting that
+graph. If it cannot, the original workload is exported. This is particularly relevant to failures
+involving interacting compiled regions or compiler-generated layout decisions.
+
+`qualify` runs fixed MLP, convolution, and masked-attention workloads over selected floating dtypes
+on an explicit device. Each case uses the native worker, gradient oracle, AOT capture, and export
+path. Device discovery alone is not a successful execution check. No CPU fallback is permitted;
+missing ROCm/device support returns an unavailable report before running the matrix. Results are
+component checks, not a hardware certification or a benchmark.
+
 ## Execution chain
 
 `generator or trusted model capture → validated data-only IR → frozen inputs → FX graph`

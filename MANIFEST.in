@@ -4,6 +4,7 @@ recursive-include tests/faultline *.py
 include scripts/validate_faultline.py scripts/check_release.py
 include scripts/validate_upgrades.py
 include scripts/validate_native.py
+include scripts/validate_aot.py
 include examples/capture_mlp.py
 include examples/models.py
 include examples/native_models.py

@@ -18,7 +18,7 @@ jobs:
       - run: python -m ruff format --check src/faultline tests/faultline scripts examples
       - run: python scripts/check_release.py --index
       - run: python -m build
-      - run: python scripts/check_release.py dist/faultline_ml-0.4.0-py3-none-any.whl dist/faultline_ml-0.4.0.tar.gz
+      - run: python scripts/check_release.py dist/faultline_ml-0.5.0-py3-none-any.whl dist/faultline_ml-0.5.0.tar.gz
   compiler:
     runs-on: ubuntu-latest
     steps:
@@ -53,6 +53,8 @@ jobs:
         run: python scripts/validate_upgrades.py --compiler --baseline-python .baseline/bin/python --output faultline-runs/upgrades
       - name: Check original-model workloads and native graph reduction
         run: python scripts/validate_native.py --compiler --baseline-python .baseline/bin/python --output faultline-runs/native
+      - name: Check AOT backward graph capture and guarded reduction
+        run: python scripts/validate_aot.py --compiler --baseline-python .baseline/bin/python --output faultline-runs/aot
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -60,3 +62,4 @@ jobs:
           path: |
             faultline-runs/upgrades
             faultline-runs/native
+            faultline-runs/aot

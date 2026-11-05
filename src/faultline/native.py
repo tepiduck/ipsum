@@ -4,6 +4,7 @@ import copy
 import hashlib
 import json
 import random
+import re
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -45,8 +46,16 @@ def seal_native(directory, manifest):
 def verify_native(directory):
     directory = Path(directory).resolve()
     manifest = read_json(directory / "workload.json")
-    if manifest["schema_version"] != 1 or manifest["kind"] not in {"workload", "native-graph"}:
+    if manifest["schema_version"] not in {1, 2} or manifest["kind"] not in {
+        "workload",
+        "native-graph",
+    }:
         raise ValueError("Unsupported workload bundle schema")
+    if manifest["schema_version"] == 2 and (
+        manifest["kind"] != "native-graph"
+        or manifest.get("aot_stage") not in {"forward", "backward"}
+    ):
+        raise ValueError("Version-2 bundles must identify a valid AOT graph stage")
     for name, digest in manifest["files"].items():
         path = (directory / name).resolve()
         if not path.is_relative_to(directory) or not path.is_file() or file_hash(path) != digest:
@@ -67,6 +76,8 @@ class NativeJob:
     only_graph: int | None = None
     requests: tuple[int, ...] | None = None
     seed: int = 0
+    aot: bool = False
+    only_aot: str | None = None
 
     @classmethod
     def create(cls, directory, **kwargs):
@@ -79,6 +90,15 @@ class NativeJob:
     def validate(self):
         if self.operation not in {"capture", "evaluate"}:
             raise ValueError("Unsupported native operation")
+        if type(self.aot) is not bool or (
+            self.only_aot is not None
+            and (
+                not self.aot
+                or not isinstance(self.only_aot, str)
+                or not re.fullmatch(r"\d+:(?:forward|backward):\d+", self.only_aot)
+            )
+        ):
+            raise ValueError("Invalid AOT graph selection")
         if self.only_graph is not None and (
             type(self.only_graph) is not int or self.only_graph < 0
         ):
@@ -92,7 +112,7 @@ class NativeJob:
         verify_native(self.bundle)
 
     def to_dict(self):
-        return {
+        data = {
             "kind": "native",
             "bundle": self.bundle,
             "bundle_hash": self.bundle_hash,
@@ -101,6 +121,9 @@ class NativeJob:
             "requests": self.requests,
             "seed": self.seed,
         }
+        if self.aot:
+            data.update(aot=True, only_aot=self.only_aot)
+        return data
 
     def digest(self):
         # Relocating an identical bundle does not change its workload identity.
@@ -215,12 +238,84 @@ def capture_native(job):
 
 
 class GraphRecorder:
-    def __init__(self, directory, settings, only_graph=None):
+    def __init__(self, directory, settings, only_graph=None, *, aot=False, only_aot=None):
         self.directory = Path(directory)
         self.settings, self.only_graph = settings, only_graph
         self.entries = []
+        self.aot_entries = []
+        self.aot, self.only_aot = aot, only_aot
         self.enabled = True
         self.current_step = 0
+
+    def record(self, entry, module, args, metadata=None):
+        entry["calls"] += 1
+        if not self.enabled:
+            return
+        try:
+            import io
+
+            frozen = tuple(int(a) if isinstance(a, torch.SymInt) else a for a in args)
+            buffer = io.BytesIO()
+            torch.save(frozen, buffer)
+            buffer.seek(0)
+            snapshot = torch.load(buffer, map_location="cpu", weights_only=True)
+            entry["requests"].append(snapshot)
+            entry["steps"].append(self.current_step)
+            target = self.directory / entry["directory"]
+            save_native_graph(target, module, entry["requests"])
+            seal_native(
+                target,
+                {
+                    "schema_version": 2 if metadata and metadata.get("aot_stage") else 1,
+                    "kind": "native-graph",
+                    "sources": [],
+                    "seed": 0,
+                    "trace": len(entry["requests"]) > 1,
+                    "request_count": len(entry["requests"]),
+                    "origin_graph": entry.get("parent", entry["id"]),
+                    "origin_steps": entry["steps"],
+                    "captured": True,
+                    **(metadata or {}),
+                },
+            )
+            entry["portable"] = True
+        except Exception as exc:
+            entry["capture_error"] = f"{type(exc).__name__}: {exc}"
+
+    def stage_compiler(self, parent, module, inputs, stage, options):
+        from .native_aot import compile_stage
+
+        ordinal = sum(x["parent"] == parent and x["stage"] == stage for x in self.aot_entries)
+        key = f"{parent}:{stage}:{ordinal}"
+        entry = {
+            "id": key,
+            "parent": parent,
+            "stage": stage,
+            "nodes": len(list(module.graph.nodes)),
+            "calls": 0,
+            "requests": [],
+            "steps": [],
+            "portable": False,
+            "directory": f"aot-{len(self.aot_entries):04d}-{stage}",
+        }
+        self.aot_entries.append(entry)
+        original = copy.deepcopy(module)
+        placeholders = [node.name for node in module.graph.nodes if node.op == "placeholder"]
+        metadata = {
+            "aot_stage": stage,
+            "origin_aot_key": key,
+            "aot_static_inputs": [placeholders[i] for i in options.get("static_input_idxs", [])],
+            "aot_inference": options.get("is_inference", False),
+        }
+        return compile_stage(
+            module,
+            inputs,
+            self.settings.backend,
+            stage,
+            options=options,
+            selected=self.only_aot in (None, key),
+            observe=lambda values: self.record(entry, original, values, metadata),
+        )
 
     def backend(self, module, example_inputs):
         from torch._dynamo.backends.registry import lookup_backend
@@ -233,6 +328,7 @@ class GraphRecorder:
             "requests": [],
             "steps": [],
             "portable": False,
+            "directory": f"graph-{index:04d}",
         }
         self.entries.append(entry)
         original = copy.deepcopy(module)
@@ -241,50 +337,33 @@ class GraphRecorder:
         selected = self.only_graph is None or index == self.only_graph
         transformed = mutate_native(module, mutant) if selected and mutant else module
         # Backend selection is explicit; the eager graphs here implement graph isolation.
-        if not selected or backend == "eager" or mutant:
+        if selected and self.aot and backend != "eager":
+            from .native_aot import compile_pipeline
+
+            compiled = compile_pipeline(
+                module,
+                example_inputs,
+                backend,
+                lambda graph, args, stage, options: self.stage_compiler(
+                    index, graph, args, stage, options
+                ),
+            )
+        elif not selected or backend == "eager" or mutant:
             compiled = transformed.forward
         else:
             compiled = lookup_backend(backend)(transformed, example_inputs)
 
         def execute(*args):
-            entry["calls"] += 1
-            if self.enabled:
-                try:
-                    frozen = tuple(int(a) if isinstance(a, torch.SymInt) else a for a in args)
-                    # Snapshot before execution, so in-place operators cannot corrupt evidence.
-                    import io
-
-                    buffer = io.BytesIO()
-                    torch.save(frozen, buffer)
-                    buffer.seek(0)
-                    snapshot = torch.load(buffer, map_location="cpu", weights_only=True)
-                    entry["requests"].append(snapshot)
-                    entry["steps"].append(self.current_step)
-                    target = self.directory / f"graph-{index:04d}"
-                    save_native_graph(target, original, entry["requests"])
-                    seal_native(
-                        target,
-                        {
-                            "schema_version": 1,
-                            "kind": "native-graph",
-                            "sources": [],
-                            "seed": 0,
-                            "trace": len(entry["requests"]) > 1,
-                            "request_count": len(entry["requests"]),
-                            "origin_graph": index,
-                            "origin_steps": entry["steps"],
-                            "captured": True,
-                        },
-                    )
-                    entry["portable"] = True
-                except Exception as exc:
-                    entry["capture_error"] = f"{type(exc).__name__}: {exc}"
+            self.record(entry, original, args)
             return compiled(*args)
 
         return execute
 
-    def summary(self):
-        return [{k: v for k, v in entry.items() if k != "requests"} for entry in self.entries]
+    def summary(self, aot=False):
+        return [
+            {k: v for k, v in entry.items() if k != "requests"}
+            for entry in (self.aot_entries if aot else self.entries)
+        ]
 
 
 def evaluate_native(job, settings, directory):
@@ -300,22 +379,40 @@ def evaluate_native(job, settings, directory):
         "mutant:relu-as-neg",
         "mutant:sum-as-mean",
         "mutant:gradient-scale",
+        "mutant:aot-backward-scale",
     }:
         raise ValueError("This mutant is not supported for native workloads")
     if not manifest.get("captured"):
         raise ValueError("Workload snapshot is incomplete")
+    if job.aot and (not settings.gradients or manifest["kind"] != "workload"):
+        raise ValueError("AOT capture requires a whole-model workload and --gradients")
+    if settings.backend == "mutant:aot-backward-scale" and not (
+        job.aot or manifest.get("aot_stage")
+    ):
+        raise ValueError("The backward compiler mutant requires --aot or a saved AOT graph")
     torch._dynamo.reset()
     bundle, directory = Path(job.bundle), Path(directory)
     recorders = []
 
     def make_execution(candidate=False):
         recorder = (
-            GraphRecorder(directory / "graphs", settings, job.only_graph) if candidate else None
+            GraphRecorder(
+                directory / "graphs", settings, job.only_graph, aot=job.aot, only_aot=job.only_aot
+            )
+            if candidate
+            else None
         )
         if recorder:
             recorders.append(recorder)
 
         def compile_model(model, is_graph):
+            if is_graph and manifest.get("aot_stage"):
+                from .native_aot import replay_stage_backend
+
+                return compile_native_graph(
+                    model,
+                    lambda gm, args: replay_stage_backend(gm, args, settings.backend, manifest),
+                )
             if not is_graph:
                 return torch.compile(model, backend=recorder.backend, dynamic=settings.dynamic)
             return compile_native_graph(model, recorder.backend)
@@ -331,13 +428,30 @@ def evaluate_native(job, settings, directory):
             step_hook=(lambda n: setattr(recorder, "current_step", n)) if recorder else None,
         )
 
-    result = check_native(
-        make_execution(), lambda: make_execution(True), settings.to_dict(), portable
-    )
+    from .native_aot import AOTUnsupported, annotate_aot_result, capture_context
+
+    try:
+        with capture_context(job.aot):
+            result = check_native(
+                make_execution(), lambda: make_execution(True), settings.to_dict(), portable
+            )
+    except AOTUnsupported as exc:
+        result = {"status": "unsupported_aot", "error": str(exc)}
     graphs = [entry for recorder in recorders for entry in recorder.summary()]
-    if not graphs and settings.backend in {"inductor", "aot_eager"} and result["status"] == "pass":
+    if (
+        not graphs
+        and not manifest.get("aot_stage")
+        and settings.backend in {"inductor", "aot_eager"}
+        and result["status"] == "pass"
+    ):
         result["status"] = "no_compiled_graph"
+    aot_graphs = [entry for recorder in recorders for entry in recorder.summary(aot=True)]
+    annotate_aot_result(
+        result, manifest, job.aot, aot_graphs if settings.backend != "eager" else None
+    )
     atomic_json(directory / "graphs.json", graphs)
+    if job.aot:
+        atomic_json(directory / "aot-graphs.json", aot_graphs)
     result.update(
         graphs=graphs,
         graph_count=len(graphs),
@@ -345,7 +459,13 @@ def evaluate_native(job, settings, directory):
         request_count=len(job.requests) if job.requests else manifest["request_count"],
         native=True,
         full_workload_preserved=True,
-        loss_definition="sum(output.square().mean()) over floating tensor outputs",
+        loss_definition=(
+            "Saved first-order backward cotangents; no second derivatives"
+            if manifest.get("aot_stage") == "backward"
+            else "Saved AOT forward outputs; no additional differentiation"
+            if manifest.get("aot_stage")
+            else "sum(output.square().mean()) over floating tensor outputs"
+        ),
     )
     return result
 

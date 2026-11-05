@@ -41,7 +41,7 @@ def export_native(job, settings, output, expected=None):
     output.mkdir(parents=True, exist_ok=False)
     bundle = copy_workload(job.bundle, output / "workload")
     source = Path(__file__).parent
-    for name in ("native_runtime.py", "native_graph.py", "portable.py"):
+    for name in ("native_runtime.py", "native_graph.py", "native_aot.py", "portable.py"):
         shutil.copyfile(source / name, output / name)
     shutil.copyfile(source / "native_repro.py", output / "repro.py")
     manifest = verify_native(bundle)
@@ -49,6 +49,7 @@ def export_native(job, settings, output, expected=None):
         "repro.py",
         "native_runtime.py",
         "native_graph.py",
+        "native_aot.py",
         "portable.py",
         "workload/workload.json",
         *["workload/" + name for name in manifest["files"]],
@@ -60,6 +61,8 @@ def export_native(job, settings, output, expected=None):
             "settings": settings.to_dict(),
             "expected": expected,
             "only_graph": job.only_graph,
+            "aot": job.aot,
+            "only_aot": job.only_aot,
             "requests": job.requests,
             "files": {name: file_hash(output / name) for name in names},
         },
@@ -78,31 +81,55 @@ def write_native_report(output, summary):
     output = Path(output)
     atomic_json(output / "summary.json", summary)
     body = html.escape(json.dumps(summary, indent=2))
-    links = [
-        '<a href="workload/workload.json">Workload manifest</a>',
-        '<a href="summary.json">JSON result</a>',
-    ]
+    links = ['<a href="summary.json">JSON result</a>']
+    if (output / "workload" / "workload.json").exists():
+        links.append('<a href="workload/workload.json">Workload manifest</a>')
+    if (output / "run" / "aot-graphs.json").exists():
+        links.append('<a href="run/aot-graphs.json">AOT graph index</a>')
     for name in ("candidate", "baseline", "run"):
         if (output / name).exists():
             links.append(f'<a href="{name}/outcome.json">{name} outcome</a>')
+    table = ""
+    if summary.get("cases"):
+        rows = []
+        for case in summary["cases"]:
+            label = html.escape(case["id"])
+            if case.get("report"):
+                label = f'<a href="{html.escape(case["report"], quote=True)}">{label}</a>'
+            rows.append(f"<tr><td>{label}</td><td>{html.escape(case['status'])}</td></tr>")
+        table = "<table><tr><th>Workload</th><th>Outcome</th></tr>" + "".join(rows) + "</table>"
     (output / "report.html").write_text(
         '<!doctype html><meta charset="utf-8"><title>Faultline model comparison</title>'
         "<style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:0 20px}"
         "pre{white-space:pre-wrap;overflow-wrap:anywhere}a{margin-right:20px}</style>"
-        "<h1>Model comparison</h1>" + " ".join(links) + f"<pre>{body}</pre>",
+        "<h1>Model comparison</h1>" + " ".join(links) + table + f"<pre>{body}</pre>",
         encoding="utf-8",
     )
 
 
 def run_native(
-    bundle, output, settings, *, python=None, expected=None, only_graph=None, requests=None
+    bundle,
+    output,
+    settings,
+    *,
+    python=None,
+    expected=None,
+    only_graph=None,
+    requests=None,
+    aot=False,
+    only_aot=None,
 ):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     copied = copy_workload(bundle, output / "workload")
-    job = NativeJob.create(copied, only_graph=only_graph, requests=requests)
+    job = NativeJob.create(
+        copied, only_graph=only_graph, requests=requests, aot=aot, only_aot=only_aot
+    )
     atomic_json(output / "settings.json", settings.to_dict())
-    atomic_json(output / "selection.json", {"only_graph": only_graph, "requests": requests})
+    atomic_json(
+        output / "selection.json",
+        {"only_graph": only_graph, "requests": requests, "aot": aot, "only_aot": only_aot},
+    )
     result = run_case(job, settings, output / "run", python=interpreter(python or sys.executable))
     atomic_json(
         output / "evidence.json",
@@ -126,6 +153,8 @@ def run_native(
         "status": result["status"],
         "exit_code": code,
         "graph_count": result.get("graph_count", 0),
+        "aot_graph_count": len(result.get("aot_graphs", [])),
+        "observation_mode": result.get("observation_mode", "model_outputs_and_gradients"),
         "parameter_count": result.get("parameter_count"),
         "injected_fault": settings.backend.startswith("mutant:"),
         "case_hash": job.digest(),
@@ -179,6 +208,7 @@ def compare_native_environments(
     candidate_settings=None,
     reduce=False,
     max_evaluations=32,
+    aot=False,
 ):
     candidate_settings = candidate_settings or settings
     a, b = settings.to_dict(), candidate_settings.to_dict()
@@ -189,7 +219,7 @@ def compare_native_environments(
     baseline_python, candidate_python = interpreter(baseline_python), interpreter(candidate_python)
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
-    job = NativeJob.create(copy_workload(bundle, output / "workload"))
+    job = NativeJob.create(copy_workload(bundle, output / "workload"), aot=aot)
     baseline = run_case(job, settings, output / "baseline", python=baseline_python)
     candidate = run_case(job, candidate_settings, output / "candidate", python=candidate_python)
     label = classification(baseline, candidate)

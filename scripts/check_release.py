@@ -29,6 +29,7 @@ FILES = {
     "scripts/validate_faultline.py",
     "scripts/validate_upgrades.py",
     "scripts/validate_native.py",
+    "scripts/validate_aot.py",
     "scripts/check_release.py",
 }
 SOURCE_PREFIXES = ("src/faultline/", "tests/faultline/")

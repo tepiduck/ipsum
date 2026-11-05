@@ -40,7 +40,7 @@ was exhausted, so local irreducibility is not claimed. The reduced candidate rep
 worker and an independent standalone script with matching comparison metrics and failure signature.
 A captured MLP using Linear, LayerNorm, and ReLU also passed CPU TorchInductor comparison.
 
-**Confirmed upstream bugs: zero.** No upstream issue has been submitted for the numerical candidate.
+**New upstream bug discoveries: zero.** No upstream issue has been submitted for the numerical candidate.
 
 ## Coverage and limits
 
@@ -153,3 +153,51 @@ python scripts/validate_native.py --compiler --large --baseline-python .baseline
 Add `--historical-python .historical/bin/python` with PyTorch 2.12.0, NumPy, and psutil to run the
 historical bug check. Omit `--large` for the smaller CI workload. Public summaries omit local paths
 and exact model data; full evidence remains in the chosen output directory.
+
+## Version 0.5 backward graphs and device checks
+
+The AOT validation ran on CPU under Ubuntu/WSL and Python 3.12.3, using PyTorch 2.14.1, 2.15.0,
+and a separate 2.12.0 historical environment. The comparison retained two repeats, one CPU thread,
+and the existing dtype-dependent tolerances. AOTAutograd caching was disabled for graph capture;
+Inductor's kernel cache stayed enabled.
+
+- A controlled fault doubled the backward graph's outputs while preserving forward results.
+  Whole-model isolation retained the gradient failure. Independent graph reduction went from
+  **12 operations / 597,504 tensor input elements to 4 operations / 3,072 elements** in seven
+  dual-environment evaluations. Every accepted proposal passed in the baseline, and final fresh
+  workers confirmed both outcomes. Separate exported scripts reproduced the passing baseline
+  and injected gradient failure.
+- The same native workload passed actual Inductor forward/backward checks on 2.14.1 and 2.15.0.
+  Its independently captured backward graph also passed on 2.15.0, including standalone replay.
+  These replays execute saved derivative operations without taking second derivatives.
+- A five-by-five `diagonal_scatter(...).sum()` fixture reproduced the gradient error described in
+  [PyTorch issue #182012](https://github.com/pytorch/pytorch/issues/182012). Forward results agreed
+  on both versions; gradients failed on 2.12.0 and agreed on 2.15.0. Compiling only the backward
+  stage retained the original full-model failure. The independent **four-operation backward graph**
+  reproduced it with one scalar cotangent input. Its only bypass proposal removed the failure and
+  was rejected. Five dual-environment evaluations, including final confirmation, left the graph
+  unchanged. Both exported scripts reproduced their expected outcomes. Preserving Inductor's
+  output-visibility metadata was necessary to retain this failure in the independent graph.
+
+The historical release was deliberately selected as the failing candidate. This is a known bug
+reproduction, not a new discovery or a claim that a current upgrade regressed. Controlled faults
+are labeled separately in artifacts. Reduction does not claim a globally minimal graph.
+
+`faultline qualify --device cpu --repeats 2` passed all **nine** combinations of MLP, convolution,
+and boolean-masked attention with float32, float16, and bfloat16 on Inductor 2.15.0. Each performed
+forward/backward checks with AOT capture. `qualify --require-rocm` returned `unavailable` on the local
+CPU-only PyTorch installation and ran no fallback cases. AMD hardware execution is still unvalidated.
+The matrix is a fixed set of small components, not evidence of arbitrary-model or full-training coverage.
+
+The compiler suite now also checks independent AOT backward replay. Portable tests cover backward
+stage isolation, baseline-preserving reduction, standalone parity, saved AOT policy, compiler
+metadata serialization, static-input roles after argument pruning, and unavailable-device behavior.
+The two-environment CI job runs the AOT experiment in addition to the existing model/upgrade checks.
+
+```bash
+python scripts/validate_aot.py --compiler --baseline-python .baseline/bin/python --output faultline-runs/aot-validation
+```
+
+Add `--historical-python .historical/bin/python` with PyTorch 2.12.0, NumPy, and psutil to check the
+known backward bug. The Inductor adapter uses private compiler interfaces tested on the releases
+listed above; other PyTorch versions and GPU code paths need their own validation.

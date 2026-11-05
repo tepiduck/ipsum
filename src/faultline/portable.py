@@ -40,6 +40,8 @@ def same_failure(baseline, result):
         and result.get("dynamic", False) == baseline.get("dynamic", False)
         and result.get("trace", False) == baseline.get("trace", False)
         and result.get("native", False) == baseline.get("native", False)
+        and result.get("aot", False) == baseline.get("aot", False)
+        and result.get("graph_stage", "dynamo") == baseline.get("graph_stage", "dynamo")
     )
 
 

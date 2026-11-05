@@ -21,6 +21,11 @@ def add_model_commands(commands, execution_options):
         command = sub.add_parser(name, help="check a frozen native workload")
         command.add_argument("bundle", type=Path)
         execution_options(command)
+        command.add_argument(
+            "--aot",
+            action="store_true",
+            help="capture compiler forward/backward graphs; requires --gradients",
+        )
         if name == "run":
             command.add_argument("--python", default=sys.executable)
         else:
@@ -61,7 +66,9 @@ def model_command(args, settings_from):
         print(f"Captured workload: {path}")
         return 0
     if args.model_command == "run":
-        result = run_native(args.bundle, args.output, settings_from(args), python=args.python)
+        result = run_native(
+            args.bundle, args.output, settings_from(args), python=args.python, aot=args.aot
+        )
     elif args.model_command == "compare":
         settings = settings_from(args)
         candidate = replace(settings, backend=args.candidate_backend or settings.backend)
@@ -74,6 +81,7 @@ def model_command(args, settings_from):
             candidate,
             args.reduce,
             args.max_evaluations,
+            aot=args.aot,
         )
         print(
             json.dumps(
@@ -111,6 +119,8 @@ def model_command(args, settings_from):
             expected=expected,
             only_graph=job.only_graph,
             requests=job.requests,
+            aot=job.aot,
+            only_aot=job.only_aot,
         )
     print(json.dumps(result, indent=2))
     return result["exit_code"]

@@ -140,10 +140,15 @@ def graph_spec(module):
                 "args": encode_native(node.args, tensors),
                 "kwargs": encode_native(node.kwargs, tensors),
                 "tensor_meta": tensor_metadata(node),
+                "compiler_meta": {
+                    key: node.meta[key]
+                    for key in ("user_visible_output_idxs", "is_static_input")
+                    if key in node.meta
+                },
             }
         )
     return {
-        "schema_version": 1,
+        "schema_version": 2 if any(node["compiler_meta"] for node in nodes) else 1,
         "kind": "native-graph",
         "nodes": nodes,
         "attributes": attributes,
@@ -160,7 +165,7 @@ def tensor_metadata(node):
 
 
 def build_native_graph(spec, tensors, device=None):
-    if spec.get("schema_version") != 1 or spec.get("kind") != "native-graph":
+    if spec.get("schema_version") not in {1, 2} or spec.get("kind") != "native-graph":
         raise ValueError("Unsupported native graph schema")
     graph, root, nodes = torch.fx.Graph(), torch.nn.Module(), {}
     for path, encoded in spec["attributes"].items():
@@ -184,6 +189,7 @@ def build_native_graph(spec, tensors, device=None):
         kwargs = decode_native(node["kwargs"], nodes, tensors, device)
         nodes[node["name"]] = graph.create_node(op, target, args, kwargs, name=node["name"])
         nodes[node["name"]].meta["faultline_tensor"] = node.get("tensor_meta")
+        nodes[node["name"]].meta.update(node.get("compiler_meta", {}))
     graph.lint()
     return torch.fx.GraphModule(root, graph)
 

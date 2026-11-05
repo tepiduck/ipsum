@@ -95,6 +95,8 @@ def reduce_native(
         copy_workload(job.bundle, output / "original"),
         only_graph=job.only_graph,
         requests=job.requests,
+        aot=job.aot,
+        only_aot=job.only_aot,
     )
     attempts, calls = [], 0
     last_baseline = None
@@ -161,19 +163,32 @@ def reduce_native(
     localization = []
     native = manifest["kind"] == "native-graph"
     if not native:
-        for graph in observed.get("graphs", []):
+        graphs = observed.get("aot_graphs", []) if job.aot else observed.get("graphs", [])
+        if job.aot:
+            preferred = "backward" if expected["status"] == "gradient_mismatch" else "forward"
+            graphs = sorted(graphs, key=lambda entry: entry["stage"] != preferred)
+        for graph in graphs:
             if not graph.get("portable") or calls >= max_evaluations - 2:
                 continue
-            isolated = replace(best, only_graph=graph["id"])
+            isolated = replace(
+                best,
+                only_graph=graph["parent"] if job.aot else graph["id"],
+                only_aot=graph["id"] if job.aot else None,
+            )
             result, path = evaluate(isolated, "isolate-graph-in-original-model")
             record = {
                 "graph": graph["id"],
+                "stage": graph.get("stage", "dynamo"),
                 "whole_model_failure_retained": same_failure(target, result),
             }
             localization.append(record)
             if not record["whole_model_failure_retained"]:
                 continue
-            graph_path = path / "graphs" / f"graph-{graph['id']:04d}"
+            graph_path = (
+                path
+                / "graphs"
+                / graph.get("directory", f"graph-{graph['id']:04d}" if not job.aot else "missing")
+            )
             if not (graph_path / "workload.json").exists() or calls >= max_evaluations - 1:
                 continue
             proposal = NativeJob.create(graph_path)
@@ -188,6 +203,12 @@ def reduce_native(
     before = after = None
     if native:
         module, requests, _ = load_native_graph(best.bundle)
+        graph_manifest = verify_native(best.bundle)
+        stage_metadata = {
+            key: graph_manifest[key]
+            for key in ("aot_stage", "aot_static_inputs", "aot_inference", "origin_aot_key")
+            if key in graph_manifest
+        }
         if best.requests is not None:
             requests = [requests[i] for i in best.requests]
         before = graph_complexity(module, requests)
@@ -201,13 +222,14 @@ def reduce_native(
                 seal_native(
                     directory,
                     {
-                        "schema_version": 1,
+                        "schema_version": 2 if stage_metadata.get("aot_stage") else 1,
                         "kind": "native-graph",
                         "sources": [],
                         "seed": best.seed,
                         "trace": len(inputs) > 1,
                         "request_count": len(inputs),
                         "captured": True,
+                        **stage_metadata,
                     },
                 )
                 proposal = NativeJob.create(directory)
@@ -227,6 +249,7 @@ def reduce_native(
         "evaluations": calls,
         "budget_exhausted": calls >= max_evaluations,
         "native_graph": native,
+        "graph_stage": verify_native(best.bundle).get("aot_stage", "dynamo"),
         "original_complexity": before,
         "reduced_complexity": after,
         "retained_requests": list(best.requests) if best.requests else None,

@@ -332,6 +332,7 @@ def make_native_execution(
     """Construct one eager/compiled callable, restoring saved state for each whole trace."""
     bundle = Path(bundle)
     device = settings["device"]
+    gradients = settings.get("gradients", False) and not manifest.get("aot_stage")
     is_graph = manifest["kind"] == "native-graph"
     if is_graph:
         model, _, spec = graph_loader(bundle, device)
@@ -368,13 +369,13 @@ def make_native_execution(
             before_run(invocations)
         with (
             workload_imports(bundle),
-            torch.enable_grad() if settings.get("gradients", False) else torch.no_grad(),
+            torch.enable_grad() if gradients else torch.no_grad(),
         ):
             result = observe_native(
                 model,
                 fn,
                 requests,
-                settings.get("gradients", False),
+                gradients,
                 compile_model is not None and settings["backend"] == "mutant:gradient-scale",
                 step_hook,
             )

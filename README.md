@@ -70,8 +70,20 @@ CPU Inductor requires a C++ toolchain and Python development headers. It has bee
 Ubuntu/WSL. `doctor --probe` checks whether the selected backend works in your environment.
 
 For AMD GPUs, use a compatible PyTorch/ROCm installation and `--device cuda:0`; ROCm uses PyTorch's
-`cuda` namespace. GPU execution has not yet been validated on hardware. Unavailable devices are
-reported explicitly. The host-memory limit does not cover GPU memory.
+`cuda` namespace. To check that installation:
+
+```bash
+faultline qualify --device cuda:0 --require-rocm --output faultline-runs/rocm-check
+```
+
+This runs forward/backward checks for MLP, convolution, and masked attention in float32, float16,
+and bfloat16, with a report for each case. Use `--dtype float32` or `--workload attention` to narrow
+the matrix. Omit `--require-rocm` for NVIDIA, or select `--device cpu` for CPU checks. Missing
+devices produce an unavailable result; the command does not substitute CPU execution.
+
+GPU execution has not yet been validated on hardware. The host-memory limit does not cover GPU
+memory. Consult AMD's [ROCm compatibility documentation](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/compatibility/compatibilityrad/wsl/wsl_compatibility.html)
+for the supported GPU, driver, OS, and PyTorch combinations.
 
 ## Checking an existing model
 
@@ -129,6 +141,22 @@ and dead-code removal. Every accepted change must retain the stable failure; upg
 must also keep the baseline passing. A fresh worker confirms the final result. If a graph cannot
 be isolated or serialized, the full model reproducer remains available. Shape reduction and
 minification across interacting graphs are not implemented for native workloads.
+
+For a gradient failure, add `--aot` to capture the compiler's forward and backward graphs:
+
+```bash
+faultline model compare workloads/my-model --baseline-python .baseline/bin/python --candidate-python .candidate/bin/python --gradients --aot --reduce --timeout 600 --max-rss-mb 8192 --output faultline-runs/backward-upgrade
+```
+
+The reducer first checks whether compiling a single backward graph still causes the original
+model's failure. It then tries replaying that graph with its captured activations and cotangents,
+and reducing it independently. The standalone reproducer runs the saved derivative graph directly;
+it does not differentiate it a second time. Forward failures can be isolated the same way.
+
+AOT capture uses version-dependent PyTorch compiler hooks and disables the AOTAutograd cache for
+the diagnostic run. Kernel caching remains enabled. If an independent graph loses the failure,
+the full-model reproducer is retained. See [architecture](docs/architecture.md) for the boundary
+between whole-model evidence and an independently reproduced graph failure.
 
 The native path has no compact-IR tensor-size or operator-count caps. It still needs enough memory
 for the model, compiler, frozen inputs, and comparison observations. It supports evaluation-mode
@@ -244,6 +272,8 @@ reproducers. See [comparison classifications and exit codes](docs/cli.md).
 | `ui` | Open the terminal menu |
 | `demo` | Run the injected-fault example |
 | `doctor` | Inspect runtime and optionally probe compilation |
+| `qualify` | Check forward/backward execution across a device's dtype/workload matrix |
+| `model` | Capture, compare, replay, reduce, or export original-model workloads |
 | `generate` | Create a seeded, frozen JSON case |
 | `capture` | Import a trusted model factory into frozen JSON |
 | `trace` | Combine compatible cases into an ordered request sequence |
@@ -270,6 +300,7 @@ python -m pytest -q -m compiler
 python -m ruff check src/faultline tests/faultline scripts/validate_faultline.py scripts/validate_upgrades.py scripts/check_release.py examples
 python scripts/validate_faultline.py --compiler --output faultline-runs/validation
 python scripts/validate_upgrades.py --compiler --output faultline-runs/upgrades
+python scripts/validate_aot.py --compiler --output faultline-runs/aot
 python -m build
 ```
 

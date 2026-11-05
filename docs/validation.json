@@ -1,4 +1,177 @@
 {
+  "aot_backward_validation": {
+    "cpu_qualification": {
+      "backend": "inductor",
+      "cases": [
+        {
+          "id": "mlp-float32",
+          "status": "pass"
+        },
+        {
+          "id": "convolution-float32",
+          "status": "pass"
+        },
+        {
+          "id": "attention-float32",
+          "status": "pass"
+        },
+        {
+          "id": "mlp-float16",
+          "status": "pass"
+        },
+        {
+          "id": "convolution-float16",
+          "status": "pass"
+        },
+        {
+          "id": "attention-float16",
+          "status": "pass"
+        },
+        {
+          "id": "mlp-bfloat16",
+          "status": "pass"
+        },
+        {
+          "id": "convolution-bfloat16",
+          "status": "pass"
+        },
+        {
+          "id": "attention-bfloat16",
+          "status": "pass"
+        }
+      ],
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 4096,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 300
+      },
+      "status": "pass",
+      "torch": "2.15.0+cpu"
+    },
+    "date": "2026-11-05T22:15:06.824964+00:00",
+    "environment": {
+      "device": "cpu",
+      "os": "Ubuntu 24.04 / WSL",
+      "python": "3.12.3"
+    },
+    "experiment_source_sha256": "8c12469b66b5b61089244fbdec641aaf602ff5ebf512490f818c3a23f5d3bb82",
+    "experiments": [
+      {
+        "baseline-reproducer": {
+          "exit_code": 0,
+          "reproduces_expected": true,
+          "status": "pass"
+        },
+        "baseline_status": "pass",
+        "baseline_torch": "2.14.1+cpu",
+        "candidate_status": "gradient_mismatch",
+        "candidate_torch": "2.15.0+cpu",
+        "classification": "regression",
+        "forward_unchanged": true,
+        "injected_fault": true,
+        "name": "backward-mutant",
+        "reduction": {
+          "confirmed": true,
+          "evaluations": 7,
+          "graph_stage": "backward",
+          "native_graph": true,
+          "original_complexity": [
+            1,
+            12,
+            597504
+          ],
+          "reduced_complexity": [
+            1,
+            4,
+            3072
+          ]
+        },
+        "reproducer": {
+          "exit_code": 1,
+          "reproduces_expected": true,
+          "status": "gradient_mismatch"
+        },
+        "stages": [
+          "backward",
+          "forward"
+        ]
+      },
+      {
+        "baseline_status": "pass",
+        "baseline_torch": "2.14.1+cpu",
+        "candidate_status": "pass",
+        "candidate_torch": "2.15.0+cpu",
+        "classification": "agreement",
+        "forward_unchanged": true,
+        "injected_fault": false,
+        "name": "inductor",
+        "stages": [
+          "backward",
+          "forward"
+        ]
+      },
+      {
+        "exit_code": 0,
+        "name": "independent-backward-inductor",
+        "reproduces_expected": true,
+        "status": "pass"
+      },
+      {
+        "baseline-reproducer": {
+          "exit_code": 0,
+          "reproduces_expected": true,
+          "status": "pass"
+        },
+        "baseline_status": "pass",
+        "baseline_torch": "2.15.0+cpu",
+        "candidate_status": "gradient_mismatch",
+        "candidate_torch": "2.12.0+cpu",
+        "classification": "regression",
+        "forward_unchanged": true,
+        "injected_fault": false,
+        "name": "historical-182012",
+        "reduction": {
+          "confirmed": true,
+          "evaluations": 5,
+          "graph_stage": "backward",
+          "native_graph": true,
+          "original_complexity": [
+            1,
+            4,
+            1
+          ],
+          "reduced_complexity": [
+            1,
+            4,
+            1
+          ]
+        },
+        "reproducer": {
+          "exit_code": 1,
+          "reproduces_expected": true,
+          "status": "gradient_mismatch"
+        },
+        "stages": [
+          "backward",
+          "forward"
+        ]
+      }
+    ],
+    "note": "Historical issue #182012 reproduced on CPU; no new upstream bug discovery or GPU execution claim. Controlled faults remain explicitly labeled. Diagnostic AOT capture disables AOTAutograd caching.",
+    "rocm_check": {
+      "executed_cases": 0,
+      "reason": "ROCm was required, but this interpreter has no selected ROCm device/runtime",
+      "status": "unavailable"
+    },
+    "validation_passed": true,
+    "version": "0.5.0"
+  },
   "checks": [
     {
       "name": "eager-control",

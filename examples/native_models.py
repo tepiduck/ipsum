@@ -58,3 +58,15 @@ def reduction_demo():
     torch.manual_seed(21)
     model = nn.Sequential(nn.Linear(768, 768), nn.ReLU(), nn.Sigmoid(), nn.Tanh()).eval()
     return model, (torch.randn(2, 768),)
+
+
+class DiagonalScatterReduction(nn.Module):
+    """Historical backward regression: https://github.com/pytorch/pytorch/issues/182012."""
+
+    def forward(self, matrix, replacements):
+        return torch.diagonal_scatter(matrix, replacements).sum()
+
+
+def scatter_backward():
+    torch.manual_seed(18)
+    return DiagonalScatterReduction().eval(), (torch.randn(5, 5), torch.randn(5))

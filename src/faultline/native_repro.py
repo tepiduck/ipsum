@@ -4,6 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
+import native_aot
 import native_graph
 import native_runtime
 import portable
@@ -30,11 +31,13 @@ def main():
         return 2
     torch._dynamo.reset()
     compiled_graphs = []
+    aot_graphs = []
 
     def compile_model(model, is_graph):
         from torch._dynamo.backends.registry import lookup_backend
 
         compiled_graphs.clear()
+        aot_graphs.clear()
 
         def backend(module, inputs):
             index = len(compiled_graphs)
@@ -43,10 +46,33 @@ def main():
             name = settings["backend"]
             if not selected or name == "eager":
                 return module.forward
+            if config.get("aot"):
+
+                def stage_compiler(graph, args, stage, options):
+                    ordinal = sum(x["parent"] == index and x["stage"] == stage for x in aot_graphs)
+                    key = f"{index}:{stage}:{ordinal}"
+                    aot_graphs.append({"parent": index, "stage": stage, "id": key})
+                    return native_aot.compile_stage(
+                        graph,
+                        args,
+                        name,
+                        stage,
+                        options=options,
+                        selected=config.get("only_aot") in (None, key),
+                    )
+
+                return native_aot.compile_pipeline(module, inputs, name, stage_compiler)
             if name.startswith("mutant:"):
                 return native_graph.mutate_native(module, name.split(":", 1)[1]).forward
             return lookup_backend(name)(module, inputs)
 
+        if is_graph and manifest.get("aot_stage"):
+            return native_runtime.compile_native_graph(
+                model,
+                lambda gm, args: native_aot.replay_stage_backend(
+                    gm, args, settings["backend"], manifest
+                ),
+            )
         if not is_graph:
             return torch.compile(model, backend=backend, dynamic=settings.get("dynamic", False))
         return native_runtime.compile_native_graph(model, backend)
@@ -61,13 +87,26 @@ def main():
             requests_selection=config.get("requests"),
         )
 
-    result = native_runtime.check_native(execution(), lambda: execution(True), settings, portable)
+    try:
+        with native_aot.capture_context(config.get("aot", False)):
+            result = native_runtime.check_native(
+                execution(), lambda: execution(True), settings, portable
+            )
+    except native_aot.AOTUnsupported as exc:
+        result = {"status": "unsupported_aot", "error": str(exc)}
     if (
         not compiled_graphs
+        and not manifest.get("aot_stage")
         and settings["backend"] in {"inductor", "aot_eager"}
         and result["status"] == "pass"
     ):
         result["status"] = "no_compiled_graph"
+    native_aot.annotate_aot_result(
+        result,
+        manifest,
+        config.get("aot", False),
+        aot_graphs if settings["backend"] != "eager" else None,
+    )
     result.update(
         backend=settings["backend"],
         device=settings["device"],

@@ -112,6 +112,15 @@ def main(argv=None):
     from .model_cli import add_model_commands, model_command
 
     add_model_commands(commands, execution_options)
+    qualify = commands.add_parser(
+        "qualify", help="check a device/compiler across dtypes and backward graphs"
+    )
+    execution_options(qualify)
+    qualify.set_defaults(device="cuda:0", gradients=True, timeout=300)
+    qualify.add_argument("--dtype", action="append", choices=("float32", "float16", "bfloat16"))
+    qualify.add_argument("--workload", action="append", choices=("mlp", "convolution", "attention"))
+    qualify.add_argument("--require-rocm", action="store_true")
+    qualify.add_argument("--output", type=Path, required=True)
     ui = commands.add_parser("ui", help="open the interactive terminal interface")
     ui.add_argument("--workspace", type=Path, default=Path("faultline-runs"))
     demo = commands.add_parser("demo", help="detect and shrink a controlled fault, end to end")
@@ -181,6 +190,27 @@ def main(argv=None):
     report.add_argument("--open", action="store_true", help="open the local report in your browser")
     args = parser.parse_args(argv)
     try:
+        if args.command == "qualify":
+            from .qualify import qualify_device
+
+            result = qualify_device(
+                args.output,
+                settings_from(args),
+                dtypes=args.dtype or ("float32", "float16", "bfloat16"),
+                workloads=args.workload or ("mlp", "convolution", "attention"),
+                require_rocm=args.require_rocm,
+            )
+            print(
+                json.dumps(
+                    {
+                        "status": result["status"],
+                        "reason": result.get("reason"),
+                        "report": str(args.output / "report.html"),
+                    },
+                    indent=2,
+                )
+            )
+            return result["exit_code"]
         if args.command == "model":
             return model_command(args, settings_from)
         if args.command == "ui":
