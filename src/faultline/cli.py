@@ -109,6 +109,9 @@ def main(argv=None):
     )
     parser.add_argument("--version", action="version", version=f"Faultline {__version__}")
     commands = parser.add_subparsers(dest="command", required=True)
+    from .model_cli import add_model_commands, model_command
+
+    add_model_commands(commands, execution_options)
     ui = commands.add_parser("ui", help="open the interactive terminal interface")
     ui.add_argument("--workspace", type=Path, default=Path("faultline-runs"))
     demo = commands.add_parser("demo", help="detect and shrink a controlled fault, end to end")
@@ -178,6 +181,8 @@ def main(argv=None):
     report.add_argument("--open", action="store_true", help="open the local report in your browser")
     args = parser.parse_args(argv)
     try:
+        if args.command == "model":
+            return model_command(args, settings_from)
         if args.command == "ui":
             from .ui import launch
 

@@ -126,7 +126,7 @@ def run_case(case, settings, directory, *, python=None):
         "injected_fault": settings.backend.startswith("mutant:"),
         "gradients": settings.gradients,
         "dynamic": settings.dynamic,
-        "trace": case.to_dict().get("kind") == "trace",
+        "trace": case.to_dict().get("kind") in {"trace", "native"},
         "worker_wall_s": time.monotonic() - start,
         "peak_tree_rss_mb": peak / 1024**2,
         "worker_returncode": process.returncode,

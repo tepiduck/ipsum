@@ -25,8 +25,10 @@ FILES = {
     "docs/validation.json",
     "examples/capture_mlp.py",
     "examples/models.py",
+    "examples/native_models.py",
     "scripts/validate_faultline.py",
     "scripts/validate_upgrades.py",
+    "scripts/validate_native.py",
     "scripts/check_release.py",
 }
 SOURCE_PREFIXES = ("src/faultline/", "tests/faultline/")

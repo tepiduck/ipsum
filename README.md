@@ -4,9 +4,11 @@ Faultline is a command-line tool for comparing eager and compiled PyTorch execut
 outputs and gradients, reduces reproducible failures, and exports standalone Python reproducers.
 It also supports request sequences and comparisons between two compiler environments.
 
-It is intended for debugging small models or model components and testing PyTorch upgrades against
-saved workloads. Each run produces JSON results, worker logs, and a local HTML report. Workers run
-in separate processes with configurable time and host-memory limits.
+Use it to check a model before changing PyTorch versions or compiler settings, then package a
+failing workload for investigation. The `model` commands execute your original module and preserve
+weights and nested inputs in binary snapshots. A separate compact graph format supports fuzzing.
+Each run produces JSON results, worker logs, and a local HTML report. Workers have configurable
+time and host-memory limits.
 
 ## Installation
 
@@ -71,7 +73,75 @@ For AMD GPUs, use a compatible PyTorch/ROCm installation and `--device cuda:0`; 
 `cuda` namespace. GPU execution has not yet been validated on hardware. Unavailable devices are
 reported explicitly. The host-memory limit does not cover GPU memory.
 
-## Reproducing and reducing failures
+## Checking an existing model
+
+Put model construction and representative inputs in a trusted Python factory:
+
+```python
+import torch
+from torch import nn
+
+
+def factory():
+    model = nn.Sequential(nn.Linear(768, 768), nn.GELU(), nn.Linear(768, 128)).eval()
+    # Load a checkpoint here if needed. Capture freezes the resulting state_dict.
+    return model, (torch.randn(8, 768),)
+```
+
+```bash
+faultline model capture my_model.py:factory --output workloads/my-model
+faultline model run workloads/my-model --backend inductor --gradients --timeout 600 --max-rss-mb 8192 --output faultline-runs/model
+faultline model replay faultline-runs/model --output faultline-runs/recheck
+```
+
+Inputs can be a tensor, a positional tuple, a dictionary of keyword arguments, or
+`{"args": (...), "kwargs": {...}}`. Nested dictionaries, lists, and tuples are supported.
+Integer token IDs, boolean masks, mixed floating dtypes, noncontiguous views, and shared tensor
+storage are retained. With `--trace`, the factory returns an ordered list of requests.
+
+The factory is executed again to construct the model at replay time, then saved weights, inputs,
+trainability flags, and RNG state are restored. Its dependencies and any files it opens must still
+be available. Use `--include helper.py --include weights.pt` to copy explicitly named local source
+and assets into the bundle. Relative assets should be opened relative to the factory's `__file__`.
+This is not a serialized arbitrary Python process or a checkpoint downloader.
+
+To check an environment change:
+
+```bash
+faultline model compare workloads/my-model --baseline-python .baseline/bin/python --candidate-python .candidate/bin/python --gradients --reduce --timeout 600 --max-rss-mb 8192 --output faultline-runs/model-upgrade
+```
+
+Both interpreters need PyTorch, NumPy, psutil, and the model's dependencies. They use the same frozen
+workload and comparison policy. A regression requires the baseline to agree with eager execution
+and the candidate to fail consistently. A discrepancy present in both environments is reported
+separately. The HTML report and JSON result retain both outcomes.
+
+For a saved failing run:
+
+```bash
+faultline model reduce faultline-runs/model --max-evaluations 32 --output faultline-runs/model-reduced
+python faultline-runs/model-reduced/reproducer/repro.py
+```
+
+Reduction first removes requests, then tries compiling individual captured graphs inside the
+original model. If one graph independently reproduces the failure, Faultline attempts node bypass
+and dead-code removal. Every accepted change must retain the stable failure; upgrade reductions
+must also keep the baseline passing. A fresh worker confirms the final result. If a graph cannot
+be isolated or serialized, the full model reproducer remains available. Shape reduction and
+minification across interacting graphs are not implemented for native workloads.
+
+The native path has no compact-IR tensor-size or operator-count caps. It still needs enough memory
+for the model, compiler, frozen inputs, and comparison observations. It supports evaluation-mode
+forward execution and optional input/parameter gradient checks, not optimizer steps or general
+training loops. Graph breaks can leave portions of the model running eagerly; the report records
+captured graphs and does not claim complete compilation coverage.
+
+[examples/native_models.py](examples/native_models.py) includes ResNet-18, a 48.9-million-parameter
+transformer with integer tokens and boolean masks, a controlled reduction example, and a historical
+indexing regression. These use synthetic inputs and random weights. See [RESULTS.md](RESULTS.md)
+for executed checks, including discrepancies and unvalidated configurations.
+
+## Compact-graph testing and reduction
 
 Choose a case in `faultline ui`, or replace `CASE_ID` below with an ID from your report:
 
@@ -94,7 +164,7 @@ report whether the original failure signature recurs through `reproduces_expecte
 Artifacts include model weights, input values, logs, and environment metadata. Review their contents
 before sharing them. Faultline runs locally and has no telemetry.
 
-## Capturing a model
+## Capturing a compact graph
 
 Save a factory in `my_model.py` that returns an evaluation-mode model and example inputs:
 
@@ -207,8 +277,9 @@ Portable tests run on Windows and Linux. Compiler tests require a working Induct
 Validation includes injected faults, actual compiler comparisons, and upgrade checks across two
 PyTorch environments.
 
-Current coverage is limited to supported operators in stateless evaluation graphs. Distributed
-execution, general training loops, and performance-regression detection are unsupported. Numerical
+The compact importer is limited to its supported operators and size guards. The native model path
+executes original modules but cannot reduce every graph or preserve arbitrary Python-side state.
+Distributed execution, general training loops, and performance-regression detection are unsupported. Numerical
 differences require investigation; exceeding a tolerance alone does not establish a compiler bug.
 See PyTorch's [numerical accuracy notes](https://docs.pytorch.org/docs/stable/notes/numerical_accuracy.html)
 for relevant floating-point behavior.

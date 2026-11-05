@@ -1,5 +1,59 @@
 # Faultline architecture and validity
 
+## Native workloads
+
+`model capture` runs a trusted factory in a supervised worker and saves its state dictionary,
+trainability flags, nested requests, and Python/NumPy/PyTorch RNG states. Tensor data uses
+`torch.save`, retaining strides, storage offsets, repeated references, and shared storage. Loading
+uses `weights_only=True`; the copied factory is still executable trusted Python. Artifact hashes
+detect accidental edits, not maliciously coordinated replacements. Included local source and asset
+files must be named explicitly. Factory dependencies and external files are not automatically vendored.
+
+`model run` compares the original module with `torch.compile(module)`. It restores saved state at
+the start of every whole request stream, while retaining one compiled callable across repeats and
+requests. It compares nested outputs, post-call tensor inputs, final registered buffers and
+parameters, and optionally a fixed scalar loss plus input/parameter derivatives. Missing derivatives
+are distinct from zeros. Integer and boolean comparisons are exact, including int64 values beyond
+float64 precision. Comparison storage retains two anchor observations and the current repeat;
+memory still grows with model size and request-stream length. Timings include reset, copying,
+graph capture, and observation overhead and must not be treated as performance measurements.
+
+The backend callback records Dynamo graphs and actual arguments before the first execution.
+It delegates to the explicitly selected compiler backend. Native graph snapshots retain PyTorch
+operations instead of translating them into the compact IR. Unsupported graph targets, symbolic
+objects, or opaque submodules prevent independent graph export, but do not prevent the original
+model from running. Compilation failures before real arguments reach the callback can also leave
+only the full-workload reproducer. No captured graph under a real compiler produces the
+inconclusive `no_compiled_graph` status rather than an apparent compiler pass.
+
+Native reduction checks the original failure again, removes requests, and tries compiling one
+graph at a time in the full model while executing the others eagerly. The full-model failure
+signature must survive that isolation. It then establishes a separate independent graph predicate:
+output names and lifted parameter names differ at this boundary. The category must match, but this
+does not prove root-cause identity. Both stages require a passing baseline when comparing
+environments. Backend flat output lists are adapted to the captured FX tuple ABI only at the
+independent graph boundary; original-model output structure remains part of the comparison.
+
+For a portable independent graph, reduction bypasses shape/dtype-compatible nodes in chunks,
+prunes dead code and unused arguments, and accepts only strict decreases in the lexicographic
+ordering `(requests, call nodes, first-request tensor elements)`. It preserves the independent
+failure signature. A final uncached evaluation is reserved; dual-environment checks rerun both
+interpreters. Graph shape reduction and multi-graph interaction minification are not implemented.
+The full original snapshot is retained, including when no graph can be isolated. Attempt records
+and proposals consume disk space; large models and long request streams can make reduction costly.
+
+Standalone native bundles copy the same comparison, execution, and graph reconstruction modules
+used by workers. They verify file hashes and need no Faultline installation. Full-model bundles
+also need factory dependencies; graph bundles use standard PyTorch/operator/math targets. The
+standalone process does not apply the coordinator's timeout/RSS watchdog.
+
+This path requires `eval()`. It does not restore arbitrary Python attributes, optimizer state,
+external services, or distributed process state. Such state can cause unstable or misleading
+results and must be removed or explicitly reset in a workload. Stochastic operators can use
+different eager and compiled RNG algorithms even with the same seed; this is a numerical
+comparison tool, not a statistical equivalence test. Complex tensors are unsupported. CPU
+validation does not establish GPU correctness.
+
 ## Execution chain
 
 `generator or trusted model capture → validated data-only IR → frozen inputs → FX graph`
@@ -111,7 +165,7 @@ execution with saved wall/RSS limits.
 Whether upstream minification triggers depends on the PyTorch version and failure. Faultline's
 own reducer does not import or modify private PyTorch minifier internals.
 
-## Current limits
+## Compact-IR limits
 
 Stateless evaluation graphs with forward/backward checking; no optimizer state, stochastic training,
 arbitrary control flow, in-place mutation, sparse tensors, distributed execution, or

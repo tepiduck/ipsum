@@ -39,6 +39,7 @@ def same_failure(baseline, result):
         and result.get("gradients", False) == baseline.get("gradients", False)
         and result.get("dynamic", False) == baseline.get("dynamic", False)
         and result.get("trace", False) == baseline.get("trace", False)
+        and result.get("native", False) == baseline.get("native", False)
     )
 
 
@@ -110,7 +111,10 @@ def fingerprint(result):
     ):
         failed = sorted(
             {
-                (x["target"], "nonfinite" if x.get("candidate_nonfinite", 0) else x["kind"])
+                (
+                    re.sub(r"^step:\d+:", "", x["target"]) if result.get("native") else x["target"],
+                    "nonfinite" if x.get("candidate_nonfinite", 0) else x["kind"],
+                )
                 for x in result["comparison"]["outputs"]
                 if not x["matches"]
             }

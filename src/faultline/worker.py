@@ -1,4 +1,4 @@
-"""Private subprocess entry point; never load arbitrary Python or pickle inputs."""
+"""Private subprocess entry point. Native workloads explicitly execute trusted factories."""
 
 import argparse
 import os
@@ -45,7 +45,12 @@ def main():
     try:
         if job.get("worker_protocol", 2) != 2:
             raise ValueError("unsupported worker protocol")
-        result = evaluate(program_from_dict(job["case"]), Settings(**job["settings"]))
+        if job["case"].get("kind") == "native":
+            from .native import native_worker
+
+            result = native_worker(job["case"], Settings(**job["settings"]), args.result.parent)
+        else:
+            result = evaluate(program_from_dict(job["case"]), Settings(**job["settings"]))
         result["worker_environment"] = describe()
     except Exception as exc:
         import traceback

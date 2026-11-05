@@ -1,5 +1,45 @@
 # CLI and artifact semantics
 
+## Original-model commands
+
+`faultline model` uses binary workload bundles independently of the compact IR commands below.
+
+| Command | Input and output |
+|---|---|
+| `model capture FILE:FACTORY --output NEW` | Executes trusted Python; saves factory, state dictionary, nested inputs, RNG state, hashes |
+| `model run BUNDLE --output NEW` | Runs eager/compiler checks; saves complete workload, logs, report, and standalone reproducer |
+| `model compare BUNDLE --baseline-python PYTHON --candidate-python PYTHON --output NEW` | Runs the same snapshot in both environments; classifies the change |
+| `model replay RUN --output NEW` | Rechecks saved settings and workload in a fresh process |
+| `model reduce RUN --output NEW` | Removes requests, isolates a native graph, attempts reduction, independently confirms |
+| `model export RUN --output NEW` | Copies a verified standalone bundle without running it |
+
+Capture accepts `--trace` and repeated `--include RELATIVE_FILE` for explicitly copied source and assets.
+Run/capture accept `--python`; compare accepts both interpreter paths. Native reduction and replay
+retain saved settings and accept `--python` to select the execution environment. Baseline and
+candidate must run on the same operating system; use Linux paths from inside WSL. All output
+directories must be new. Source artifacts are not modified.
+
+Run/compare use the execution settings below. For larger models, increase `--timeout` and
+`--max-rss-mb` deliberately. The memory watchdog samples aggregate host RSS, including compiler
+children, and cannot bound device memory. `--gradients` checks a fixed sum of mean-squared tensor
+outputs; it is not a user training loss. `--dynamic` controls compilation, but independent native
+graph snapshots concretize captured symbolic integers and are specific to those recorded calls.
+
+`model run` and `model replay` return 0 for agreement, 1 for a stable discrepancy or compiler
+exception, and 2 for an inconclusive result. `model compare` uses the classification table below.
+`model reduce` returns 0 for a confirmed export and 2 if the saved failure no longer reproduces;
+a successful reduction may retain the full workload. Standalone `repro.py` returns 0 for the
+expected agreement, 1 for the expected stable failure, and 2 for a changed or inconclusive outcome.
+Capture/export return 0 on success. Invalid arguments and artifact-integrity errors are errors.
+
+Native run directories contain `workload/`, `settings.json`, `selection.json`, `evidence.json`,
+`run/outcome.json`, `run/graphs.json`, `run/graphs/graph-NNNN/`, `summary.json`, `report.html`,
+and `reproducer/`. Graph directories contain readable `forward.py`, structured `graph.json`,
+binary `tensors.pt`, and a hashed `workload.json`. Comparison directories additionally retain
+baseline/candidate results and reproducers. `--reduce` saves reduction attempts and final evidence.
+Bundles contain model weights, exact inputs, source, logs, and environment metadata. Review them
+before sharing. Full-model reproducers need the original factory's dependencies and external assets.
+
 `faultline` and `python -m faultline` expose the same commands. `faultline ui` provides a numbered
 terminal menu over those commands; it does not start a server. Browser reports are local HTML,
 work offline, and load no external scripts or styles.

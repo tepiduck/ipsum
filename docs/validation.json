@@ -82,6 +82,108 @@
     "torch": "2.15.0+cpu"
   },
   "experiment_source_sha256": "558e29fda7f858a8bf215cc6baa507879b64cc20e0b2265a104c73d059044815",
+  "native_workloads": {
+    "checks_passed": true,
+    "date": "2026-11-05",
+    "environment": {
+      "device": "cpu",
+      "os": "Ubuntu 24.04 / WSL",
+      "python": "3.12.3"
+    },
+    "experiment_source_sha256": "8b46a68039c8fc5cdd833b6ea9eaaa06b28ec089643aa8ef49fd42946889e7e7",
+    "experiments": [
+      {
+        "baseline_status": "pass",
+        "baseline_torch": "2.14.1+cpu",
+        "candidate_graphs": 1,
+        "candidate_status": "numerical_mismatch",
+        "candidate_torch": "2.15.0+cpu",
+        "classification": "regression",
+        "injected_fault": true,
+        "name": "reduction_demo",
+        "parameter_count": 590592,
+        "reduction": {
+          "confirmed": true,
+          "evaluations": 8,
+          "native_graph": true,
+          "original_complexity": [
+            1,
+            4,
+            592128
+          ],
+          "reduced_complexity": [
+            1,
+            1,
+            1536
+          ]
+        },
+        "snapshot_bytes": 2383783,
+        "standalone_reproduces": true
+      },
+      {
+        "baseline_status": "pass",
+        "baseline_torch": "2.14.1+cpu",
+        "candidate_graphs": 1,
+        "candidate_status": "pass",
+        "candidate_torch": "2.15.0+cpu",
+        "classification": "agreement",
+        "injected_fault": false,
+        "name": "expanded_index_add",
+        "parameter_count": 0,
+        "snapshot_bytes": 14890
+      },
+      {
+        "baseline_status": "pass",
+        "baseline_torch": "2.14.1+cpu",
+        "candidate_graphs": 1,
+        "candidate_status": "pass",
+        "candidate_torch": "2.15.0+cpu",
+        "classification": "agreement",
+        "injected_fault": false,
+        "name": "resnet18",
+        "parameter_count": 11689512,
+        "snapshot_bytes": 47453065
+      },
+      {
+        "baseline_status": "pass",
+        "baseline_torch": "2.14.1+cpu",
+        "candidate_graphs": 1,
+        "candidate_status": "pass",
+        "candidate_torch": "2.15.0+cpu",
+        "classification": "agreement",
+        "injected_fault": false,
+        "name": "transformer",
+        "parameter_count": 48917120,
+        "snapshot_bytes": 195712781
+      },
+      {
+        "baseline_status": "pass",
+        "candidate_status": "numerical_mismatch",
+        "classification": "regression",
+        "injected_fault": false,
+        "name": "historical_issue_183986",
+        "reduction_confirmed": true
+      }
+    ],
+    "historical_issue": {
+      "failing_torch": "2.12.0+cpu",
+      "note": "Older release deliberately used as candidate. Historical reproduction, not a newly discovered regression.",
+      "passing_torch": "2.15.0+cpu",
+      "url": "https://github.com/pytorch/pytorch/issues/183986"
+    },
+    "resnet18_backward": {
+      "atol": 1e-05,
+      "baseline_status": "gradient_mismatch",
+      "baseline_torch": "2.14.1+cpu",
+      "candidate_status": "gradient_mismatch",
+      "candidate_torch": "2.15.0+cpu",
+      "classification": "recurring",
+      "forward_outputs_agreed": true,
+      "note": "Numerical gradient discrepancy in both versions; not a new compiler bug claim.",
+      "rtol": 0.0001
+    },
+    "version": "0.4.0"
+  },
   "note": "Public summaries of measured experiments with source fingerprints. Local paths and raw machine logs are omitted. Top-level results describe the original campaign; upgrade_experiments describes the new workflows.",
   "real_compiler_counts": {
     "numerical_mismatch": 1,

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "faultline-ml"
-version = "0.3.0"
+version = "0.4.0"
 description = "Differential testing and failure reduction for PyTorch compilers"
 readme = "README.md"
 license = "MIT"
@@ -40,3 +40,5 @@ target-version = "py311"
 "src/faultline/evaluate.py" = ["BLE001"]
 "src/faultline/portable.py" = ["BLE001"]
 "src/faultline/worker.py" = ["BLE001"]
+"src/faultline/native.py" = ["BLE001"]
+"src/faultline/native_runtime.py" = ["BLE001"]
