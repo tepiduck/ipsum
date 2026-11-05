@@ -135,6 +135,31 @@ def test_dictionary_keys_preserve_types_and_scalar_outputs():
     assert not result["matches"] and result["kind"] == "structure"
 
 
+def test_native_graph_retains_batchnorm_buffer_autograd_roles(tmp_path):
+    source = tmp_path / "batchnorm.py"
+    source.write_text(
+        """import torch
+def factory():
+    model = torch.nn.Sequential(torch.nn.BatchNorm1d(4), torch.nn.ReLU()).eval()
+    return model, (torch.tensor([[-2., 1., 3., 4.], [1., -1., 2., 3.]]),)
+""",
+        encoding="utf-8",
+    )
+    settings = Settings(backend="mutant:gradient-scale", gradients=True, repeats=2)
+    bundle = capture_workload(f"{source}:factory", tmp_path / "bundle", settings)
+    result = run_case(NativeJob.create(bundle), settings, tmp_path / "run")
+    assert result["status"] == "gradient_mismatch", result
+    graph = NativeJob.create(tmp_path / "run" / "graphs" / "graph-0000")
+    graph_result = run_case(graph, settings, tmp_path / "graph-run")
+    assert graph_result["status"] == "gradient_mismatch", graph_result
+    targets = [
+        item["target"]
+        for item in graph_result["comparison"]["outputs"]
+        if ":gradient:" in item["target"]
+    ]
+    assert not any("running_mean" in target or "running_var" in target for target in targets)
+
+
 def test_gradient_mismatch_with_identical_forward():
     model = torch.nn.Linear(4, 3).eval()
     x = torch.ones(2, 4)

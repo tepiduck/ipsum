@@ -96,10 +96,14 @@ def observe_native(model, fn, requests, gradients=False, wrong_gradient=False, s
         if gradients:
             for path, value in tensor_leaves((args, kwargs), "input"):
                 if value.is_floating_point() and id(value) not in seen:
+                    names = request.get("input_names")
+                    # Dynamo lifts buffers and frozen parameters into graph arguments.
+                    # Their captured autograd role must survive independent graph replay.
+                    if names and not value.requires_grad:
+                        continue
                     if not value.is_leaf:
                         raise ValueError("Frozen native inputs must be autograd leaves")
                     value.requires_grad_(True)
-                    names = request.get("input_names")
                     if names:
                         path = next(
                             (
