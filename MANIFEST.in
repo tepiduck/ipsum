@@ -1,0 +1,16 @@
+include README.md LICENSE pyproject.toml
+recursive-include src/faultline *.py
+recursive-include tests/faultline *.py
+include scripts/validate_faultline.py scripts/check_release.py
+include examples/capture_mlp.py
+include docs/architecture.md docs/cli.md docs/validation.json
+global-exclude __pycache__ *.py[cod] AGENTS.md CLAUDE.md
+exclude tests/test_*.py
+prune reports
+prune frontend
+prune _private
+prune src/molsys
+prune infra
+prune native
+prune research
+prune experiments

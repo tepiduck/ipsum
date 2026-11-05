@@ -1,0 +1,92 @@
+{
+  "checks": [
+    {
+      "name": "eager-control",
+      "passed": true
+    },
+    {
+      "name": "sum-mutant",
+      "passed": true
+    },
+    {
+      "name": "relu-mutant",
+      "passed": true
+    },
+    {
+      "name": "softmax-mutant",
+      "passed": true
+    },
+    {
+      "name": "nan-mutant",
+      "passed": true
+    },
+    {
+      "name": "unstable-control",
+      "passed": true
+    },
+    {
+      "name": "exception-control",
+      "passed": true
+    },
+    {
+      "name": "worker-crash-control",
+      "passed": true
+    },
+    {
+      "name": "independent-standalone-reproducer",
+      "passed": true
+    },
+    {
+      "name": "reduction-retains-target-operation",
+      "passed": true
+    },
+    {
+      "name": "saved-finding-replay-preserves-policy-and-evidence",
+      "passed": true
+    },
+    {
+      "name": "standalone-exception-confirmation",
+      "passed": true
+    },
+    {
+      "name": "resume-preserves-completed-evidence",
+      "passed": true
+    },
+    {
+      "name": "compiler-toolchain-operational",
+      "passed": true
+    }
+  ],
+  "confirmed_upstream_bugs": 0,
+  "controlled_reduction": {
+    "budget_exhausted": false,
+    "evaluations": 17,
+    "original_complexity": [
+      7,
+      144,
+      1,
+      144
+    ],
+    "reduced_complexity": [
+      1,
+      2,
+      0,
+      2
+    ]
+  },
+  "date": "2026-11-05",
+  "environment": {
+    "device": "cpu",
+    "os": "Ubuntu 24.04 / WSL",
+    "python": "3.12.3",
+    "torch": "2.15.0+cpu"
+  },
+  "experiment_source_sha256": "558e29fda7f858a8bf215cc6baa507879b64cc20e0b2265a104c73d059044815",
+  "note": "Public summary of measured experiments. Local paths, logs, and machine-specific raw artifacts are omitted. The recorded experiment predates the terminal UI release.",
+  "real_compiler_counts": {
+    "numerical_mismatch": 1,
+    "pass": 17
+  },
+  "schema_version": 1,
+  "validation_passed": true
+}

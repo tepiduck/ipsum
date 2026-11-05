@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "faultline-ml"
+version = "0.2.0"
+description = "Differential testing and failure reduction for PyTorch compilers"
+readme = "README.md"
+license = "MIT"
+license-files = ["LICENSE"]
+requires-python = ">=3.11"
+dependencies = ["torch>=2.6,<3", "psutil>=5.9,<8", "numpy>=1.26,<3"]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.9", "build>=1.2"]
+
+[project.urls]
+Repository = "https://github.com/tepiduck/ipsum"
+Issues = "https://github.com/tepiduck/ipsum/issues"
+
+[project.scripts]
+faultline = "faultline.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["faultline*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests/faultline"]
+markers = ["compiler: requires a working TorchInductor toolchain"]
+addopts = "-m 'not compiler'"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint.per-file-ignores]
+# These are explicit isolation boundaries for arbitrary compiler exception types.
+"src/faultline/evaluate.py" = ["BLE001"]
+"src/faultline/portable.py" = ["BLE001"]
+"src/faultline/worker.py" = ["BLE001"]
