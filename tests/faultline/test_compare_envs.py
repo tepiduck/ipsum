@@ -1,4 +1,5 @@
 import json
+import os
 import subprocess
 import sys
 from dataclasses import replace
@@ -68,8 +69,8 @@ def test_upgrade_gate_runs_real_workers_and_exports_reproducers(tmp_path):
     result = compare_envs.compare_environments(
         corpus()[:1],
         tmp_path / "comparison",
-        sys.executable,
-        sys.executable,
+        os.path.relpath(sys.executable),
+        os.path.relpath(sys.executable),
         settings,
         replace(settings, backend="mutant:sum-as-mean"),
         reduce=True,
@@ -78,6 +79,7 @@ def test_upgrade_gate_runs_real_workers_and_exports_reproducers(tmp_path):
     )
     assert result["counts"] == {"regression": 1}
     assert result["exit_code"] == 1
+    assert os.path.isabs(result["baseline_python"])
     item = result["cases"][0]
     assert item["reduction"]["baseline_confirmed"]
     assert item["baseline"]["worker_environment"]["packages"]["torch"]
@@ -99,6 +101,15 @@ def test_upgrade_gate_runs_real_workers_and_exports_reproducers(tmp_path):
             check=False,
         )
         assert run.returncode == code, run.stderr
+
+
+@pytest.mark.skipif(os.name == "nt", reason="Windows symlinks require extra privileges")
+def test_relative_interpreter_preserves_virtual_environment_symlink(tmp_path, monkeypatch):
+    python = tmp_path / "env" / "bin" / "python"
+    python.parent.mkdir(parents=True)
+    python.symlink_to(sys.executable)
+    monkeypatch.chdir(tmp_path)
+    assert compare_envs.interpreter("env/bin/python") == str(python)
 
 
 def test_capture_trace_and_gradient_run_cli(tmp_path):

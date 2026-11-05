@@ -17,10 +17,12 @@ from .storage import atomic_json
 
 
 def interpreter(path):
-    resolved = shutil.which(str(path)) or str(Path(path).expanduser().resolve())
-    if not Path(resolved).is_file():
+    # Workers change cwd. Make relative paths absolute, but never resolve symlinks:
+    # resolving a venv's Python symlink would launch the base interpreter instead.
+    resolved = Path(shutil.which(str(path)) or str(path)).expanduser().absolute()
+    if not resolved.is_file():
         raise ValueError(f"Python interpreter does not exist: {path}")
-    return resolved
+    return str(resolved)
 
 
 def classification(baseline, candidate):
