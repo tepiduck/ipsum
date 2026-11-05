@@ -113,7 +113,45 @@ own reducer does not import or modify private PyTorch minifier internals.
 
 ## Current limits
 
-Forward inference only; concrete shapes; no arbitrary control flow, in-place mutation, sparse
-tensors, convolution capture, gradients, distributed execution, or performance-regression
-classification. The small fixed corpus is engineering coverage, not representative evidence
-for all real models. Mutant detection measures harness behavior, not compiler bug prevalence.
+Stateless evaluation graphs with forward/backward checking; no optimizer state, stochastic training,
+arbitrary control flow, in-place mutation, sparse tensors, distributed execution, or
+performance-regression classification. Traces use concrete requests with one shared graph; they
+cannot express arbitrary shape-dependent Python branches. The operator registry is deliberately
+bounded. The small corpus is engineering coverage, not representative evidence for all models.
+Mutant detection measures harness behavior, not compiler bug prevalence.
+
+## Model import, backward checking, and request sequences
+
+The `torch.export` importer uses graph-signature metadata to distinguish user inputs, parameters,
+buffers, and constants. Schema 2 retains those roles and parameter trainability and adds explicit
+contracts for GELU, convolution, pooling, permutation, and attention. Schema 1 serialization and
+hashes remain unchanged. Translation checks compare the normalized IR's eager outputs to the
+exported model. Imported operations are normalized into this IR, so capture is not byte-for-byte
+preservation of the original exported graph. Unknown operators and mutations are rejected.
+
+Backward checks differentiate a deterministic mean-square loss through eager and compiled forward
+functions. AOTAutograd can therefore compile the candidate's backward path. Observations include
+forward outputs, loss, gradient-presence flags, and gradient tensors. Repeats use fresh leaves and
+autograd graphs, preserving strides. Gradient signatures name tensor identities. This is an
+eager-versus-compiled derivative check for one loss, not finite-difference validation or a full
+Jacobian proof. The controlled wrong-gradient fixture preserves forward values but doubles the
+derivative; it is clearly labeled as injected.
+
+A trace contains ordered frozen cases sharing graph structure and model state. Each full trace
+creates a fresh callable and invokes it sequentially; repetition replays the whole trace. Compiler
+process-global caches are not forcibly cleared between repetitions. Isolated reduction attempts
+run in new worker processes. Evidence records failed request indices. Failure signatures retain
+the affected tensor identity and category but omit the request index, allowing earlier requests
+to be deleted. Sequence length precedes graph/input size in the reduction ordering. Accepted
+proposals must retain the repeated whole-trace failure, and the final trace is independently
+confirmed. Signatures do not prove which earlier request caused an error.
+
+## Environment regression gates
+
+Protocol-versioned jobs run through explicitly selected Python interpreters, with the same harness
+source, frozen cases, and comparison policy. Each worker records its own package/runtime metadata.
+Baseline failures, unavailable environments, and unstable comparisons cannot be presented as new
+candidate regressions. Automatic reduction invokes the baseline first and rejects any proposal
+that stops passing there; the candidate must then retain the original stable failure. A fresh
+dual-environment confirmation precedes export. Source-controlled CI pins both compiler releases
+and retains comparison artifacts even when the gate fails.

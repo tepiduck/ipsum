@@ -82,11 +82,95 @@
     "torch": "2.15.0+cpu"
   },
   "experiment_source_sha256": "558e29fda7f858a8bf215cc6baa507879b64cc20e0b2265a104c73d059044815",
-  "note": "Public summary of measured experiments. Local paths, logs, and machine-specific raw artifacts are omitted. The recorded experiment predates the terminal UI release.",
+  "note": "Public summaries of measured experiments with source fingerprints. Local paths and raw machine logs are omitted. Top-level results describe the original campaign; upgrade_experiments describes the new workflows.",
   "real_compiler_counts": {
     "numerical_mismatch": 1,
     "pass": 17
   },
   "schema_version": 1,
+  "upgrade_experiments": {
+    "baseline_final_status": "pass",
+    "candidate_final_status": "numerical_mismatch",
+    "checks": [
+      {
+        "backend": "inductor",
+        "counts": {
+          "pass": 3
+        },
+        "name": "captured-model-forward-and-backward",
+        "passed": true
+      },
+      {
+        "name": "identical-forward-wrong-backward",
+        "passed": true,
+        "status": "gradient_mismatch"
+      },
+      {
+        "name": "isolated-requests-do-not-trigger-sequence-fault",
+        "passed": true
+      },
+      {
+        "evaluations": 32,
+        "name": "whole-trace-reduction",
+        "original_requests": 7,
+        "passed": true,
+        "reduced_batch_sizes": [
+          2,
+          3,
+          2
+        ]
+      },
+      {
+        "name": "standalone-trace-reproducer",
+        "passed": true
+      },
+      {
+        "name": "dynamic-shape-trace-forward-and-backward",
+        "passed": true,
+        "status": "pass"
+      },
+      {
+        "counts": {
+          "agreement": 3
+        },
+        "name": "environment-agreement-control",
+        "passed": true
+      },
+      {
+        "counts": {
+          "regression": 1
+        },
+        "name": "new-regression-gate-and-baseline-preserving-reduction",
+        "passed": true
+      }
+    ],
+    "controlled_upgrade_reduction": {
+      "budget_exhausted": true,
+      "evaluations": 8,
+      "original_complexity": [
+        3,
+        136,
+        1,
+        136
+      ],
+      "reduced_complexity": [
+        1,
+        4,
+        1,
+        4
+      ]
+    },
+    "environment": {
+      "baseline_torch": "2.14.1+cpu",
+      "candidate_torch": "2.15.0+cpu",
+      "device": "cpu",
+      "os": "Ubuntu 24.04 / WSL",
+      "python": "3.12.3"
+    },
+    "experiment_source_sha256": "a28273a3fc02a834dcb0ac0f8f8361e9954a7f72bbf5a77aa712a6a6ca921ed8",
+    "note": "Controlled failures validate detection and reduction; no new upstream compiler bug is claimed.",
+    "validation_passed": true,
+    "version": "0.3.0"
+  },
   "validation_passed": true
 }

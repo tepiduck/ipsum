@@ -47,11 +47,13 @@ A captured MLP using Linear, LayerNorm, and ReLU also passed CPU TorchInductor c
 The portable test suite exercises graph validation, model capture, numerical/nonfinite handling,
 repeat stability, worker lifecycle, reduction, saved-finding integrity, standalone export, and
 terminal workflows. The separate compiler test executes real TorchInductor code generation.
-CI runs the portable suite on Windows and Linux and the compiler suite on Linux.
+CI runs the portable suite on Windows and Linux, the compiler suite on Linux, and a separate
+two-environment upgrade gate.
 
 CPU eager corpus tests cover float16, bfloat16, float32, and float64. The compiled 18-case campaign
-used float32. GPU execution, gradients, distributed execution, dynamic shapes, and arbitrary-model
-coverage have not been established. Diagnostic timing fields are not throughput or speedup evidence.
+used float32. GPU execution, distributed execution, and arbitrary-model coverage have not been
+established. Forward/backward and dynamic-shape coverage for version 0.3 is described below.
+Diagnostic timing fields are not throughput or speedup evidence.
 
 The recorded experiment predates the terminal interface release. Current behavior is checked by
 the automated suite; rerun the experiment harness to record evidence for another revision:
@@ -59,3 +61,38 @@ the automated suite; rerun the experiment harness to record evidence for another
 ```bash
 python scripts/validate_faultline.py --compiler --output faultline-runs/validation
 ```
+
+## Version 0.3 model and upgrade experiments
+
+All **eight additional experiment checks passed** on CPU under Ubuntu/WSL. The two independent
+Python environments used **PyTorch 2.14.1+cpu and 2.15.0+cpu**, both on Python 3.12.3.
+
+- Captured GELU/LayerNorm MLP, convolution/pooling, and causal-attention workloads passed real
+  TorchInductor forward and backward comparison. All three also passed in both compiler environments.
+- A deliberately doubled derivative produced `gradient_mismatch` while forward outputs and loss
+  still agreed. The unit suite separately distinguishes missing gradients from zero gradients.
+- A controlled history-dependent failure was absent in all seven isolated requests. Whole-trace
+  reduction retained **three requests with batch sizes 2 → 3 → 2**, within a 32-evaluation budget.
+  A fresh standalone script reproduced the same failure. This is an injected fixture, not a real
+  compiler cache bug; the exhausted budget does not establish local irreducibility.
+- A seven-request captured MLP stream passed real dynamic TorchInductor forward/backward checks.
+- The environment gate detected a controlled candidate regression and reduced **3 operations / 136
+  input values to 1 operation / 4 values** in eight dual-environment evaluations. The final baseline
+  passed and the final candidate retained the original numerical failure. Separate baseline and
+  candidate reproducers were exported. This bounded reduction does not claim global minimality.
+
+The compiler unit suite additionally covers approximate GELU, grouped/dilated convolution, and
+noncausal attention. Standalone exports are exercised without importing Faultline. Tests include
+baseline rejection during reduction, saved gradient/trace policy integrity, and CLI factory capture.
+These checks establish behavior on small representative components, not correctness for all models.
+No AMD/ROCm hardware result or throughput improvement is claimed.
+
+Reproduce the new experiment (the baseline environment needs PyTorch, NumPy, and psutil):
+
+```bash
+python scripts/validate_upgrades.py --compiler --baseline-python .baseline/bin/python --output faultline-runs/upgrades
+```
+
+Omit `--baseline-python` for a same-environment control. CI pins both PyTorch releases and uploads
+the full evidence after success or failure. The public JSON summary retains the measured source
+fingerprint and separates these observations from the original 18-case campaign.

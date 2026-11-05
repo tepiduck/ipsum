@@ -10,7 +10,7 @@ import torch
 from .lowering import build, inputs_for
 from .oracle import fp64_advisory
 from .portable import (
-    check_execution,
+    check_workload,
     configure,
     confirm_exception,
     exception_record,
@@ -30,6 +30,8 @@ MUTANTS = {
     "crash",
     "hang",
     "worker-exit",
+    "gradient-scale",
+    "sequence-cache",
 }
 
 
@@ -43,6 +45,8 @@ class Settings:
     threads: int = 1
     timeout_s: float = 120.0
     max_rss_mb: int = 4096
+    gradients: bool = False
+    dynamic: bool | None = False
 
     def validate(self):
         valid = self.backend in BACKENDS or (
@@ -57,14 +61,35 @@ class Settings:
         if not 0 < self.timeout_s <= 3600 or not 128 <= self.max_rss_mb <= 131072:
             raise ValueError("invalid execution limits")
         tolerances("float32", self.rtol, self.atol)
+        if type(self.gradients) is not bool or (
+            self.dynamic is not None and type(self.dynamic) is not bool
+        ):
+            raise ValueError(
+                "gradients and dynamic must be boolean (dynamic also accepts auto/None)"
+            )
+        if self.backend == "mutant:gradient-scale" and not self.gradients:
+            raise ValueError("gradient-scale requires gradient checking")
 
     def to_dict(self):
-        return asdict(self)
+        data = asdict(self)
+        # Preserve hashes and serialized settings of version-1 findings.
+        if not self.gradients:
+            data.pop("gradients")
+        if self.dynamic is False:
+            data.pop("dynamic")
+        return data
 
 
 def evaluate(case, settings):
+    from .trace import Trace
+
     settings.validate()
     case.validate()
+    is_trace = isinstance(case, Trace)
+    steps = case.steps if is_trace else (case,)
+    graph = steps[0]
+    if settings.backend == "mutant:sequence-cache" and not is_trace:
+        raise ValueError("sequence-cache requires a trace")
     base = {
         "schema_version": 1,
         "case_hash": case.digest(),
@@ -74,6 +99,9 @@ def evaluate(case, settings):
         "torch_version": torch.__version__,
         "hip_version": torch.version.hip,
         "cuda_version": torch.version.cuda,
+        "gradients": settings.gradients,
+        "dynamic": settings.dynamic,
+        "trace": is_trace,
     }
 
     def finish(record):
@@ -91,7 +119,7 @@ def evaluate(case, settings):
     mutant = settings.backend.split(":", 1)[1] if base["injected_fault"] else None
 
     def create_candidate():
-        module = build(case, mutant)
+        module = build(graph, mutant)
         if mutant == "worker-exit":
             os._exit(86)
         if mutant == "crash":
@@ -101,32 +129,41 @@ def evaluate(case, settings):
         return (
             module
             if settings.backend == "eager" or mutant
-            else torch.compile(module, backend=settings.backend, fullgraph=True, dynamic=False)
+            else torch.compile(
+                module, backend=settings.backend, fullgraph=True, dynamic=settings.dynamic
+            )
         )
 
-    with torch.inference_mode():
+    with torch.enable_grad() if settings.gradients else torch.inference_mode():
         try:
-            args = inputs_for(case, settings.device)
-            reference_module = build(case)
+            requests = [inputs_for(step, settings.device) for step in steps]
         except Exception as exc:
             return finish(exception_record(exc, "reference_error"))
-        record, reference, candidate = check_execution(
-            reference_module,
+        record, reference, candidate = check_workload(
+            lambda: build(graph),
             create_candidate,
-            args,
+            requests,
+            graph.to_dict()["inputs"],
+            graph.outputs,
+            gradients=settings.gradients,
+            trace=is_trace,
             device=settings.device,
             repeats=settings.repeats,
             rtol=rtol,
             atol=atol,
             mutant=mutant,
         )
-        if record["status"] == "numerical_mismatch":
+        if record["status"] == "numerical_mismatch" and not is_trace and not settings.gradients:
             try:
                 high = build(case)(*inputs_for(case, "cpu", "float64"))
                 record["fp64_advisory"] = fp64_advisory(reference, candidate, high)
             except Exception as exc:
                 record["fp64_advisory"] = {"unavailable": str(exc)[:1000]}
         if reference is not None:
-            record["input_strides"] = [list(t.stride()) for t in args]
-            record["fx_code"] = build(case, mutant).code
+            record["input_strides"] = (
+                [[list(t.stride()) for t in args] for args in requests]
+                if is_trace
+                else [list(t.stride()) for t in requests[0]]
+            )
+            record["fx_code"] = build(graph, mutant).code
         return finish(record)

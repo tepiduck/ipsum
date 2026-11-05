@@ -10,6 +10,7 @@ from .ir import Case
 from .portable import REDUCIBLE, fingerprint, same_failure, tolerances
 from .runner import run_case
 from .storage import atomic_json, now, read_json
+from .trace import Trace, program_from_dict
 
 ENVIRONMENT_KEYS = (
     "faultline_source_sha256",
@@ -26,7 +27,7 @@ ENVIRONMENT_KEYS = (
 @dataclass(frozen=True)
 class Finding:
     directory: Path
-    case: Case
+    case: Case | Trace
     settings: Settings
     outcome: dict
     environment: dict | None
@@ -78,13 +79,13 @@ def _load(directory):
     )
     if raw_case is None or raw_settings is None:
         raise ValueError("Finding needs case/settings JSON or a worker job.json")
-    case = Case.from_dict(raw_case)
+    case = program_from_dict(raw_case)
     settings = Settings(**raw_settings)
     settings.validate()
     if any(spec.values is None for spec in case.inputs):
         raise ValueError("Saved findings must contain frozen input values")
     if job and (
-        Case.from_dict(job["case"]).digest() != case.digest()
+        program_from_dict(job["case"]).digest() != case.digest()
         or job["settings"] != settings.to_dict()
     ):
         raise ValueError("Saved case or settings disagree with the worker job")
@@ -98,6 +99,13 @@ def _load(directory):
     }
     if any(outcome[key] != value for key, value in expected.items()):
         raise ValueError("Saved outcome does not match execution settings")
+    for key, value in {
+        "gradients": settings.gradients,
+        "dynamic": settings.dynamic,
+        "trace": isinstance(case, Trace),
+    }.items():
+        if outcome.get(key, False) != value:
+            raise ValueError("Saved outcome does not match gradient/trace execution settings")
     rtol, atol = tolerances(case.inputs[0].dtype, settings.rtol, settings.atol)
     if any(
         outcome.get(key, value) != value
@@ -113,7 +121,11 @@ def _load(directory):
         raise ValueError("Saved failure fingerprint does not match its comparison")
 
     environment_path = directory / "environment.json"
-    environment = read_json(environment_path) if environment_path.exists() else None
+    environment = (
+        read_json(environment_path)
+        if environment_path.exists()
+        else outcome.get("worker_environment")
+    )
     manifest_path = directory.parent.parent / "manifest.json"
     if directory.parent.name == "cases" and manifest_path.exists():
         manifest = read_json(manifest_path)

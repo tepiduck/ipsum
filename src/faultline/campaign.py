@@ -8,10 +8,10 @@ from pathlib import Path
 
 from .environment import describe
 from .evaluate import Settings
-from .ir import Case
 from .lowering import freeze
 from .runner import run_case
 from .storage import atomic_json, campaign_lock, now, provenance, read_json
+from .trace import program_from_dict
 
 
 def config_hash(settings):
@@ -50,6 +50,7 @@ def summarize(directory, manifest):
             "structural_mismatch",
             "compile_error",
             "runtime_error",
+            "gradient_mismatch",
         }:
             groups.setdefault(result["fingerprint"], []).append(entry["id"])
     summary = {
@@ -124,7 +125,7 @@ def run_campaign(
                 ):
                     raise ValueError("Source changed during campaign; start a new run")
                 path = directory / "cases" / entry["id"]
-                case = Case.from_dict(read_json(path / "case.json"))
+                case = program_from_dict(read_json(path / "case.json"))
                 if case.digest() != entry["hash"]:
                     raise ValueError("Input case changed after campaign creation")
                 if (path / "outcome.json").exists():

@@ -54,7 +54,7 @@ def tree_rss(pid, observed=None):
     return total
 
 
-def run_case(case, settings, directory):
+def run_case(case, settings, directory, *, python=None):
     case.validate()
     settings.validate()
     directory = Path(directory).resolve()
@@ -65,6 +65,7 @@ def run_case(case, settings, directory):
     atomic_json(
         job_path,
         {
+            "worker_protocol": 2,
             "case": case.to_dict(),
             "settings": settings.to_dict(),
             "parent": [os.getpid(), psutil.Process().create_time()],
@@ -90,7 +91,7 @@ def run_case(case, settings, directory):
     ):
         process = subprocess.Popen(
             [
-                sys.executable,
+                str(python or sys.executable),
                 "-m",
                 "faultline.worker",
                 "--job",
@@ -123,6 +124,9 @@ def run_case(case, settings, directory):
         "backend": settings.backend,
         "device": settings.device,
         "injected_fault": settings.backend.startswith("mutant:"),
+        "gradients": settings.gradients,
+        "dynamic": settings.dynamic,
+        "trace": case.to_dict().get("kind") == "trace",
         "worker_wall_s": time.monotonic() - start,
         "peak_tree_rss_mb": peak / 1024**2,
         "worker_returncode": process.returncode,
@@ -141,6 +145,8 @@ def run_case(case, settings, directory):
     else:
         try:
             payload = read_json(raw_path)
+            if payload.get("worker_protocol") != 2:
+                raise ValueError("worker protocol mismatch")
             if payload["status"] != "harness_error" and payload["case_hash"] != case.digest():
                 raise ValueError("worker returned a different case")
             result = {**payload, **base}

@@ -13,11 +13,11 @@ from .evaluate import Settings
 from .export import export_case
 from .finding import load_finding, replay_finding
 from .generate import corpus, generate, reduction_fixture
-from .ir import Case
 from .lowering import freeze
 from .report import write_report
 from .runner import run_case
 from .storage import atomic_json, read_json
+from .trace import Trace, program_from_dict
 from .workflows import run_demo, run_reduction
 
 
@@ -34,6 +34,10 @@ def execution_options(parser, optional=False):
     parser.add_argument("--max-rss-mb", type=int, default=4096)
     parser.add_argument("--rtol", type=float)
     parser.add_argument("--atol", type=float)
+    parser.add_argument("--gradients", action="store_true", default=None if optional else False)
+    parser.add_argument(
+        "--dynamic", choices=("static", "auto", "dynamic"), default=None if optional else "static"
+    )
     if optional:
         parser.set_defaults(
             backend=None, device=None, repeats=None, threads=None, timeout=None, max_rss_mb=None
@@ -50,10 +54,14 @@ def settings_from(args):
         "threads": "threads",
         "rtol": "rtol",
         "atol": "atol",
+        "gradients": "gradients",
     }
-    return Settings(
-        **{key: getattr(args, arg) for arg, key in names.items() if getattr(args, arg) is not None}
-    )
+    values = {
+        key: getattr(args, arg) for arg, key in names.items() if getattr(args, arg) is not None
+    }
+    if args.dynamic is not None:
+        values["dynamic"] = {"static": False, "auto": None, "dynamic": True}[args.dynamic]
+    return Settings(**values)
 
 
 def case_source(args):
@@ -69,19 +77,27 @@ def case_source(args):
                 "max_rss_mb",
                 "rtol",
                 "atol",
+                "gradients",
+                "dynamic",
             )
         ):
             raise ValueError("Saved findings retain their settings; overrides are not accepted")
         finding = load_finding(args.case)
         return finding.case, finding.settings, finding
-    return freeze(Case.from_dict(read_json(args.case))), settings_from(args), None
+    return freeze(program_from_dict(read_json(args.case))), settings_from(args), None
 
 
 def exit_status(summary):
     counts = summary["counts"]
     if any(
         counts.get(s, 0)
-        for s in ("numerical_mismatch", "structural_mismatch", "compile_error", "runtime_error")
+        for s in (
+            "numerical_mismatch",
+            "gradient_mismatch",
+            "structural_mismatch",
+            "compile_error",
+            "runtime_error",
+        )
     ):
         return 1
     return 0 if set(counts) <= {"pass"} else 2
@@ -110,6 +126,28 @@ def main(argv=None):
         "--fixture", action="store_true", help="noisy graph for controlled reduction tests"
     )
     gen.add_argument("--output", type=Path, required=True)
+    capture = commands.add_parser("capture", help="capture a trusted local model.py:factory")
+    capture.add_argument("factory", help="executes trusted Python returning (eval model, inputs)")
+    capture.add_argument("--frontend", choices=("export", "fx"), default="export")
+    capture.add_argument(
+        "--trace", action="store_true", help="factory returns a sequence of input tuples"
+    )
+    capture.add_argument("--output", type=Path, required=True)
+    trace = commands.add_parser(
+        "trace", help="combine ordered, compatible cases into a request trace"
+    )
+    trace.add_argument("--case", type=Path, action="append", required=True)
+    trace.add_argument("--output", type=Path, required=True)
+    comparison = commands.add_parser("compare", help="gate compiler environment upgrades")
+    execution_options(comparison)
+    comparison.add_argument("--baseline-python", required=True)
+    comparison.add_argument("--candidate-python", default=sys.executable)
+    comparison.add_argument("--candidate-backend", help="optional explicit backend comparison")
+    comparison.add_argument("--case", type=Path, action="append", default=[])
+    comparison.add_argument("--corpus", action="store_true")
+    comparison.add_argument("--output", type=Path, required=True)
+    comparison.add_argument("--reduce", action="store_true")
+    comparison.add_argument("--max-evaluations", type=int, default=64)
     run = commands.add_parser("run", help="run a corpus, generated cases, or JSON files")
     execution_options(run)
     run.add_argument("--output", type=Path, required=True)
@@ -171,10 +209,54 @@ def main(argv=None):
             )
             atomic_json(args.output, freeze(case).to_dict())
             print(args.output)
+        elif args.command == "capture":
+            from .model_source import capture_factory
+
+            if args.output.exists():
+                raise ValueError("Capture output exists; choose a new path")
+            case = capture_factory(args.factory, trace=args.trace, frontend=args.frontend)
+            atomic_json(args.output, case.to_dict())
+            print(args.output)
+        elif args.command == "trace":
+            if args.output.exists():
+                raise ValueError("Trace output exists; choose a new path")
+            steps = tuple(freeze(program_from_dict(read_json(path))) for path in args.case)
+            if any(isinstance(step, Trace) for step in steps):
+                raise ValueError("trace --case accepts individual cases, not nested traces")
+            result = Trace(steps)
+            result.validate()
+            atomic_json(args.output, result.to_dict())
+            print(args.output)
+        elif args.command == "compare":
+            from dataclasses import replace
+
+            from .compare_envs import compare_environments
+
+            settings = settings_from(args)
+            cases = [program_from_dict(read_json(path)) for path in args.case]
+            if args.corpus:
+                cases.extend(corpus())
+            candidate = (
+                replace(settings, backend=args.candidate_backend)
+                if args.candidate_backend
+                else settings
+            )
+            result = compare_environments(
+                cases,
+                args.output,
+                args.baseline_python,
+                args.candidate_python,
+                settings,
+                candidate,
+                args.reduce,
+                args.max_evaluations,
+            )
+            print(args.output / "report.html")
+            return result["exit_code"]
         elif args.command == "run":
             if not 0 <= args.count <= 10000:
                 raise ValueError("count must be in [0, 10000]")
-            cases = [Case.from_dict(read_json(path)) for path in args.case]
+            cases = [program_from_dict(read_json(path)) for path in args.case]
             if args.corpus:
                 cases.extend(corpus(args.dtype))
             cases.extend(generate(args.seed + i, args.depth, args.dtype) for i in range(args.count))

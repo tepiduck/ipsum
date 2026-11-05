@@ -93,6 +93,11 @@ def shapes_and_values(case):
 
 
 def minimize(case, oracle, max_evaluations=64, progress=None, expected=None):
+    from .sequence_reduce import minimize_trace
+    from .trace import Trace
+
+    if isinstance(case, Trace):
+        return minimize_trace(case, oracle, max_evaluations, progress, expected)
     if max_evaluations < 2:
         raise ValueError("reduction needs at least two evaluations")
     case.validate()

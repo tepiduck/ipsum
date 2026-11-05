@@ -38,11 +38,15 @@ def main():
     if "parent" in job:
         threading.Thread(target=watch_parent, args=tuple(job["parent"]), daemon=True).start()
     # Import torch only after the coordinator has started enforcing resource limits.
+    from .environment import describe
     from .evaluate import Settings, evaluate
-    from .ir import Case
+    from .trace import program_from_dict
 
     try:
-        result = evaluate(Case.from_dict(job["case"]), Settings(**job["settings"]))
+        if job.get("worker_protocol", 2) != 2:
+            raise ValueError("unsupported worker protocol")
+        result = evaluate(program_from_dict(job["case"]), Settings(**job["settings"]))
+        result["worker_environment"] = describe()
     except Exception as exc:
         import traceback
 
@@ -53,6 +57,7 @@ def main():
             "error": f"{type(exc).__name__}: {exc}",
             "traceback": traceback.format_exc(),
         }
+    result["worker_protocol"] = 2
     atomic_json(args.result, result)
 
 

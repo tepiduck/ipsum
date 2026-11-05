@@ -14,7 +14,13 @@ from .ir import Case, Input, Node
 from .lowering import inputs_for
 
 
-def capture(model, examples, *, tag="captured-model", seed=0):
+def capture(model, examples, *, tag="captured-model", seed=0, frontend="fx"):
+    if frontend == "export":
+        from .importer import capture_export
+
+        return capture_export(model, examples, tag=tag, seed=seed)
+    if frontend != "fx":
+        raise ValueError("capture frontend must be fx or export")
     if model.training:
         raise ValueError("capture requires model.eval(); training graphs are not supported")
     if not examples or any(not isinstance(value, torch.Tensor) for value in examples):

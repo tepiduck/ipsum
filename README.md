@@ -11,6 +11,10 @@ failures while preserving their original inputs, settings, and failure signature
 - **Isolated workers** with wall-time and host-memory limits.
 - **Failure-preserving reduction** over graphs, dimensions, layouts, and input values.
 - **Standalone reproducers** that need only PyTorch, with the same repeated checks as the runner.
+- **Model import through `torch.export`**, including GELU, convolution, pooling, and attention.
+- **Forward and gradient comparisons**, with named input and parameter diagnostics.
+- **Request-sequence reduction** for failures that depend on earlier shapes or requests.
+- **Compiler upgrade gates** across two Python environments, with automatic regression reduction.
 
 A numerical discrepancy is a finding to investigate, **not an automatically confirmed compiler bug**.
 
@@ -100,23 +104,66 @@ before sharing them. Faultline runs locally and has no telemetry or hosted servi
 ```python
 import torch
 from torch import nn
-from faultline.capture import capture
-from faultline.storage import atomic_json
 
-model = nn.Sequential(nn.Linear(17, 31), nn.ReLU(), nn.Linear(31, 5)).eval()
-case = capture(model, (torch.randn(7, 17),), tag="my-mlp")
-atomic_json("my-model.json", case.to_dict())
+# Save as my_model.py. The factory runs once during capture.
+def factory():
+    torch.manual_seed(0)
+    model = nn.Sequential(nn.Linear(17, 31), nn.GELU(), nn.Linear(31, 5)).eval()
+    return model, (torch.randn(7, 17),)
 ```
 
 ```bash
-faultline run --case my-model.json --backend inductor --output faultline-runs/model
+faultline capture my_model.py:factory --output my-model.json
+faultline run --case my-model.json --gradients --backend inductor --output faultline-runs/model
 ```
 
-Capture supports a bounded, inference-only subset: Linear, last-dimension LayerNorm, ReLU, Tanh,
-Sigmoid, Softmax, Identity, and supported functional tensor operations. Parameters become frozen
-tensor inputs. Unsupported operations, mutation, training mode, unsupported strides, and nested
-outputs are rejected. Model capture executes trusted local Python; saved cases are data-only JSON.
-See [the model example](examples/capture_mlp.py).
+The CLI defaults to a `torch.export` importer with an explicit operator registry. It supports Linear,
+GELU, Conv2d, AdaptiveAvgPool2d, scaled dot-product attention, last-dimension LayerNorm, and common
+arithmetic/activation/reshape operations. Parameters retain their identities and trainability.
+The importer checks its lowered outputs against the exported model before accepting a case.
+`--gradients` compares forward outputs, a deterministic scalar loss, input gradients, and trainable
+parameter gradients. It detects missing gradients separately from zero gradients.
+
+Capture requires `eval()` and flat tensor inputs/outputs. Stochastic training, mutation, optimizer
+steps, unsupported operations, and unsupported strides are rejected. Attention accepts causal or
+finite floating-point masks; boolean masks, dropout, and grouped-query attention are unsupported.
+Models must fit the bounded IR; this is a debugger for small models and isolated model components.
+Capture executes trusted local Python; saved cases are data-only JSON. See the
+[ready-to-run model factories](examples/models.py). The older FX importer remains available with
+`--frontend fx`; the Python `capture()` API retains FX as its default for compatibility.
+
+## Debug a request sequence
+
+```bash
+faultline capture examples/models.py:requests --trace --output requests.json
+faultline run --case requests.json --dynamic dynamic --gradients --output faultline-runs/sequence
+```
+
+A trace factory returns one model and an ordered list of input tuples. Each trace execution reuses
+one compiled callable across requests, allowing shape-history failures to appear. All requests must
+share graph structure and frozen model state. Reduce a failing trace with the usual `reduce`
+command: it removes requests before simplifying graphs and tensors. A whole trace is repeated and
+rechecked for every proposal. The controlled sequence experiment reduces seven requests to
+`A → B → A`, even though every request passes alone.
+
+## Gate a compiler upgrade
+
+Install the desired PyTorch versions plus NumPy and psutil in two environments, then run:
+
+```bash
+faultline compare --baseline-python .baseline/bin/python --candidate-python .candidate/bin/python --case my-model.json --gradients --reduce --output faultline-runs/upgrade
+```
+
+On Windows, use each environment's `Scripts/python.exe`. Both interpreters must run on the same
+host OS; run the command inside WSL when using Linux environments. Faultline supplies the same
+harness source to both workers and records each environment independently. Add multiple `--case`
+arguments or use `--corpus`. Cases and traces use the same comparison workflow.
+
+A new stable candidate failure fails the gate. Automatic reduction accepts a smaller case only
+when **the baseline still passes and the candidate still exhibits the original failure**. It
+exports separate baseline and candidate reproducers after fresh confirmation. Timeouts, unstable
+results, unavailable devices, and broken environments are inconclusive and cannot pass the gate.
+The HTML report links to both outcomes and the reduced reproducers. See [exit codes](docs/cli.md).
 
 ## Command reference
 
@@ -126,6 +173,9 @@ See [the model example](examples/capture_mlp.py).
 | `demo` | Complete controlled-fault example |
 | `doctor` | Inspect runtime and optionally probe compilation |
 | `generate` | Create a seeded, frozen JSON case |
+| `capture` | Import a trusted model factory into frozen JSON |
+| `trace` | Combine compatible cases into an ordered request sequence |
+| `compare` | Compare compiler environments and optionally reduce new failures |
 | `run` | Test a corpus, generated cases, or supplied JSON files |
 | `resume` | Continue a compatible interrupted campaign |
 | `report` | Build a searchable local HTML report; `--open` opens it |
@@ -144,13 +194,15 @@ python -m pytest -q
 python -m pytest -q -m compiler
 python -m ruff check src/faultline tests/faultline scripts/validate_faultline.py scripts/check_release.py examples
 python scripts/validate_faultline.py --compiler --output faultline-runs/validation
+python scripts/validate_upgrades.py --compiler --output faultline-runs/upgrades
 python -m build
 ```
 
 The portable tests run on Windows and Linux. The `compiler` test needs a working Inductor toolchain.
-The experiment harness separates controlled mutations from real compiler comparisons. Fixed shapes,
-forward inference, and a restricted operator set define the current scope; gradients, distributed
-execution, arbitrary models, and performance-regression detection are not supported.
+The experiment harness separates controlled mutations from real compiler comparisons. Forward and
+backward checks use stateless evaluation graphs and a restricted operator set. Traces supply concrete
+requests to static, automatic, or dynamic compilation. Distributed execution, arbitrary training
+loops, arbitrary model coverage, and performance-regression detection are outside the current scope.
 
 Faultline uses public PyTorch FX and `torch.compile` APIs. Its IR reducer is independent of
 PyTorch's internal minifier. An exported script can optionally request the upstream debugger with

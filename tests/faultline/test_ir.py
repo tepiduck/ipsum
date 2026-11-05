@@ -68,7 +68,7 @@ def test_unknown_schema_and_fields_rejected():
     with pytest.raises(ValueError):
         Case.from_dict({**data, "arbitrary_python": "print(1)"})
     with pytest.raises(ValueError):
-        replace(corpus()[0], schema_version=2).validate()
+        replace(corpus()[0], schema_version=99).validate()
     for reserved in ("self", "torch"):
         with pytest.raises(ValueError):
             Case((Input(reserved, (2,)),), (), (reserved,)).validate()

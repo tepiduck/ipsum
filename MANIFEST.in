@@ -2,7 +2,9 @@ include README.md LICENSE pyproject.toml
 recursive-include src/faultline *.py
 recursive-include tests/faultline *.py
 include scripts/validate_faultline.py scripts/check_release.py
+include scripts/validate_upgrades.py
 include examples/capture_mlp.py
+include examples/models.py
 include docs/architecture.md docs/cli.md docs/validation.json
 global-exclude __pycache__ *.py[cod] AGENTS.md CLAUDE.md
 exclude tests/test_*.py

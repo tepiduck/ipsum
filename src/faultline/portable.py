@@ -19,7 +19,13 @@ TOLERANCES = {
     "bfloat16": (5e-2, 5e-3),
 }
 
-REDUCIBLE = {"numerical_mismatch", "structural_mismatch", "compile_error", "runtime_error"}
+REDUCIBLE = {
+    "numerical_mismatch",
+    "structural_mismatch",
+    "gradient_mismatch",
+    "compile_error",
+    "runtime_error",
+}
 
 
 def same_failure(baseline, result):
@@ -30,6 +36,9 @@ def same_failure(baseline, result):
         and result.get("injected_fault") == baseline.get("injected_fault")
         and result.get("backend") == baseline.get("backend")
         and result.get("device") == baseline.get("device")
+        and result.get("gradients", False) == baseline.get("gradients", False)
+        and result.get("dynamic", False) == baseline.get("dynamic", False)
+        and result.get("trace", False) == baseline.get("trace", False)
     )
 
 
@@ -94,6 +103,19 @@ def reference_health(outputs):
 def fingerprint(result):
     """A failure-family key, not a claim that deduplicated cases share a root cause."""
     status = result["status"]
+    if status == "gradient_mismatch" or (
+        (result.get("trace") or result.get("gradients"))
+        and status in REDUCIBLE
+        and "comparison" in result
+    ):
+        failed = sorted(
+            {
+                (x["target"], "nonfinite" if x.get("candidate_nonfinite", 0) else x["kind"])
+                for x in result["comparison"]["outputs"]
+                if not x["matches"]
+            }
+        )
+        return f"{status}:targets={failed}:backend={result['backend']}"
     if status in {"numerical_mismatch", "structural_mismatch"}:
         failed = [
             (x["index"], "nonfinite" if x.get("candidate_nonfinite", 0) else x["kind"])
@@ -259,3 +281,128 @@ def check_execution(reference, create_candidate, args, *, device, repeats, rtol,
         references[0],
         candidates[0],
     )
+
+
+def observe_gradients(fn, args, selected, *, wrong_gradient=False):
+    # Detach creates fresh leaves without changing strides or expanded storage.
+    leaves = tuple(
+        value.detach().requires_grad_(index in selected) for index, value in enumerate(args)
+    )
+    outputs = tuple(fn(*leaves))
+    loss = sum(value.square().mean() for value in outputs)
+    if wrong_gradient:
+        loss = loss.detach() + 2 * (loss - loss.detach())
+    targets = tuple(leaves[i] for i in selected)
+    gradients = (
+        torch.autograd.grad(loss, targets, allow_unused=True)
+        if loss.requires_grad
+        else (None,) * len(targets)
+    )
+    observed = [*outputs, loss]
+    for target, gradient in zip(targets, gradients, strict=True):
+        observed.append(torch.tensor(gradient is not None, device=target.device))
+        observed.append(torch.zeros_like(target) if gradient is None else gradient)
+    return tuple(observed)
+
+
+def check_workload(
+    reference_factory,
+    candidate_factory,
+    requests,
+    input_specs,
+    output_names,
+    *,
+    gradients=False,
+    trace=False,
+    device,
+    repeats,
+    rtol,
+    atol,
+    mutant=None,
+):
+    selected = [
+        i
+        for i, spec in enumerate(input_specs)
+        if spec.get("role", "input") == "input"
+        or (spec.get("role") == "parameter" and spec.get("requires_grad", False))
+    ]
+    if gradients and not selected:
+        raise ValueError("gradient checking requires an input or trainable parameter")
+    names = [f"output:{name}" for name in output_names]
+    if gradients:
+        names += ["loss:sum_squared_means"]
+        for index in selected:
+            names.extend(
+                [
+                    f"gradient:{input_specs[index]['name']}:present",
+                    f"gradient:{input_specs[index]['name']}:value",
+                ]
+            )
+    user_index = next(
+        (i for i, spec in enumerate(input_specs) if spec.get("role", "input") == "input"), 0
+    )
+
+    def observe(fn, args, candidate):
+        return (
+            observe_gradients(
+                fn, args, selected, wrong_gradient=candidate and mutant == "gradient-scale"
+            )
+            if gradients
+            else tuple(fn(*args))
+        )
+
+    def sequence(factory, candidate):
+        fn = factory()
+        values, state = [], 0
+        for args in requests:
+            output = observe(fn, args, candidate)
+            if candidate and mutant == "sequence-cache":
+                batch = args[user_index].shape[0]
+                if batch == 2:
+                    if state == 2:
+                        output = tuple(t * 2 for t in output)
+                    elif state == 0:
+                        state = 1
+                elif batch == 3 and state == 1:
+                    state = 2
+            values.extend(output)
+        return tuple(values)
+
+    with torch.enable_grad() if gradients else torch.inference_mode():
+        if trace:
+            reference = lambda: sequence(reference_factory, False)
+            create = lambda: lambda: sequence(candidate_factory, True)
+            args = ()
+        else:
+            ref = reference_factory()
+            reference = lambda *args: observe(ref, args, False)
+
+            def create():
+                fn = candidate_factory()
+                return lambda *args: observe(fn, args, True)
+
+            args = requests[0]
+        result, reference_values, candidate_values = check_execution(
+            reference,
+            create,
+            args,
+            device=device,
+            repeats=repeats,
+            rtol=rtol,
+            atol=atol,
+            mutant=mutant,
+        )
+    if "comparison" in result:
+        for item in result["comparison"]["outputs"]:
+            item["target"] = names[item["index"] % len(names)]
+            if trace:
+                item["step"] = item["index"] // len(names)
+        failures = [x for x in result["comparison"]["outputs"] if not x["matches"]]
+        if gradients and failures and all(x["target"].startswith("gradient:") for x in failures):
+            result["status"] = "gradient_mismatch"
+        if trace:
+            result["failing_steps"] = sorted({x["step"] for x in failures})
+    if gradients:
+        result["loss_definition"] = "sum of mean squared outputs: sum(output.square().mean())"
+        result["gradient_targets"] = [input_specs[i]["name"] for i in selected]
+    return result, reference_values, candidate_values

@@ -29,6 +29,8 @@ import os
 import sys
 
 CASE = json.loads($case_json)
+STEPS = CASE.get("steps", [CASE])
+GRAPH = STEPS[0]
 SETTINGS = json.loads($settings_json)
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--device", default=SETTINGS["device"])
@@ -46,9 +48,9 @@ $reference
 class Candidate(torch.nn.Module):
 $candidate
 
-def make_inputs():
+def make_inputs(specifications):
     result = []
-    for spec in CASE["inputs"]:
+    for spec in specifications:
         dtype = getattr(torch, spec["dtype"])
         shape = spec["shape"]
         value = torch.tensor(spec["values"], dtype=dtype, device=options.device).reshape(shape)
@@ -75,6 +77,8 @@ def finish(record):
     result = {"schema_version": 1, "case_hash": CASE_HASH, "torch_version": torch.__version__,
               "device": options.device, "backend": SETTINGS["backend"],
               "injected_fault": SETTINGS["backend"].startswith("mutant:"),
+              "gradients": SETTINGS.get("gradients", False),
+              "dynamic": SETTINGS.get("dynamic", False), "trace": CASE.get("kind") == "trace",
               "rtol": $rtol, "atol": $atol, "repeats": SETTINGS["repeats"], **record}
     result["fingerprint"] = fingerprint(result)
     if EXPECTED is not None:
@@ -86,7 +90,7 @@ def finish(record):
 
 
 def main():
-    unavailable = configure(options.device, SETTINGS["threads"], CASE["seed"])
+    unavailable = configure(options.device, SETTINGS["threads"], GRAPH["seed"])
     if unavailable:
         return finish(unavailable)
     backend = SETTINGS["backend"]
@@ -97,17 +101,19 @@ def main():
             raise RuntimeError("Injected compiler failure: faultline validation fixture")
         candidate = Candidate()
         if backend != "eager" and mutant is None:
-            candidate = torch.compile(candidate, backend=backend, fullgraph=True, dynamic=False)
+            candidate = torch.compile(candidate, backend=backend, fullgraph=True,
+                                      dynamic=SETTINGS.get("dynamic", False))
         return candidate
 
-    with torch.inference_mode():
+    with torch.enable_grad() if SETTINGS.get("gradients", False) else torch.inference_mode():
         try:
-            inputs = make_inputs()
-            reference = Reference()
+            requests = [make_inputs(step["inputs"]) for step in STEPS]
         except Exception as exc:
             return finish(exception_record(exc, "reference_error"))
-        record, _, _ = check_execution(
-            reference, create_candidate, inputs, device=options.device,
+        record, _, _ = check_workload(
+            Reference, create_candidate, requests, GRAPH["inputs"], GRAPH["outputs"],
+            gradients=SETTINGS.get("gradients", False), trace=CASE.get("kind") == "trace",
+            device=options.device,
             repeats=SETTINGS["repeats"], rtol=$rtol, atol=$atol, mutant=mutant,
         )
         return finish(record)
@@ -132,6 +138,9 @@ def export_case(case, settings, directory, result=None, *, environment=_CURRENT_
     if directory.exists() and any(directory.iterdir()):
         raise ValueError("Export would overwrite existing evidence; choose a new directory")
     case = freeze(case)
+    from .trace import Trace
+
+    graph = case.steps[0] if isinstance(case, Trace) else case
     mutant = settings.backend.split(":", 1)[1] if settings.backend.startswith("mutant:") else None
     rtol, atol = tolerances(case.inputs[0].dtype, settings.rtol, settings.atol)
     if result and (
@@ -139,6 +148,9 @@ def export_case(case, settings, directory, result=None, *, environment=_CURRENT_
         or result.get("backend") != settings.backend
         or result.get("device") != settings.device
         or result.get("injected_fault") != bool(mutant)
+        or result.get("gradients", False) != settings.gradients
+        or result.get("dynamic", False) != settings.dynamic
+        or result.get("trace", False) != isinstance(case, Trace)
         or any(
             result.get(key, value) != value
             for key, value in {
@@ -157,8 +169,8 @@ def export_case(case, settings, directory, result=None, *, environment=_CURRENT_
         label="a CONTROLLED FAULT INJECTION" if mutant else "an unconfirmed differential test",
         case_json=repr(json.dumps(case.to_dict(), allow_nan=False)),
         settings_json=repr(json.dumps(settings.to_dict(), allow_nan=False)),
-        reference=textwrap.indent(build(case).code.strip(), "    "),
-        candidate=textwrap.indent(build(case, mutant).code.strip(), "    "),
+        reference=textwrap.indent(build(graph).code.strip(), "    "),
+        candidate=textwrap.indent(build(graph, mutant).code.strip(), "    "),
         rtol=repr(rtol),
         atol=repr(atol),
     )

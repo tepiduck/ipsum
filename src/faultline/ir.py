@@ -18,6 +18,7 @@ LAYOUTS = {"contiguous", "transposed", "strided", "expanded"}
 UNARY = {"relu", "tanh", "sigmoid", "sin", "neg", "contiguous", "clone"}
 BINARY = {"add", "sub", "mul", "matmul"}
 OPS = UNARY | BINARY | {"sum", "mean", "transpose", "reshape", "softmax", "layer_norm"}
+EXTENDED_OPS = {"gelu", "conv2d", "adaptive_avg_pool2d", "attention", "permute"}
 
 
 def numel(shape):
@@ -56,6 +57,8 @@ class Input:
     dtype: str = "float32"
     layout: str = "contiguous"
     values: tuple[float, ...] | None = None
+    role: str = "input"
+    requires_grad: bool = False
 
 
 @dataclass(frozen=True)
@@ -76,7 +79,12 @@ class Case:
     schema_version: int = 1
 
     def to_dict(self):
-        return asdict(self)
+        data = asdict(self)
+        if self.schema_version == 1:
+            for spec in data["inputs"]:
+                spec.pop("role")
+                spec.pop("requires_grad")
+        return data
 
     @classmethod
     def from_dict(cls, data):
@@ -116,13 +124,16 @@ class Case:
         ).hexdigest()
 
     def validate(self):
-        if type(self.schema_version) is not int or self.schema_version != 1:
+        if type(self.schema_version) is not int or self.schema_version not in {1, 2}:
             raise ValueError("unsupported case schema")
         if type(self.seed) is not int or not 0 <= self.seed < 2**32:
             raise ValueError("seed must be uint32")
         if not isinstance(self.tag, str) or len(self.tag) > 256:
             raise ValueError("invalid tag")
-        if not 1 <= len(self.inputs) <= 16 or len(self.nodes) > MAX_NODES:
+        if (
+            not 1 <= len(self.inputs) <= (16 if self.schema_version == 1 else 64)
+            or len(self.nodes) > MAX_NODES
+        ):
             raise ValueError("input/node budget exceeded")
         shapes = {}
 
@@ -140,6 +151,13 @@ class Case:
 
         for item in self.inputs:
             name_ok(item.name)
+            if (
+                item.role not in {"input", "parameter", "buffer", "constant"}
+                or type(item.requires_grad) is not bool
+            ):
+                raise ValueError("invalid input role or gradient flag")
+            if self.schema_version == 1 and (item.role != "input" or item.requires_grad):
+                raise ValueError("input roles and gradient flags require case schema 2")
             shape = checked_shape(item.shape)
             if item.dtype not in DTYPES or item.layout not in LAYOUTS:
                 raise ValueError("unsupported dtype/layout")
@@ -162,8 +180,16 @@ class Case:
             raise ValueError("mixed input dtypes are not supported")
         for node in self.nodes:
             name_ok(node.name)
-            if node.op not in OPS or not isinstance(node.params, dict):
+            supported = OPS | EXTENDED_OPS if self.schema_version == 2 else OPS
+            if node.op not in supported or not isinstance(node.params, dict):
                 raise ValueError("unsupported operator")
+            if node.op in EXTENDED_OPS:
+                from .operators import infer_extended
+
+                if any(a not in shapes for a in node.args):
+                    raise ValueError("invalid forward reference")
+                shapes[node.name] = checked_shape(infer_extended(node, shapes))
+                continue
             arity = 2 if node.op in BINARY else 1
             if len(node.args) != arity or any(a not in shapes for a in node.args):
                 raise ValueError("invalid arity or forward reference")

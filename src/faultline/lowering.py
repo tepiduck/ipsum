@@ -36,6 +36,12 @@ def inputs_for(case, device="cpu", dtype=None):
 
 
 def freeze(case):
+    from .trace import Trace
+
+    if isinstance(case, Trace):
+        result = replace(case, steps=tuple(freeze(step) for step in case.steps))
+        result.validate()
+        return result
     case.validate()
     values = inputs_for(case)
     return replace(
@@ -67,6 +73,12 @@ def build(case, mutant=None):
             value = graph.call_function(F.layer_norm, (*args, (shapes[node.args[0]][-1],)), params)
         elif op == "reshape":
             value = graph.call_function(torch.reshape, (*args, tuple(params["shape"])))
+        elif op == "permute":
+            value = graph.call_method("permute", (args[0], tuple(params["dims"])))
+        elif op == "attention":
+            value = graph.call_function(F.scaled_dot_product_attention, args, params)
+        elif op in {"gelu", "conv2d", "adaptive_avg_pool2d"}:
+            value = graph.call_function(getattr(F, op), args, params)
         else:
             value = graph.call_function(getattr(torch, op), args, params)
         value.name = node.name
