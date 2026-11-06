@@ -248,6 +248,470 @@
     ]
   },
   "date": "2026-11-05",
+  "diagnostic_validation": {
+    "cuda_requirement_check": {
+      "executed_cases": 0,
+      "status": "unavailable"
+    },
+    "date": "2026-11-05",
+    "environment": {
+      "baseline_torch": "2.15.0+cpu",
+      "candidate_torch": "2.12.0+cpu",
+      "device": "cpu",
+      "os": "Ubuntu 24.04 / WSL",
+      "python": "3.12.3",
+      "qualification_torch": "2.15.0+cpu"
+    },
+    "experiment_source_sha256": "20e22540e1fdf7346394bfac36a039720850ea1ca874ac0d3743e55f34633c04",
+    "gpu_hardware_validated": false,
+    "historical_corpus": {
+      "candidate_detections": 3,
+      "cases": [
+        {
+          "aot_capture": false,
+          "baseline_status": "pass",
+          "candidate_detected": true,
+          "candidate_status": "numerical_mismatch",
+          "classification": "regression",
+          "device": "cpu",
+          "diagnosis": {
+            "boundary": "Inductor lowering or code generation",
+            "rungs": [
+              {
+                "backend": "eager",
+                "status": "pass"
+              },
+              {
+                "backend": "aot_eager",
+                "status": "pass"
+              },
+              {
+                "backend": "aot_eager_decomp_partition",
+                "status": "pass"
+              },
+              {
+                "backend": "inductor",
+                "status": "numerical_mismatch"
+              }
+            ],
+            "status": "observed_boundary"
+          },
+          "expected_status": "numerical_mismatch",
+          "expected_target": "step:0:output",
+          "family": "expanded_storage",
+          "id": "183986",
+          "issue": "https://github.com/pytorch/pytorch/issues/183986",
+          "original_snapshot_bytes": 14890,
+          "paired_reproduction": true,
+          "reduction": {
+            "budget_exhausted": false,
+            "confirmed": true,
+            "evaluations": 5,
+            "graph_stage": "dynamo",
+            "native_graph": true,
+            "original_complexity": [
+              1,
+              3,
+              15
+            ],
+            "predicate": "same stable failure AND baseline passes",
+            "reduced_complexity": [
+              1,
+              3,
+              15
+            ]
+          },
+          "reduction_wall_s": 82.056884164,
+          "reported_device": "CUDA",
+          "standalone": {
+            "baseline": {
+              "peak_tree_rss_mb": 395.75390625,
+              "returncode": 0,
+              "status": "pass",
+              "verified": true,
+              "wall_s": 4.125407239000026
+            },
+            "candidate": {
+              "peak_tree_rss_mb": 565.01953125,
+              "returncode": 1,
+              "status": "numerical_mismatch",
+              "verified": true,
+              "wall_s": 11.347459585999957
+            }
+          },
+          "status": "paired_reproduction",
+          "wall_s": 156.769451253
+        },
+        {
+          "aot_capture": true,
+          "baseline_status": "pass",
+          "candidate_detected": true,
+          "candidate_status": "gradient_mismatch",
+          "classification": "regression",
+          "device": "cpu",
+          "diagnosis": {
+            "boundary": "Inductor lowering or code generation",
+            "rungs": [
+              {
+                "backend": "eager",
+                "status": "pass"
+              },
+              {
+                "backend": "aot_eager",
+                "status": "pass"
+              },
+              {
+                "backend": "aot_eager_decomp_partition",
+                "status": "pass"
+              },
+              {
+                "backend": "inductor",
+                "status": "gradient_mismatch"
+              }
+            ],
+            "status": "observed_boundary"
+          },
+          "expected_status": "gradient_mismatch",
+          "expected_target": "step:0:gradient:input[0][0]:value",
+          "family": "expanded_storage",
+          "id": "182012",
+          "issue": "https://github.com/pytorch/pytorch/issues/182012",
+          "original_snapshot_bytes": 14954,
+          "paired_reproduction": true,
+          "reduction": {
+            "budget_exhausted": false,
+            "confirmed": true,
+            "evaluations": 5,
+            "graph_stage": "backward",
+            "native_graph": true,
+            "original_complexity": [
+              1,
+              4,
+              1
+            ],
+            "predicate": "same stable failure AND baseline passes",
+            "reduced_complexity": [
+              1,
+              4,
+              1
+            ]
+          },
+          "reduction_wall_s": 79.90015986099996,
+          "reported_device": "CUDA",
+          "standalone": {
+            "baseline": {
+              "peak_tree_rss_mb": 384.05859375,
+              "returncode": 0,
+              "status": "pass",
+              "verified": true,
+              "wall_s": 3.7760375860000295
+            },
+            "candidate": {
+              "peak_tree_rss_mb": 556.55078125,
+              "returncode": 1,
+              "status": "gradient_mismatch",
+              "verified": true,
+              "wall_s": 11.152438454999924
+            }
+          },
+          "status": "paired_reproduction",
+          "wall_s": 142.68325648500002
+        },
+        {
+          "aot_capture": true,
+          "baseline_status": "pass",
+          "candidate_detected": false,
+          "candidate_status": "pass",
+          "classification": "agreement",
+          "device": "cpu",
+          "expected_status": "gradient_mismatch",
+          "expected_target": "step:0:gradient:input[0][0]:value",
+          "family": "expanded_storage",
+          "id": "180164",
+          "issue": "https://github.com/pytorch/pytorch/issues/180164",
+          "original_snapshot_bytes": 15530,
+          "paired_reproduction": false,
+          "reduction_skipped": "No paired reproduction with a passing baseline",
+          "reported_device": "CUDA",
+          "status": "not_observed",
+          "wall_s": 21.46949523300009
+        },
+        {
+          "aot_capture": false,
+          "baseline_status": "numerical_mismatch",
+          "candidate_detected": true,
+          "candidate_status": "numerical_mismatch",
+          "classification": "recurring",
+          "device": "cpu",
+          "diagnosis": {
+            "boundary": "Inductor lowering or code generation",
+            "rungs": [
+              {
+                "backend": "eager",
+                "status": "pass"
+              },
+              {
+                "backend": "aot_eager",
+                "status": "pass"
+              },
+              {
+                "backend": "aot_eager_decomp_partition",
+                "status": "pass"
+              },
+              {
+                "backend": "inductor",
+                "status": "numerical_mismatch"
+              }
+            ],
+            "status": "observed_boundary"
+          },
+          "expected_status": "numerical_mismatch",
+          "expected_target": "step:0:output[0]",
+          "family": "explicit_rounding",
+          "id": "185337",
+          "issue": "https://github.com/pytorch/pytorch/issues/185337",
+          "original_snapshot_bytes": 14829,
+          "paired_reproduction": false,
+          "reduction_skipped": "No paired reproduction with a passing baseline",
+          "reported_device": "CPU",
+          "status": "candidate_detected_without_passing_control",
+          "wall_s": 41.1442087769999
+        }
+      ],
+      "corpus_version": 1,
+      "counts": {
+        "candidate_detected_without_passing_control": 1,
+        "not_observed": 1,
+        "paired_reproduction": 2
+      },
+      "detection_fraction_of_selected": 0.75,
+      "family_count": 2,
+      "note": "The older release is deliberately the candidate. Four selected issue patterns span two families. CPU adaptations are labeled; these observations are neither a representative bug-detection rate nor a claim of new upstream bugs. Times include cached compilation, supervision, reduction and optional diagnosis on a shared host.",
+      "paired_reproductions": 2,
+      "selected_count": 4,
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "max_rss_mb": 4096,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 300
+      },
+      "status": "complete"
+    },
+    "note": "Autocast MLP gradients exceeded the unchanged per-output dtype thresholds. This is a numerical finding, not a confirmed compiler bug. CUDA/ROCm checks require external hardware validation.",
+    "qualification": {
+      "autocast": {
+        "aot_capture": false,
+        "cases": [
+          {
+            "failed_outputs": [
+              {
+                "bitwise_equal": false,
+                "candidate_nonfinite": 0,
+                "candidate_shape": [
+                  4,
+                  32
+                ],
+                "elements": 128,
+                "index": 7,
+                "kind": "numeric",
+                "matches": false,
+                "max_abs_error": 0.0001068115234375,
+                "max_scaled_error": 10.42970379641218,
+                "mismatched_elements": 80,
+                "reference_nonfinite": 0,
+                "reference_shape": [
+                  4,
+                  32
+                ],
+                "target": "step:0:gradient:input[0][0]:value"
+              },
+              {
+                "bitwise_equal": false,
+                "candidate_nonfinite": 0,
+                "candidate_shape": [
+                  64
+                ],
+                "elements": 64,
+                "index": 9,
+                "kind": "numeric",
+                "matches": false,
+                "max_abs_error": 0.00018310546875,
+                "max_scaled_error": 17.713222920910457,
+                "mismatched_elements": 53,
+                "reference_nonfinite": 0,
+                "reference_shape": [
+                  64
+                ],
+                "target": "step:0:gradient:parameter:0.bias:value"
+              },
+              {
+                "bitwise_equal": false,
+                "candidate_nonfinite": 0,
+                "candidate_shape": [
+                  64,
+                  32
+                ],
+                "elements": 2048,
+                "index": 11,
+                "kind": "numeric",
+                "matches": false,
+                "max_abs_error": 0.00048828125,
+                "max_scaled_error": 32.54855158945427,
+                "mismatched_elements": 1260,
+                "reference_nonfinite": 0,
+                "reference_shape": [
+                  64,
+                  32
+                ],
+                "target": "step:0:gradient:parameter:0.weight:value"
+              },
+              {
+                "bitwise_equal": false,
+                "candidate_nonfinite": 0,
+                "candidate_shape": [
+                  64
+                ],
+                "elements": 64,
+                "index": 13,
+                "kind": "numeric",
+                "matches": false,
+                "max_abs_error": 0.00010523875243961811,
+                "max_scaled_error": 10.426823813810074,
+                "mismatched_elements": 42,
+                "reference_nonfinite": 0,
+                "reference_shape": [
+                  64
+                ],
+                "target": "step:0:gradient:parameter:1.bias:value"
+              },
+              {
+                "bitwise_equal": false,
+                "candidate_nonfinite": 0,
+                "candidate_shape": [
+                  64
+                ],
+                "elements": 64,
+                "index": 15,
+                "kind": "numeric",
+                "matches": false,
+                "max_abs_error": 0.00021953508257865906,
+                "max_scaled_error": 16.633660714801838,
+                "mismatched_elements": 40,
+                "reference_nonfinite": 0,
+                "reference_shape": [
+                  64
+                ],
+                "target": "step:0:gradient:parameter:1.weight:value"
+              },
+              {
+                "bitwise_equal": false,
+                "candidate_nonfinite": 0,
+                "candidate_shape": [
+                  8
+                ],
+                "elements": 8,
+                "index": 17,
+                "kind": "numeric",
+                "matches": false,
+                "max_abs_error": 0.00030517578125,
+                "max_scaled_error": 23.246875619916683,
+                "mismatched_elements": 8,
+                "reference_nonfinite": 0,
+                "reference_shape": [
+                  8
+                ],
+                "target": "step:0:gradient:parameter:3.bias:value"
+              },
+              {
+                "bitwise_equal": false,
+                "candidate_nonfinite": 0,
+                "candidate_shape": [
+                  8,
+                  64
+                ],
+                "elements": 512,
+                "index": 19,
+                "kind": "numeric",
+                "matches": false,
+                "max_abs_error": 0.000732421875,
+                "max_scaled_error": 51.939058171745145,
+                "mismatched_elements": 312,
+                "reference_nonfinite": 0,
+                "reference_shape": [
+                  8,
+                  64
+                ],
+                "target": "step:0:gradient:parameter:3.weight:value"
+              }
+            ],
+            "graph_count": 1,
+            "id": "mlp-float32",
+            "status": "gradient_mismatch"
+          },
+          {
+            "failed_outputs": [],
+            "graph_count": 1,
+            "id": "convolution-float32",
+            "status": "pass"
+          },
+          {
+            "failed_outputs": [],
+            "graph_count": 1,
+            "id": "attention-float32",
+            "status": "pass"
+          }
+        ],
+        "settings": {
+          "atol": null,
+          "autocast": "bfloat16",
+          "backend": "inductor",
+          "device": "cpu",
+          "gradients": true,
+          "max_rss_mb": 4096,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 300
+        },
+        "status": "discrepancy"
+      },
+      "state_and_shapes": {
+        "aot_capture": false,
+        "cases": [
+          {
+            "failed_outputs": [],
+            "graph_count": 1,
+            "id": "buffer_update-float32",
+            "status": "pass"
+          },
+          {
+            "failed_outputs": [],
+            "graph_count": 1,
+            "id": "shape_sequence-float32",
+            "status": "pass"
+          }
+        ],
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cpu",
+          "dynamic": true,
+          "gradients": true,
+          "max_rss_mb": 4096,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 300
+        },
+        "status": "pass"
+      }
+    },
+    "version": "0.6.0"
+  },
   "environment": {
     "device": "cpu",
     "os": "Ubuntu 24.04 / WSL",

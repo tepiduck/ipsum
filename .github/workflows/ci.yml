@@ -18,7 +18,7 @@ jobs:
       - run: python -m ruff format --check src/faultline tests/faultline scripts examples
       - run: python scripts/check_release.py --index
       - run: python -m build
-      - run: python scripts/check_release.py dist/faultline_ml-0.5.0-py3-none-any.whl dist/faultline_ml-0.5.0.tar.gz
+      - run: python scripts/check_release.py dist/faultline_ml-0.6.0-py3-none-any.whl dist/faultline_ml-0.6.0.tar.gz
   compiler:
     runs-on: ubuntu-latest
     steps:
@@ -63,3 +63,23 @@ jobs:
             faultline-runs/upgrades
             faultline-runs/native
             faultline-runs/aot
+  historical-calibration:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y g++
+      - run: python -m venv .historical
+      - run: .historical/bin/python -m pip install torch==2.12.0 --index-url https://download.pytorch.org/whl/cpu
+      - run: .historical/bin/python -m pip install numpy psutil
+      - run: python -m pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install -e '.[dev]'
+      - name: Require the two independently confirmed historical regressions
+        run: python -m faultline benchmark historical --bad-python .historical/bin/python --case 183986 --case 182012 --require-paired --diagnose --output faultline-runs/historical
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: faultline-historical-evidence
+          path: faultline-runs/historical

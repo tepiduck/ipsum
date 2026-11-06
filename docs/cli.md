@@ -199,6 +199,15 @@ component tests, not a claim of correctness for arbitrary models or GPU performa
 
 ## Useful recipes
 
+Native `model run/compare` additionally accept `--autocast float16|bfloat16` and
+`--compile-mode default|reduce-overhead|max-autotune|max-autotune-no-cudagraphs`. These settings
+are retained by saved-run operations. They are currently unavailable for compact-IR cases.
+
+`model diagnose BUNDLE_OR_RUN` executes the four-backend ladder. `benchmark list` and
+`benchmark historical` expose the versioned historical corpus. `qualify` additionally accepts
+`--require-cuda`, `--no-aot`, and the `buffer_update` / `shape_sequence` workloads. Detailed
+semantics, exit codes, and GPU runner setup are in [diagnostics](diagnostics.md).
+
 ```bash
 # CPU pipeline sanity check without compiling
 faultline run --corpus --backend eager --output faultline-runs/eager

@@ -47,8 +47,8 @@ A captured MLP using Linear, LayerNorm, and ReLU also passed CPU TorchInductor c
 The portable test suite exercises graph validation, model capture, numerical/nonfinite handling,
 repeat stability, worker lifecycle, reduction, saved-finding integrity, standalone export, and
 terminal workflows. The separate compiler test executes real TorchInductor code generation.
-CI runs the portable suite on Windows and Linux, the compiler suite on Linux, and a separate
-two-environment upgrade gate.
+CI runs the portable suite on Windows and Linux, the compiler suite on Linux, a two-environment
+upgrade gate, and historical calibration. GPU qualification is a separate manual workflow.
 
 CPU eager corpus tests cover float16, bfloat16, float32, and float64. The compiled 18-case campaign
 used float32. GPU execution, distributed execution, and arbitrary-model coverage have not been
@@ -201,3 +201,69 @@ python scripts/validate_aot.py --compiler --baseline-python .baseline/bin/python
 Add `--historical-python .historical/bin/python` with PyTorch 2.12.0, NumPy, and psutil to check the
 known backward bug. The Inductor adapter uses private compiler interfaces tested on the releases
 listed above; other PyTorch versions and GPU code paths need their own validation.
+
+## Version 0.6 diagnostics and historical calibration
+
+The versioned historical corpus was run on CPU under Ubuntu/WSL and Python 3.12.3, with
+PyTorch 2.15.0 as the control and 2.12.0 deliberately selected as the older candidate. Each
+comparison used two repeats, one thread, and unchanged dtype-dependent tolerances. All four
+selected fixtures remain in the denominator:
+
+| Issue pattern | 2.12.0 | 2.15.0 | Calibration result | Total wall time |
+|---|---|---|---|---|
+| [183986](https://github.com/pytorch/pytorch/issues/183986), expanded-storage indexing | Numerical mismatch | Pass | Paired reproduction | 157 s |
+| [182012](https://github.com/pytorch/pytorch/issues/182012), diagonal-scatter backward | Gradient mismatch | Pass | Paired reproduction | 143 s |
+| [180164](https://github.com/pytorch/pytorch/issues/180164), slice-scatter backward | Pass | Pass | Not observed | 21 s |
+| [185337](https://github.com/pytorch/pytorch/issues/185337), explicit cast rounding | Numerical mismatch | Numerical mismatch | Recurring; no passing control | 41 s |
+
+The expected symptom appeared in **3 of 4 fixtures**; **2 of 4** also had a passing control.
+The first three reports originated on CUDA; these executions used independently sized CPU
+adaptations. They also share an expanded-storage family, so the corpus represents two families,
+not four independent mechanisms. This is calibration on a small selected set, not a general
+detection rate or a false-negative estimate. Closed upstream issues can still reproduce on a
+given release, as the cast-rounding fixture demonstrates.
+
+Both paired cases were isolated and checked in fresh workers and separate exported scripts:
+
+| Fixture | Original independent graph | Retained graph | Evaluations | Reduction wall time |
+|---|---|---|---|---|
+| Expanded-storage indexing | 3 operations / 15 tensor input elements | 3 / 15 | 5 | 82 s |
+| Diagonal-scatter backward | 4 operations / 1 scalar cotangent | 4 / 1 | 5 | 80 s |
+
+The graphs were already small: the implemented bypass proposals did not remove further operations.
+Their passing baseline and failing candidate scripts reproduced all four expected outcomes.
+The cast case was not automatically reduced because neither environment supplied a passing
+control. Timing includes startup, compilation, supervision, and export verification; the total
+also includes diagnosis. Caches were enabled and other validation used the same host, so these
+times describe this run's cost rather than a reproducible performance benchmark.
+
+For all three detected candidates, `eager`, `aot_eager`, and `aot_eager_decomp_partition` passed;
+only `inductor` failed. The ladder therefore reported an observed Inductor lowering/code-generation
+boundary. This narrows investigation without establishing which pass or transformation caused it.
+
+On Inductor 2.15.0 CPU, float32 model storage with bfloat16 autocast passed convolution and masked
+attention checks. The MLP reported `gradient_mismatch`, with agreeing forward outputs. Seven
+input/parameter gradient tensors exceeded the existing float32 thresholds; the largest absolute
+difference was **0.000732421875**. Thresholds were not relaxed. Low-precision accumulation can
+produce such differences, so this remains a numerical finding rather than a compiler-bug claim.
+Both a three-request registered-buffer mutation stream and a batch-size **2 → 5 → 2 → 7** stream
+passed forward/backward checks with dynamic compilation and normal backend cache behavior.
+
+The compiler suite separately verifies all four backend rungs and a `reduce-overhead`/autocast
+run with AOT capture and standalone replay. Running this mode on CPU does not validate CUDA graphs.
+`qualify --require-cuda` correctly returned `unavailable` with zero cases on the CPU-only runtime.
+**Neither NVIDIA/CUDA nor AMD/ROCm hardware execution is validated.** The manual GPU workflow
+collects dtype, autocast, mutation/shape, and compile-mode evidence on a prepared runner; its
+presence is not a hardware result.
+
+Reproduce the calibration with PyTorch, NumPy, and psutil installed in both environments:
+
+```bash
+faultline benchmark historical --good-python .current/bin/python --bad-python .historical/bin/python --diagnose --max-evaluations 12 --output faultline-runs/history
+faultline qualify --device cpu --dtype float32 --autocast bfloat16 --no-aot --repeats 2 --output faultline-runs/amp
+faultline qualify --device cpu --dtype float32 --workload buffer_update --workload shape_sequence --dynamic dynamic --no-aot --repeats 2 --output faultline-runs/sequences
+```
+
+The benchmark returns 0 for a conclusive completed measurement, even when a fixture does not
+reproduce. CI selects the two paired historical cases and uses `--require-paired` to enforce them.
+See [diagnostics](docs/diagnostics.md) for the artifact fields, exit codes, and remaining limitations.

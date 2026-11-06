@@ -6,6 +6,15 @@ from dataclasses import replace
 from pathlib import Path
 
 
+def native_options(parser, optional=False):
+    parser.add_argument(
+        "--compile-mode",
+        choices=("default", "reduce-overhead", "max-autotune", "max-autotune-no-cudagraphs"),
+        default=None if optional else "default",
+    )
+    parser.add_argument("--autocast", choices=("float16", "bfloat16"))
+
+
 def add_model_commands(commands, execution_options):
     model = commands.add_parser("model", help="capture and check original PyTorch models")
     sub = model.add_subparsers(dest="model_command", required=True)
@@ -21,6 +30,7 @@ def add_model_commands(commands, execution_options):
         command = sub.add_parser(name, help="check a frozen native workload")
         command.add_argument("bundle", type=Path)
         execution_options(command)
+        native_options(command)
         command.add_argument(
             "--aot",
             action="store_true",
@@ -43,6 +53,12 @@ def add_model_commands(commands, execution_options):
         if name == "reduce":
             command.add_argument("--max-evaluations", type=int, default=32)
     capture.add_argument("--output", type=Path, required=True)
+    diagnose = sub.add_parser("diagnose", help="run the backend ladder on a bundle or saved run")
+    diagnose.add_argument("directory", type=Path)
+    diagnose.add_argument("--python", default=sys.executable)
+    diagnose.add_argument("--output", type=Path, required=True)
+    execution_options(diagnose, optional=True)
+    native_options(diagnose, optional=True)
 
 
 def model_command(args, settings_from):
@@ -53,6 +69,42 @@ def model_command(args, settings_from):
         load_native_run,
         run_native,
     )
+
+    if args.model_command == "diagnose":
+        from .diagnose import diagnose_native
+
+        names = (
+            "backend",
+            "device",
+            "repeats",
+            "threads",
+            "timeout",
+            "max_rss_mb",
+            "rtol",
+            "atol",
+            "gradients",
+            "dynamic",
+            "compile_mode",
+            "autocast",
+        )
+        overridden = any(getattr(args, name) is not None for name in names)
+        result = diagnose_native(
+            args.directory,
+            args.output,
+            settings_from(args) if overridden else None,
+            python=args.python,
+        )
+        print(
+            json.dumps(
+                {
+                    "status": result["status"],
+                    "boundary": result.get("boundary"),
+                    "report": str(args.output / "report.html"),
+                },
+                indent=2,
+            )
+        )
+        return result["exit_code"]
 
     if args.model_command == "capture":
         path = capture_workload(

@@ -34,14 +34,34 @@ def export_native(job, settings, output, expected=None):
     ):
         raise ValueError("Saved outcome does not belong to this workload/backend")
     if expected:
-        for name in ("device", "gradients", "dynamic", "repeats", "rtol", "atol"):
+        if (
+            expected.get("compile_mode", "default") != settings.compile_mode
+            or expected.get("autocast") != settings.autocast
+        ):
+            raise ValueError("Saved outcome has a different compiler/autocast policy")
+        for name in (
+            "device",
+            "gradients",
+            "dynamic",
+            "repeats",
+            "rtol",
+            "atol",
+            "compile_mode",
+            "autocast",
+        ):
             if name in expected and expected[name] != getattr(settings, name):
                 raise ValueError(f"Saved outcome has a different {name} policy")
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     bundle = copy_workload(job.bundle, output / "workload")
     source = Path(__file__).parent
-    for name in ("native_runtime.py", "native_graph.py", "native_aot.py", "portable.py"):
+    for name in (
+        "native_runtime.py",
+        "native_graph.py",
+        "native_aot.py",
+        "native_compile.py",
+        "portable.py",
+    ):
         shutil.copyfile(source / name, output / name)
     shutil.copyfile(source / "native_repro.py", output / "repro.py")
     manifest = verify_native(bundle)
@@ -50,6 +70,7 @@ def export_native(job, settings, output, expected=None):
         "native_runtime.py",
         "native_graph.py",
         "native_aot.py",
+        "native_compile.py",
         "portable.py",
         "workload/workload.json",
         *["workload/" + name for name in manifest["files"]],

@@ -345,6 +345,17 @@ def make_native_execution(
         model.to(device)
     model.eval()
     fn = compile_model(model, is_graph) if compile_model else model
+    if settings.get("autocast") and not manifest.get("aot_stage"):
+        forward = fn
+
+        def autocast_forward(*args, **kwargs):
+            # Scope AMP to forward; the loss and backward run outside autocast.
+            with torch.autocast(
+                device_type=torch.device(device).type, dtype=getattr(torch, settings["autocast"])
+            ):
+                return forward(*args, **kwargs)
+
+        fn = autocast_forward
     invocations = 0
 
     def execute():

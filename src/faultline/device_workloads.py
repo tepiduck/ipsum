@@ -28,3 +28,24 @@ def attention():
     values = tuple(torch.randn(2, 2, 8, 16, dtype=DTYPE) for _ in range(3))
     mask = torch.ones(8, 8, dtype=torch.bool).tril()
     return Attention().eval(), (*values, mask)
+
+
+class BufferUpdate(nn.Module):
+    def __init__(self):
+        super().__init__()
+        self.register_buffer("total", torch.zeros(16, dtype=DTYPE))
+
+    def forward(self, value):
+        self.total.add_(value.detach().mean(0))
+        return value * 0.5 + self.total
+
+
+def buffer_update():
+    torch.manual_seed(31)
+    return BufferUpdate().eval(), [(torch.randn(4, 16, dtype=DTYPE),) for _ in range(3)]
+
+
+def shape_sequence():
+    torch.manual_seed(31)
+    model = nn.Sequential(nn.Linear(32, 64), nn.GELU(), nn.Linear(64, 8)).to(dtype=DTYPE).eval()
+    return model, [(torch.randn(batch, 32, dtype=DTYPE),) for batch in (2, 5, 2, 7)]

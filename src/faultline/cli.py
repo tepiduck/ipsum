@@ -25,7 +25,7 @@ def execution_options(parser, optional=False):
     parser.add_argument(
         "--backend",
         default="inductor",
-        help="inductor, aot_eager, eager, or an explicit mutant:<name>",
+        help="inductor, aot_eager, aot_eager_decomp_partition, eager, or mutant:<name>",
     )
     parser.add_argument("--device", default="cpu", help="cpu or cuda[:index]; ROCm uses cuda")
     parser.add_argument("--repeats", type=int, default=3)
@@ -61,6 +61,9 @@ def settings_from(args):
     }
     if args.dynamic is not None:
         values["dynamic"] = {"static": False, "auto": None, "dynamic": True}[args.dynamic]
+    for name in ("compile_mode", "autocast"):
+        if getattr(args, name, None) is not None:
+            values[name] = getattr(args, name)
     return Settings(**values)
 
 
@@ -109,17 +112,57 @@ def main(argv=None):
     )
     parser.add_argument("--version", action="version", version=f"Faultline {__version__}")
     commands = parser.add_subparsers(dest="command", required=True)
-    from .model_cli import add_model_commands, model_command
+    from .model_cli import add_model_commands, model_command, native_options
 
     add_model_commands(commands, execution_options)
+    benchmark = commands.add_parser(
+        "benchmark", help="measure historical-issue detection and reduction"
+    )
+    benchmark_sub = benchmark.add_subparsers(dest="benchmark_command", required=True)
+    benchmark_sub.add_parser("list", help="list the versioned issue fixtures")
+    history = benchmark_sub.add_parser(
+        "historical", help="run known issue patterns in two environments"
+    )
+    history.add_argument("--good-python", default=sys.executable)
+    history.add_argument("--bad-python", required=True)
+    history.add_argument(
+        "--case", action="append", dest="issue_ids", help="issue ID; repeat to select a subset"
+    )
+    history.add_argument("--device", default="cpu")
+    history.add_argument("--repeats", type=int, default=2)
+    history.add_argument("--threads", type=int, default=1)
+    history.add_argument("--timeout", type=float, default=300)
+    history.add_argument("--max-rss-mb", type=int, default=4096)
+    history.add_argument("--max-evaluations", type=int, default=16)
+    history.add_argument("--no-reduce", action="store_false", dest="reduce")
+    history.add_argument("--diagnose", action="store_true")
+    history.add_argument(
+        "--require-paired",
+        action="store_true",
+        help="exit 1 unless every case fails as expected with a passing control",
+    )
+    history.add_argument("--output", type=Path, required=True)
     qualify = commands.add_parser(
         "qualify", help="check a device/compiler across dtypes and backward graphs"
     )
     execution_options(qualify)
+    native_options(qualify)
     qualify.set_defaults(device="cuda:0", gradients=True, timeout=300)
     qualify.add_argument("--dtype", action="append", choices=("float32", "float16", "bfloat16"))
-    qualify.add_argument("--workload", action="append", choices=("mlp", "convolution", "attention"))
-    qualify.add_argument("--require-rocm", action="store_true")
+    qualify.add_argument(
+        "--workload",
+        action="append",
+        choices=("mlp", "convolution", "attention", "buffer_update", "shape_sequence"),
+    )
+    runtime = qualify.add_mutually_exclusive_group()
+    runtime.add_argument("--require-rocm", action="store_true")
+    runtime.add_argument("--require-cuda", action="store_true")
+    qualify.add_argument(
+        "--no-aot",
+        action="store_false",
+        dest="aot",
+        help="use normal backend caching; omit diagnostic AOT snapshots",
+    )
     qualify.add_argument("--output", type=Path, required=True)
     ui = commands.add_parser("ui", help="open the interactive terminal interface")
     ui.add_argument("--workspace", type=Path, default=Path("faultline-runs"))
@@ -190,6 +233,46 @@ def main(argv=None):
     report.add_argument("--open", action="store_true", help="open the local report in your browser")
     args = parser.parse_args(argv)
     try:
+        if args.command == "benchmark":
+            from .historical import case_catalog, historical_benchmark
+
+            if args.benchmark_command == "list":
+                print(json.dumps(case_catalog(), indent=2))
+                return 0
+            policy = Settings(
+                device=args.device,
+                repeats=args.repeats,
+                threads=args.threads,
+                timeout_s=args.timeout,
+                max_rss_mb=args.max_rss_mb,
+            )
+            result = historical_benchmark(
+                args.output,
+                args.good_python,
+                args.bad_python,
+                policy,
+                cases=args.issue_ids,
+                reduce=args.reduce,
+                diagnose=args.diagnose,
+                max_evaluations=args.max_evaluations,
+                require_paired=args.require_paired,
+            )
+            print(
+                json.dumps(
+                    {
+                        k: result[k]
+                        for k in (
+                            "status",
+                            "selected_count",
+                            "candidate_detections",
+                            "paired_reproductions",
+                            "counts",
+                        )
+                    },
+                    indent=2,
+                )
+            )
+            return result["exit_code"]
         if args.command == "qualify":
             from .qualify import qualify_device
 
@@ -199,6 +282,8 @@ def main(argv=None):
                 dtypes=args.dtype or ("float32", "float16", "bfloat16"),
                 workloads=args.workload or ("mlp", "convolution", "attention"),
                 require_rocm=args.require_rocm,
+                require_cuda=args.require_cuda,
+                aot=args.aot,
             )
             print(
                 json.dumps(

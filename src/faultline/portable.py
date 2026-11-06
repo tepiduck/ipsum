@@ -42,6 +42,8 @@ def same_failure(baseline, result):
         and result.get("native", False) == baseline.get("native", False)
         and result.get("aot", False) == baseline.get("aot", False)
         and result.get("graph_stage", "dynamo") == baseline.get("graph_stage", "dynamo")
+        and result.get("compile_mode", "default") == baseline.get("compile_mode", "default")
+        and result.get("autocast") == baseline.get("autocast")
     )
 
 

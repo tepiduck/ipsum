@@ -5,6 +5,7 @@ import json
 from pathlib import Path
 
 import native_aot
+import native_compile
 import native_graph
 import native_runtime
 import portable
@@ -34,8 +35,6 @@ def main():
     aot_graphs = []
 
     def compile_model(model, is_graph):
-        from torch._dynamo.backends.registry import lookup_backend
-
         compiled_graphs.clear()
         aot_graphs.clear()
 
@@ -61,16 +60,18 @@ def main():
                         selected=config.get("only_aot") in (None, key),
                     )
 
-                return native_aot.compile_pipeline(module, inputs, name, stage_compiler)
+                return native_aot.compile_pipeline(
+                    module, inputs, name, stage_compiler, native_compile.mode_options(settings)
+                )
             if name.startswith("mutant:"):
                 return native_graph.mutate_native(module, name.split(":", 1)[1]).forward
-            return lookup_backend(name)(module, inputs)
+            return native_compile.compile_graph(module, inputs, settings)
 
         if is_graph and manifest.get("aot_stage"):
             return native_runtime.compile_native_graph(
                 model,
                 lambda gm, args: native_aot.replay_stage_backend(
-                    gm, args, settings["backend"], manifest
+                    gm, args, settings["backend"], manifest, native_compile.mode_options(settings)
                 ),
             )
         if not is_graph:
@@ -97,7 +98,7 @@ def main():
     if (
         not compiled_graphs
         and not manifest.get("aot_stage")
-        and settings["backend"] in {"inductor", "aot_eager"}
+        and settings["backend"] in {"inductor", "aot_eager", "aot_eager_decomp_partition"}
         and result["status"] == "pass"
     ):
         result["status"] = "no_compiled_graph"
@@ -107,6 +108,7 @@ def main():
         config.get("aot", False),
         aot_graphs if settings["backend"] != "eager" else None,
     )
+    native_compile.annotate_compiler_result(result, settings)
     result.update(
         backend=settings["backend"],
         device=settings["device"],

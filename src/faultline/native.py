@@ -318,7 +318,7 @@ class GraphRecorder:
         )
 
     def backend(self, module, example_inputs):
-        from torch._dynamo.backends.registry import lookup_backend
+        from .native_compile import compile_graph, mode_options
 
         index = len(self.entries)
         entry = {
@@ -347,11 +347,12 @@ class GraphRecorder:
                 lambda graph, args, stage, options: self.stage_compiler(
                     index, graph, args, stage, options
                 ),
+                config_patches=mode_options(self.settings.to_dict()),
             )
         elif not selected or backend == "eager" or mutant:
             compiled = transformed.forward
         else:
-            compiled = lookup_backend(backend)(transformed, example_inputs)
+            compiled = compile_graph(transformed, example_inputs, self.settings.to_dict())
 
         def execute(*args):
             self.record(entry, original, args)
@@ -408,10 +409,13 @@ def evaluate_native(job, settings, directory):
         def compile_model(model, is_graph):
             if is_graph and manifest.get("aot_stage"):
                 from .native_aot import replay_stage_backend
+                from .native_compile import mode_options
 
                 return compile_native_graph(
                     model,
-                    lambda gm, args: replay_stage_backend(gm, args, settings.backend, manifest),
+                    lambda gm, args: replay_stage_backend(
+                        gm, args, settings.backend, manifest, mode_options(settings.to_dict())
+                    ),
                 )
             if not is_graph:
                 return torch.compile(model, backend=recorder.backend, dynamic=settings.dynamic)
@@ -441,7 +445,7 @@ def evaluate_native(job, settings, directory):
     if (
         not graphs
         and not manifest.get("aot_stage")
-        and settings.backend in {"inductor", "aot_eager"}
+        and settings.backend in {"inductor", "aot_eager", "aot_eager_decomp_partition"}
         and result["status"] == "pass"
     ):
         result["status"] = "no_compiled_graph"
@@ -449,6 +453,9 @@ def evaluate_native(job, settings, directory):
     annotate_aot_result(
         result, manifest, job.aot, aot_graphs if settings.backend != "eager" else None
     )
+    from .native_compile import annotate_compiler_result
+
+    annotate_compiler_result(result, settings.to_dict())
     atomic_json(directory / "graphs.json", graphs)
     if job.aot:
         atomic_json(directory / "aot-graphs.json", aot_graphs)

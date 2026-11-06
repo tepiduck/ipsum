@@ -1,0 +1,36 @@
+name: GPU qualification (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      runtime:
+        description: Runtime installed on a labeled self-hosted Linux runner
+        required: true
+        type: choice
+        options: [cuda, rocm]
+permissions:
+  contents: read
+jobs:
+  qualify:
+    runs-on: [self-hosted, linux, "${{ inputs.runtime }}"]
+    timeout-minutes: 90
+    env:
+      TORCH_LOGS: perf_hints
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install Faultline into the runner's prepared PyTorch environment
+        run: |
+          python -m pip install numpy psutil
+          python -m pip install --no-deps -e .
+      - name: Check storage dtypes with forward/backward capture
+        run: python -m faultline qualify --require-${{ inputs.runtime }} --output faultline-runs/gpu-dtypes
+      - name: Check autocast, state mutation, and varying request shapes
+        if: ${{ !cancelled() }}
+        run: python -m faultline qualify --require-${{ inputs.runtime }} --dtype float32 --autocast bfloat16 --workload mlp --workload attention --workload buffer_update --workload shape_sequence --no-aot --output faultline-runs/gpu-amp
+      - name: Check reduce-overhead under normal backend caching
+        if: ${{ !cancelled() }}
+        run: python -m faultline qualify --require-${{ inputs.runtime }} --dtype float32 --compile-mode reduce-overhead --workload mlp --workload buffer_update --workload shape_sequence --no-aot --output faultline-runs/gpu-cudagraph-mode
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: faultline-${{ inputs.runtime }}-evidence
+          path: faultline-runs/gpu-*

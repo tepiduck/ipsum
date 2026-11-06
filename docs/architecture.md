@@ -47,6 +47,13 @@ used by workers. They verify file hashes and need no Faultline installation. Ful
 also need factory dependencies; graph bundles use standard PyTorch/operator/math targets. The
 standalone process does not apply the coordinator's timeout/RSS watchdog.
 
+The compiler adapter also travels with each standalone bundle. It resolves installed backend
+implementations and Inductor mode options without falling back to another compiler. Native runs
+can scope autocast to forward execution; the loss and backward remain outside autocast. Saved
+policies participate in export validation and failure matching. Independently saved AOT graphs
+already contain their casts and are executed without a second autocast context. The backend
+ladder and historical benchmark use these same workers; see [diagnostics](diagnostics.md).
+
 This path requires `eval()`. It does not restore arbitrary Python attributes, optimizer state,
 external services, or distributed process state. Such state can cause unstable or misleading
 results and must be removed or explicitly reset in a workload. Stochastic operators can use
@@ -90,9 +97,10 @@ graph. If it cannot, the original workload is exported. This is particularly rel
 involving interacting compiled regions or compiler-generated layout decisions.
 
 `qualify` runs fixed MLP, convolution, and masked-attention workloads over selected floating dtypes
-on an explicit device. Each case uses the native worker, gradient oracle, AOT capture, and export
-path. Device discovery alone is not a successful execution check. No CPU fallback is permitted;
-missing ROCm/device support returns an unavailable report before running the matrix. Results are
+on an explicit device, with optional registered-buffer mutation and changing-shape request streams.
+Each case uses the native worker, gradient oracle, and export path; AOT capture is enabled unless
+`--no-aot` is specified. Device discovery alone is not a successful execution check. No CPU fallback
+is permitted; missing required CUDA/ROCm support returns an unavailable report before the matrix. Results are
 component checks, not a hardware certification or a benchmark.
 
 ## Execution chain
@@ -127,7 +135,7 @@ small. Crossing a tolerance boundary between invocations is inconclusive. The fi
 invocation is checked too. It is timed
 separately because it includes compilation. These timings are diagnostics, not speedup evidence.
 
-CPU float64 eager results are included for numerical candidates. This can expose cases where
+CPU float64 eager results are included for compact-IR numerical candidates. This can expose cases where
 both float32 paths are similarly far from a higher-precision result. It does not decide which
 implementation is correct: algorithms, floating-point semantics, and conditioning still matter.
 
@@ -201,6 +209,8 @@ execution returns exit code 2 with `reproduces_expected=false`. The optional `--
 is an explicit exploratory change and therefore cannot match an expectation for another device.
 Standalone scripts do not include the process-tree watchdog; use `faultline replay` for isolated
 execution with saved wall/RSS limits.
+The historical benchmark separately supervises both exported scripts with those limits and checks
+their reported expected outcome and exit status.
 
 `--native-minifier` sets PyTorch's upstream AOT repro environment options before importing torch.
 Whether upstream minification triggers depends on the PyTorch version and failure. Faultline's

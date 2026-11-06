@@ -10,6 +10,18 @@ weights and nested inputs in binary snapshots. A separate compact graph format s
 Each run produces JSON results, worker logs, and a local HTML report. Workers have configurable
 time and host-memory limits.
 
+Faultline complements PyTorch's debugging tools:
+
+| Tool | Main purpose |
+|---|---|
+| PyTorch accuracy minifier | Reduce a failing graph from a compiler execution |
+| `TORCH_COMPILE_DEBUG` and compiler logs | Inspect graphs, transformations, and generated code |
+| `tlparse` / `TORCH_TRACE` | Inspect captured regions, graph breaks, and recompilations |
+| Faultline | Freeze workloads and request sequences, compare environments, distinguish new and recurring failures, and export baseline-checked reproducers |
+
+The [PyTorch troubleshooting guide](https://docs.pytorch.org/docs/main/user_guide/torch_compiler/torch.compiler_troubleshooting.html)
+describes the upstream tools. Faultline's reducer is independent and cannot minimize every failure.
+
 ## Installation
 
 Use Python 3.11 or newer and a virtual environment. Install the PyTorch build appropriate for your
@@ -64,6 +76,7 @@ This runs the built-in corpus and 12 generated cases. Available backends are:
 |---|---|
 | `inductor` | TorchInductor compilation and code generation |
 | `aot_eager` | AOT tracing without Inductor code generation |
+| `aot_eager_decomp_partition` | AOT tracing with decompositions and partitioning |
 | `eager` | Eager execution for checking the test pipeline |
 
 CPU Inductor requires a C++ toolchain and Python development headers. It has been tested on
@@ -78,12 +91,15 @@ faultline qualify --device cuda:0 --require-rocm --output faultline-runs/rocm-ch
 
 This runs forward/backward checks for MLP, convolution, and masked attention in float32, float16,
 and bfloat16, with a report for each case. Use `--dtype float32` or `--workload attention` to narrow
-the matrix. Omit `--require-rocm` for NVIDIA, or select `--device cpu` for CPU checks. Missing
+the matrix. Use `--require-cuda` for NVIDIA, or select `--device cpu` for CPU checks. Missing
 devices produce an unavailable result; the command does not substitute CPU execution.
 
-GPU execution has not yet been validated on hardware. The host-memory limit does not cover GPU
-memory. Consult AMD's [ROCm compatibility documentation](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/compatibility/compatibilityrad/wsl/wsl_compatibility.html)
+The host-memory limit does not cover GPU memory. Consult AMD's [ROCm compatibility documentation](https://rocm.docs.amd.com/projects/radeon-ryzen/en/latest/docs/compatibility/compatibilityrad/wsl/wsl_compatibility.html)
 for the supported GPU, driver, OS, and PyTorch combinations.
+
+Both runtime requirements reject a mismatched installation.
+The optional [GPU workflow](.github/workflows/gpu.yml) runs on a prepared self-hosted Linux runner;
+it does not provision hardware. Neither CUDA nor ROCm hardware execution has been validated here.
 
 ## Checking an existing model
 
@@ -105,6 +121,10 @@ faultline model capture my_model.py:factory --output workloads/my-model
 faultline model run workloads/my-model --backend inductor --gradients --timeout 600 --max-rss-mb 8192 --output faultline-runs/model
 faultline model replay faultline-runs/model --output faultline-runs/recheck
 ```
+
+Native runs also accept `--autocast float16|bfloat16` and Inductor's `--compile-mode` choices,
+including `reduce-overhead`. Autocast applies to forward execution; the loss and backward run
+outside that context. These policies are retained by replay, reduction, and standalone export.
 
 Inputs can be a tensor, a positional tuple, a dictionary of keyword arguments, or
 `{"args": (...), "kwargs": {...}}`. Nested dictionaries, lists, and tuples are supported.
@@ -168,6 +188,36 @@ captured graphs and does not claim complete compilation coverage.
 transformer with integer tokens and boolean masks, a controlled reduction example, and a historical
 indexing regression. These use synthetic inputs and random weights. See [RESULTS.md](RESULTS.md)
 for executed checks, including discrepancies and unvalidated configurations.
+
+## Diagnosing a failure
+
+```bash
+faultline model diagnose faultline-runs/model --output faultline-runs/diagnosis
+```
+
+This rechecks the saved finding and runs the same frozen workload under `eager`, `aot_eager`,
+`aot_eager_decomp_partition`, and `inductor`, each in a separate worker. A fresh bundle can also
+be supplied, with execution settings such as `--gradients`. Results include every backend outcome
+and a possible failure boundary. An unavailable backend, different symptoms, or a failure that
+disappears at a later rung prevents simple attribution. The boundary is diagnostic evidence, not
+proof that a particular compiler pass is responsible.
+
+## Historical-issue benchmark
+
+```bash
+faultline benchmark list
+faultline benchmark historical --good-python .current/bin/python --bad-python .historical/bin/python --diagnose --output faultline-runs/history
+```
+
+The initial versioned corpus has four independently sized issue patterns across two related
+families. Each report records detection, passing controls, reduction size, wall time, interpreter
+versions, and standalone verification. Failed reproductions and recurring discrepancies remain
+in the denominator. This is a small calibration set, not a general detection-rate claim.
+
+Use `--case 183986 --case 182012 --require-paired` to require the two cases validated with a
+2.15.0 passing control and 2.12.0 failing candidate. Without `--require-paired`, exit 0 means the
+benchmark completed conclusively; individual issues may be absent or recurring. See
+[diagnostics and GPU validation](docs/diagnostics.md) for interpretation and additional commands.
 
 ## Compact-graph testing and reduction
 
@@ -273,6 +323,7 @@ reproducers. See [comparison classifications and exit codes](docs/cli.md).
 | `demo` | Run the injected-fault example |
 | `doctor` | Inspect runtime and optionally probe compilation |
 | `qualify` | Check forward/backward execution across a device's dtype/workload matrix |
+| `benchmark` | Measure historical-issue detection, reduction, and standalone reproduction |
 | `model` | Capture, compare, replay, reduce, or export original-model workloads |
 | `generate` | Create a seeded, frozen JSON case |
 | `capture` | Import a trusted model factory into frozen JSON |

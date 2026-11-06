@@ -81,7 +81,7 @@ def compile_stage(module, inputs, backend, stage, *, options=None, selected=True
     return compiled
 
 
-def compile_pipeline(module, inputs, backend, stage_compiler):
+def compile_pipeline(module, inputs, backend, stage_compiler, config_patches=None):
     """Use the selected backend's normal AOT partitioner and compiler options."""
     if backend == "inductor":
         from torch._inductor.compile_fx import compile_fx
@@ -90,7 +90,7 @@ def compile_pipeline(module, inputs, backend, stage_compiler):
             stage = "backward" if options.get("is_backward") else "forward"
             return stage_compiler(graph, args, stage, options)
 
-        return compile_fx(module, inputs, inner_compile=inner)
+        return compile_fx(module, inputs, inner_compile=inner, config_patches=config_patches)
     if backend in {"aot_eager", "mutant:aot-backward-scale"}:
         from torch._dynamo.backends.debugging import aot_eager
 
@@ -103,7 +103,7 @@ def compile_pipeline(module, inputs, backend, stage_compiler):
     raise AOTUnsupported(f"Unsupported AOT pipeline: {backend}")
 
 
-def replay_stage_backend(module, inputs, backend, manifest):
+def replay_stage_backend(module, inputs, backend, manifest, config_patches=None):
     stage = manifest["aot_stage"]
     placeholders = [node.name for node in module.graph.nodes if node.op == "placeholder"]
     static = set(manifest.get("aot_static_inputs", []))
@@ -112,6 +112,12 @@ def replay_stage_backend(module, inputs, backend, manifest):
         "is_inference": manifest.get("aot_inference", False),
         "static_input_idxs": [i for i, name in enumerate(placeholders) if name in static],
     }
+    if config_patches:
+        from torch._inductor import config
+
+        with config.patch(config_patches):
+            compiled = compile_stage(module, inputs, backend, stage, options=options)
+        return lambda *args: compiled(list(args))
     compiled = compile_stage(module, inputs, backend, stage, options=options)
     return lambda *args: compiled(list(args))
 

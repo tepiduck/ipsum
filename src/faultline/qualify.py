@@ -15,6 +15,8 @@ def qualify_device(
     dtypes=("float32", "float16", "bfloat16"),
     workloads=("mlp", "convolution", "attention"),
     require_rocm=False,
+    require_cuda=False,
+    aot=True,
     progress=print,
 ):
     settings.validate()
@@ -22,7 +24,15 @@ def qualify_device(
         raise ValueError("Device qualification requires inductor/aot_eager and gradient checking")
     if not dtypes or not set(dtypes) <= {"float32", "float16", "bfloat16"}:
         raise ValueError("Qualification dtypes must be float32, float16, or bfloat16")
-    if not workloads or not set(workloads) <= {"mlp", "convolution", "attention"}:
+    if require_rocm and require_cuda:
+        raise ValueError("Select one required GPU runtime")
+    if not workloads or not set(workloads) <= {
+        "mlp",
+        "convolution",
+        "attention",
+        "buffer_update",
+        "shape_sequence",
+    }:
         raise ValueError("Unknown qualification workload")
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
@@ -31,6 +41,9 @@ def qualify_device(
         "schema_version": 1,
         "device": settings.device,
         "backend": settings.backend,
+        "aot_capture": aot,
+        "requested_gpu_runtime": "rocm" if require_rocm else "cuda" if require_cuda else None,
+        "cudagraph_note": "A requested compile mode does not prove CUDA graph use. Inspect worker logs for compiler skips; GPU execution requires a matching runtime and visible device.",
         "settings": settings.to_dict(),
         "environment": environment,
         "cases": [],
@@ -39,7 +52,17 @@ def qualify_device(
         "scope": "Fixed synthetic kernel matrix; not a performance benchmark or arbitrary-model certification.",
     }
     reason = None
-    if require_rocm and (not settings.device.startswith("cuda") or not environment["hip_version"]):
+    if require_cuda and (
+        not settings.device.startswith("cuda")
+        or not environment["cuda_version"]
+        or environment["hip_version"]
+    ):
+        reason = (
+            "NVIDIA CUDA was required, but this interpreter has no selected CUDA device/runtime"
+        )
+    elif require_rocm and (
+        not settings.device.startswith("cuda") or not environment["hip_version"]
+    ):
         reason = "ROCm was required, but this interpreter has no selected ROCm device/runtime"
     elif settings.device.startswith("cuda") and not environment["gpu_available"]:
         reason = (
@@ -60,8 +83,13 @@ def qualify_device(
             factory = directory / "source.py"
             factory.write_text(source + f"\nDTYPE = torch.{dtype}\n", encoding="utf-8")
             try:
-                bundle = capture_workload(f"{factory}:{name}", directory / "bundle", settings)
-                result = run_native(bundle, directory / "check", settings, aot=True)
+                bundle = capture_workload(
+                    f"{factory}:{name}",
+                    directory / "bundle",
+                    settings,
+                    trace=name in {"buffer_update", "shape_sequence"},
+                )
+                result = run_native(bundle, directory / "check", settings, aot=aot)
                 record = {
                     "id": key,
                     "status": result["status"],

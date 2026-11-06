@@ -20,7 +20,7 @@ from .portable import (
 
 __all__ = ["Settings", "confirm_exception", "evaluate", "fingerprint"]
 
-BACKENDS = {"eager", "aot_eager", "inductor"}
+BACKENDS = {"eager", "aot_eager", "aot_eager_decomp_partition", "inductor"}
 MUTANTS = {
     "sum-as-mean",
     "relu-as-neg",
@@ -48,6 +48,8 @@ class Settings:
     max_rss_mb: int = 4096
     gradients: bool = False
     dynamic: bool | None = False
+    compile_mode: str = "default"
+    autocast: str | None = None
 
     def validate(self):
         valid = self.backend in BACKENDS or (
@@ -70,6 +72,17 @@ class Settings:
             )
         if self.backend == "mutant:gradient-scale" and not self.gradients:
             raise ValueError("gradient-scale requires gradient checking")
+        if self.compile_mode not in {
+            "default",
+            "reduce-overhead",
+            "max-autotune",
+            "max-autotune-no-cudagraphs",
+        }:
+            raise ValueError("Unsupported compile mode")
+        if self.compile_mode != "default" and self.backend != "inductor":
+            raise ValueError("Compile modes require the inductor backend")
+        if self.autocast not in {None, "float16", "bfloat16"}:
+            raise ValueError("Autocast must be float16 or bfloat16")
 
     def to_dict(self):
         data = asdict(self)
@@ -78,6 +91,10 @@ class Settings:
             data.pop("gradients")
         if self.dynamic is False:
             data.pop("dynamic")
+        if self.compile_mode == "default":
+            data.pop("compile_mode")
+        if self.autocast is None:
+            data.pop("autocast")
         return data
 
 
@@ -85,6 +102,8 @@ def evaluate(case, settings):
     from .trace import Trace
 
     settings.validate()
+    if settings.compile_mode != "default" or settings.autocast:
+        raise ValueError("Compile modes and autocast currently require native model workloads")
     if settings.backend == "mutant:aot-backward-scale":
         raise ValueError("aot-backward-scale is only supported by native AOT workloads")
     case.validate()
