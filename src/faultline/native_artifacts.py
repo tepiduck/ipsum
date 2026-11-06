@@ -6,6 +6,7 @@ import shutil
 import sys
 from pathlib import Path
 
+from .accuracy import accuracy_comparison
 from .compare_envs import classification, gate_status, interpreter
 from .evaluate import Settings
 from .native import NativeJob, file_hash, verify_native
@@ -40,6 +41,7 @@ def export_native(job, settings, output, expected=None):
             or expected.get("fp64_requested", False)
             != (settings.fp64_advisory or settings.numerics)
             or expected.get("numerics_requested", False) != settings.numerics
+            or expected.get("deterministic", False) != settings.deterministic
         ):
             raise ValueError("Saved outcome has a different compiler/autocast policy")
         for name in (
@@ -51,6 +53,7 @@ def export_native(job, settings, output, expected=None):
             "atol",
             "compile_mode",
             "autocast",
+            "deterministic",
         ):
             if name in expected and expected[name] != getattr(settings, name):
                 raise ValueError(f"Saved outcome has a different {name} policy")
@@ -119,6 +122,16 @@ def write_native_report(output, summary):
     for name in ("candidate", "baseline", "run"):
         if (output / name).exists():
             links.append(f'<a href="{name}/outcome.json">{name} outcome</a>')
+
+    def accuracy_cell(evidence):
+        if not evidence:
+            return "not requested"
+        label = "accuracy_regression" if evidence.get("accuracy_regression") else "not flagged"
+        return html.escape(
+            f"{label}: {evidence.get('matched', 0)}/{evidence.get('total', 0)} targets; "
+            f"{evidence.get('available', 0)} with paired fp64 evidence ({evidence.get('status')})"
+        )
+
     table = ""
     if summary.get("cases"):
         rows = []
@@ -126,11 +139,38 @@ def write_native_report(output, summary):
             label = html.escape(case["id"])
             if case.get("report"):
                 label = f'<a href="{html.escape(case["report"], quote=True)}">{label}</a>'
-            rows.append(f"<tr><td>{label}</td><td>{html.escape(case['status'])}</td></tr>")
-        table = "<table><tr><th>Workload</th><th>Outcome</th></tr>" + "".join(rows) + "</table>"
+            triage = "; ".join(
+                f"{side}: {case[side].get('triage', 'not recorded')}"
+                for side in ("baseline", "candidate")
+                if isinstance(case.get(side), dict)
+            )
+            rows.append(
+                f"<tr><td>{label}</td><td>{html.escape(case['status'])}</td>"
+                f"<td>{accuracy_cell(case.get('accuracy_comparison'))}</td>"
+                f"<td>{html.escape(triage)}</td></tr>"
+            )
+        table = (
+            "<table><tr><th>Workload</th><th>Primary outcome</th>"
+            "<th>Accuracy advisory</th><th>Numerical triage</th></tr>" + "".join(rows) + "</table>"
+        )
+    if "accuracy_comparison" in summary:
+        table += (
+            "<h2>Cross-version accuracy advisory</h2><p>"
+            + accuracy_cell(summary["accuracy_comparison"])
+            + "</p>"
+        )
+    if "counts" in summary:
+        table = (
+            "<h2>Summary</h2><pre>"
+            + html.escape(json.dumps(summary["counts"], indent=2))
+            + "</pre>"
+            + table
+        )
     (output / "report.html").write_text(
         '<!doctype html><meta charset="utf-8"><title>Faultline model comparison</title>'
         "<style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:0 20px}"
+        "table{border-collapse:collapse;width:100%;table-layout:fixed}"
+        "th,td{padding:.5rem;text-align:left;vertical-align:top;border-bottom:1px solid #ddd;overflow-wrap:anywhere}"
         "pre{white-space:pre-wrap;overflow-wrap:anywhere}a{margin-right:20px}</style>"
         "<h1>Model comparison</h1>" + " ".join(links) + table + f"<pre>{body}</pre>",
         encoding="utf-8",
@@ -267,6 +307,8 @@ def compare_native_environments(
             s.backend.startswith("mutant:") for s in (settings, candidate_settings)
         ),
     }
+    if settings.numerics:
+        summary["accuracy_comparison"] = accuracy_comparison(baseline, candidate)
     export_native(job, candidate_settings, output / "candidate-reproducer", candidate)
     export_native(job, settings, output / "baseline-reproducer", baseline)
     write_native_report(output, summary)

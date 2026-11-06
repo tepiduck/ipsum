@@ -170,14 +170,17 @@ def annotate(primary, fp64, control, masks):
         {
             r["target"]
             for r in fp64_rows
-            if r.get("accuracy_label") == "comparable_to_eager_against_fp64"
+            if fp64.get("status") == "complete"
+            and r.get("reference_dtype") == "torch.float64"
+            and r.get("accuracy_label") == "comparable_to_eager_against_fp64"
         }
     )
     sensitive = sorted(
         {
             r["target"]
             for r in control.get("outputs", [])
-            if r["target"] in failed
+            if control.get("status") == "complete"
+            and r["target"] in failed
             and r["exceeds_primary_tolerance"]
             and r.get("control_to_candidate_rmse") is not None
             and r["control_to_candidate_rmse"] >= 0.5
@@ -194,20 +197,25 @@ def annotate(primary, fp64, control, masks):
         if row.get("status") == "complete" and row.get("flips", 0)
         for index in row.get("affected_backward_outputs", [])
     }
-    downstream = []
+    downstream, mapped = [], []
     for target in sorted(failed):
         mapping = masks.get("gradient_mapping", {}).get(target, {})
         origins = mapping.get("origins", [])
         if mapping.get("status") == "mapped" and len(origins) == 1:
+            mapped.append(target)
             origin = origins[0]
             if (origin["step"], origin["stage"], origin["output"]) in flipped_outputs:
                 downstream.append(target)
     checks = masks.get("backward_same_inputs", [])
-    backward_agrees = (
-        bool(checks)
-        and all(row.get("matches") is True for row in checks)
+    backward_agrees = None
+    if any(row.get("fp64_relative", {}).get("agrees") is False for row in checks):
+        backward_agrees = False
+    elif (
+        checks
+        and all(row.get("fp64_relative", {}).get("agrees") is True for row in checks)
         and not any(":backward:" in row.get("stage", "") for row in masks.get("errors", []))
-    )
+    ):
+        backward_agrees = True
     if (
         primary["status"] == "gradient_mismatch"
         and masks.get("replay_matches_primary")
@@ -237,8 +245,8 @@ def annotate(primary, fp64, control, masks):
             "backward_same_inputs_agree": backward_agrees,
         },
     }
-    return {
-        "schema_version": 2,
+    context = {
+        "schema_version": 3,
         "labels": labels,
         "label_coverage": coverage,
         "failing_targets": sorted(failed),
@@ -251,4 +259,85 @@ def annotate(primary, fp64, control, masks):
         "signature, and exit code are unchanged. Whole-finding labels require all failing targets. "
         "The discontinuity explanation requires same-input backward agreement and mapped downstream "
         "coverage of every failing gradient; it is an evidence criterion, not a correctness proof.",
+    }
+    context["triage"] = triage_evidence(primary, fp64, control, masks, context, mapped)
+    return context
+
+
+def triage_evidence(primary, fp64, control, masks, context, mapped):
+    """Missing diagnostics never become contrary evidence by implication."""
+    failed = set(context["failing_targets"])
+    contrary, missing = [], []
+    replay_valid = masks.get("replay_matches_primary") is True
+    checks = masks.get("backward_same_inputs", [])
+    if replay_valid and any(row.get("fp64_relative", {}).get("agrees") is False for row in checks):
+        contrary.append("same_input_backward_farther_from_fp64")
+    downstream = set(context["label_coverage"]["discontinuity_downstream"]["targets"])
+    if (
+        replay_valid
+        and masks.get("flips", 0)
+        and masks.get("status") == "complete"
+        and set(mapped) - downstream
+    ):
+        contrary.append("failing_gradients_not_downstream_of_observed_flips")
+    if not replay_valid:
+        missing.append("mask_replay_unavailable_or_unstable")
+    if masks.get("status") not in {"complete", "no_supported_masks"}:
+        missing.append("mask_coverage_incomplete")
+    if not checks or any(row.get("fp64_relative", {}).get("agrees") is None for row in checks):
+        missing.append("same_input_backward_fp64_incomplete")
+    fp_rows = (
+        {
+            row["target"]: row
+            for row in fp64.get("outputs", [])
+            if row.get("reference_dtype") == "torch.float64"
+            and row.get("accuracy_label") != "unavailable"
+        }
+        if fp64.get("status") == "complete"
+        else {}
+    )
+    if not failed <= set(fp_rows):
+        missing.append("fp64_targets_incomplete")
+    control_rows = (
+        {
+            row["target"]: row
+            for row in control.get("outputs", [])
+            if row.get("control_to_candidate_rmse") is not None
+        }
+        if control.get("status") == "complete"
+        else {}
+    )
+    if not failed <= set(control_rows):
+        missing.append("eager_control_incomplete")
+    if primary["status"] == "pass":
+        classification = "agreement"
+    elif contrary:
+        classification = "unexplained_contrary_evidence"
+    elif set(context["labels"]) & {
+        "explained_by_discontinuity",
+        "comparable_to_eager_against_fp64",
+        "eager_control_sensitive",
+    }:
+        classification = "explained"
+    else:
+        # A completed check can rule out its own proposed explanation without establishing a bug.
+        if any(
+            fp_rows[t].get("accuracy_label")
+            in {"candidate_farther_from_fp64", "eager_exact_candidate_differs"}
+            for t in failed & set(fp_rows)
+        ):
+            contrary.append("fp64_comparability_does_not_explain_all_targets")
+        if any(t not in context["eager_sensitive_targets"] for t in failed & set(control_rows)):
+            contrary.append("eager_control_does_not_explain_all_targets")
+        classification = (
+            "unexplained_contrary_evidence" if contrary else "unexplained_missing_evidence"
+        )
+        if not contrary and not missing:
+            missing.append("no_complete_supported_explanation")
+    return {
+        "classification": classification,
+        "contrary_evidence": contrary,
+        "missing_evidence": missing,
+        "note": "Advisory triage, not a correctness judgment. A complete explanation can coexist "
+        "with missing optional diagnostics. Verified contrary backward/selector evidence takes precedence.",
     }

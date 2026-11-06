@@ -498,3 +498,133 @@ key sets as sorted JSON lists. A real cached DistilBERT preparation then produce
 checkpoint revision, weight hash, input hash, and parameter count as the measured bundle. The
 numerical comparison and triage code did not change. Public evidence distinguishes the executed
 sweep source fingerprint from the final release-validation fingerprint.
+
+## Version 0.10 GPT-2 investigation
+
+Before changing the implementation, the original CPU GPT-2 sweep was examined target by target
+and rerun in fresh workers with the same frozen bundle. The [149-target table](docs/gpt2-accuracy.csv)
+lists compiled-versus-fp64 RMSE, eager-versus-fp64 RMSE, ratios, model locations, and primary failure
+membership in both environments. **Every fp64 measurement and primary comparison reproduced
+exactly** in the fresh 2.15.0 and 2.16.0.dev20261105 workers.
+
+The baseline had 132 failing gradient targets, 129 within the [0.5, 2] fp64 ratio band; the nightly
+had 141, with 70 in the band and 71 above it. The union contains 47 attention, 48 LayerNorm, 44 MLP,
+and two embedding gradients. The final LayerNorm gradients and the forward output agreed.
+
+| Target | Baseline compiled/eager fp64-error ratio | Nightly ratio | Compiled RMSE growth |
+|---|---:|---:|---:|
+| Block 1, second LayerNorm weight | 0.662 | 2.602 | 1.849× |
+| Block 6, first LayerNorm weight | 2.054 | 6.819 | 2.129× |
+| Block 9, second LayerNorm weight | 0.974 | 3.045 | 3.030× |
+| Block 9, second LayerNorm bias | 1.074 | 3.261 | 2.657× |
+
+Both environments used Transformers 5.22.1, tokenizers 0.23.3, and identical GPT-2 implementation
+code, checkpoint revision, config, factory, frozen token tensors, and weight hashes. Replay loads
+the saved token IDs; it does not tokenize again. CPU torchvision differs between environments but
+is not used by this GPT-2 factory. PyTorch's eager arithmetic also changes between versions, so the
+table includes absolute errors as well as ratios against each version's own eager reference.
+
+The nightly backend ladder passed eager and AOT-eager, then reported 135 failing targets with
+decomposition/partitioning and 141 with Inductor. The median ratio across the recorded fp64 targets
+was approximately 1.000 and 1.991, respectively. The ladder classified this as `different_failures`,
+not a single attributed boundary. In a six-evaluation-budget reduction, five evaluations ran:
+backward-only compilation changed the full-model failure signature; forward-only compilation
+retained it, but that detached graph's eager reference was nonfinite. The original workload was
+retained and independently confirmed. Optional numerical diagnostics were disabled during this
+bounded reduction; primary settings and failure predicates were retained. It did not produce a
+reduced reproducer that preserves the cross-version accuracy change.
+
+This is a **reproduced accuracy-regression candidate with unresolved attribution**, not a confirmed
+compiler defect. The advisory policy was declared before inspecting this target table: candidate
+ratio greater than 2, at least twice baseline, on at least 20% of the failing-target union. GPT-2
+qualifies on **28/141 targets (19.858%)**, so it does **not** receive the automatic advisory. The
+cutoff was not changed to catch this case. The observed shift remains recorded separately.
+
+## Version 0.10 AMD eager stability investigation
+
+BERT was rerun on the RX 7900 XT using its original frozen weights, tokens, and VJP probes. Each
+mode used five eager observations with restored model/RNG state. Both modes set explicit BLAS
+workspaces; only the deterministic mode required deterministic algorithms and enabled the
+associated cuDNN policy. No comparison tolerance was changed.
+
+| Environment | Default eager: failing targets in four repeat comparisons | Deterministic eager |
+|---|---|---|
+| 2.15.0+rocm10.3.0a20261105 | 29, 31, 35, 28 | All five observations exactly equal |
+| 2.16.0a0+rocm10.3.0a20261105 | 30, 29, 32, 32 | All five observations exactly equal |
+
+Neither build raised an unsupported deterministic-operation error. The baseline's largest
+per-target eager-repeat RMSE was approximately 7.18e-5; it was zero under the deterministic policy.
+This supports using the opt-in policy for this workload, but does not isolate embedding, LayerNorm,
+attention, or any particular kernel as the source. `--deterministic` now saves and replays this
+execution policy, including standalone exports. The default stability rule is unchanged.
+
+## Version 0.10 pretrained sweeps
+
+The same 20 frozen pretrained workloads from 0.9 were compared again, with gradients, AOT capture,
+numerical diagnostics, two repeats, one thread, a 600-second worker timeout, and 12 GiB of host RSS.
+CPU used default execution; the RX 7900 XT used **explicit deterministic execution in both
+environments**. The CPU versions were 2.15.0+cpu and 2.16.0.dev20261105+cpu. AMD used
+2.15.0+rocm10.3.0a20261105 and 2.16.0a0+rocm10.3.0a20261105. The AMD baseline is a release-version
+PyTorch build from AMD's nightly SDK packaging, not a stable-channel installation. The complete
+package versions, workload identities, source fingerprints, target coverage, and per-model rows
+are in `accuracy_triage_validation` in [docs/validation.json](docs/validation.json).
+
+| Environment pair | Models | Full agreement | `accuracy_regression` | Explained | Contrary evidence | Missing evidence | Inconclusive |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| CPU, default execution | 20 | 0 | 0 | 3 | 16 | 0 | 1 |
+| AMD, deterministic execution | 20 | 0 | 0 | 10 | 7 | 2 | 1 |
+
+Full agreement, explained, contrary evidence, missing evidence, and inconclusive sum to 20 in
+each row. The cross-version accuracy advisory is an independent count, not another partition.
+These are **advisory classifications, not a false-positive rate or compiler bug confirmations**.
+AMD's execution policy changed, so differences from 0.9 cannot be attributed solely to new labels.
+The original 0.9 evidence remains unchanged.
+
+All 40 CPU primary comparisons, including SmolLM2's saved primary observations, exactly match
+0.9. ResNet-18, ResNeXt-50, and Swin have complete explanations in both CPU environments. In
+particular, ResNet-18's failed optional mask replay no longer overrides its 27/27 eager-control
+explanation. Every stable pair has paired fp64 measurements for its full failing-target union.
+The only targets meeting the cross-version degradation criterion were CPU BERT (1/178), CPU
+GPT-2 (28/141), and AMD Swin (1/127); none reaches the fixed 20% fraction. SmolLM2 has no paired
+fp64 measurements, with all 243 CPU and 261 AMD union targets retained as unavailable evidence.
+
+ViT, Swin, ConvNeXt, BERT, GPT-2, and DistilBERT all complete stable primary comparisons in both
+AMD environments under the deterministic policy. BERT has forward and gradient discrepancies;
+the other five have gradient discrepancies. SmolLM2 still exceeds the host-memory budget during
+diagnostics in both versions on both devices. Its primary observations remain available inside
+inconclusive outcomes.
+
+The remaining diagnostic limits are visible in the classifications:
+
+- The new same-input backward criterion is not always more permissive than the elementwise
+  check. For CPU EfficientNet-B0, the elementwise backward check agrees, but one recorded output
+  has compiled RMSE 5.29e-6 versus eager RMSE 1.76e-6 against fp64, a ratio of approximately 3.0.
+  It therefore supplies contrary evidence under the fixed factor-of-two rule. That rule is a
+  reporting convention, not a calibrated bug detector.
+- AMD BERT and DistilBERT remain in the missing-evidence category. Their same-input fp64 backward
+  replay reports an unsupported operation, and the input-ULP eager control cannot perturb their
+  integer-only requests. In the candidate environment, 173/174 BERT and 47/48 DistilBERT targets
+  are in the [0.5, 2] comparability band; each remaining gradient is **closer** to fp64, with ratios
+  0.283 and 0.328. The existing whole-finding label requires every target to be inside that band.
+  Missing-evidence triage here does not mean the candidate is less accurate.
+- Saved-mask limits, unsupported graph replay, and incomplete max-pool selector coverage remain.
+  An explained label does not erase these omissions or establish correctness.
+
+The original AMD coordinator stopped while exporting the final SmolLM2 pair: memory-limited
+outcomes omitted the new deterministic-policy field, causing the strict export-policy check to
+reject them. The supervisor now retains that field for every outcome, including timeouts and
+memory limits. Dedicated tests cover both cases. The original outcomes and failed export were
+preserved; SmolLM2 was rerun in a separate directory, exported successfully, and reproduced both
+original primary comparisons exactly. The AMD table combines the 19 originally committed rows
+with this separately recorded final pair. The evidence distinguishes both source fingerprints
+and verifies that the only runtime change between them is this supervisor metadata field.
+It also records the verified CRLF/LF difference between executed working-tree bytes and Git's
+source bytes.
+
+Final local checks passed: 254 portable tests on Windows (one skipped), 12 Linux compiler tests,
+23 Linux advisory/policy tests, 31 legacy tests, lint, formatting, and all 14 validation-harness
+checks. The harness's real compiler campaign recorded 17 passes and one unconfirmed numerical
+candidate. CPU ResNet-18 and deterministic AMD BERT standalone exports were rerun with all
+`faultline` imports blocked; both retained their primary signatures, labels, triage, target
+coverage, and execution policy. The clean wheel passed an isolated install, CLI, and eager-corpus
+check. The staged source, wheel, and source archive were checked against the publication allowlist.

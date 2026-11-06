@@ -8,6 +8,12 @@ from pathlib import Path
 
 def native_options(parser, optional=False):
     parser.add_argument(
+        "--deterministic",
+        action="store_true",
+        default=None if optional else False,
+        help="require deterministic PyTorch algorithms and fixed BLAS workspace policy",
+    )
+    parser.add_argument(
         "--compile-mode",
         choices=("default", "reduce-overhead", "max-autotune", "max-autotune-no-cudagraphs"),
         default=None if optional else "default",
@@ -96,6 +102,7 @@ def model_command(args, settings_from):
             "autocast",
             "fp64_advisory",
             "numerics",
+            "deterministic",
         )
         overridden = any(getattr(args, name) is not None for name in names)
         result = diagnose_native(
@@ -150,6 +157,11 @@ def model_command(args, settings_from):
             json.dumps(
                 {
                     "classification": result["classification"],
+                    "accuracy_advisory": {
+                        key: value
+                        for key, value in result.get("accuracy_comparison", {}).items()
+                        if key not in {"targets", "policy", "note"}
+                    },
                     "report": str(args.output / "report.html"),
                 },
                 indent=2,

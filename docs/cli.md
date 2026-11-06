@@ -234,6 +234,16 @@ it also runs a separate AOT saved-mask diagnostic. Per-tensor labels and mask co
 evidence. Replay and export retain the diagnostic policy. None of these labels changes exit codes.
 See [numerics](numerics.md) for the reference semantics and saved-bundle compatibility.
 
+`model compare --numerics` includes a cross-version `accuracy_comparison` in `summary.json` and
+the HTML report. It can flag advisory accuracy degradation when both versions already fail the
+primary tolerance. `sweep run` includes these counts and distinguishes contrary evidence from
+missing diagnostics. Primary gate statuses and exit codes are unchanged.
+
+Native execution commands and `sweep run` accept `--deterministic`. It requires deterministic
+algorithms with a fixed BLAS workspace policy and is retained by replay, reduction, and exports.
+Unsupported deterministic operators remain errors. This option does not change tolerances or
+silently accept an unstable reference.
+
 `model diagnose BUNDLE_OR_RUN` executes the four-backend ladder. `benchmark list` and
 `benchmark historical` expose the versioned historical corpus. `qualify` additionally accepts
 `--require-cuda`, `--no-aot`, and the `buffer_update` / `shape_sequence` workloads. Detailed

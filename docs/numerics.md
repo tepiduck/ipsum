@@ -111,19 +111,45 @@ on every repeat. The returned model gradients are mapped to AOT backward outputs
 identity and layout. Graph-local output positions are never treated as model parameter positions.
 Copied, accumulated, ambiguous, or otherwise unmapped gradients cannot satisfy downstream coverage.
 
-- `explained_by_discontinuity` requires observed flips, agreement in **every** same-input backward
+- `explained_by_discontinuity` requires observed flips, fp64-relative agreement in **every** same-input backward
   check, no failed backward replay, and a mapped path from a flipped selector to **every** failing gradient.
 - `discontinuity_present` records flips when either the backward check disagrees or downstream
-  coverage is incomplete. It remains suspicious, including when another numerical label qualifies.
+  coverage is incomplete. Missing evidence alone does not override a complete eager-control or
+  fp64 explanation; the triage record distinguishes missing evidence from disagreement.
 - `comparable_to_eager_against_fp64` and `eager_control_sensitive` apply to the whole finding only
   when all failing targets qualify. Per-target evidence remains available for mixed findings.
 
-Numerical context schema 2 records matched/total target counts under `label_coverage`, including
+Numerical context schema 3 records matched/total target counts under `label_coverage`, including
 the exact eager control policy (`onednn_disabled` or `input_one_ulp_up`). The two controls are
 different experiments and are not pooled as equivalent evidence. Changed diagnostic execution or
 unstable masks cannot qualify for either discontinuity label. The explanation label expresses this
 evidence criterion, not a proof of compiler correctness or an adjudicated false-positive label.
 Schema 1's `discontinuity_sensitive` and any-target aggregate labels are historical 0.8 behavior.
+Schema 2 used the primary elementwise tolerance for same-input backward agreement.
+
+The same-input backward check retains that elementwise result and adds `fp64_relative`. Both eager
+and compiled backward outputs are compared against repeated fp64 execution of the same backward
+graph on the **compiled run's saved inputs**. Floating storage is promoted while integer selectors,
+aliases, strides, and offsets are retained. Every floating backward output must have compiled RMSE
+at most twice eager RMSE. Both exact qualifies; an exact eager result and an inexact compiled result
+disagree. A missing, unstable, unsupported, or explicitly downcast reference is unknown. No primary
+tolerance changes. This compares errors under different arithmetic precision; it is not a
+correctness proof for the original-dtype backward implementation.
+
+Triage uses three advisory categories for stable findings:
+
+- `explained`: a complete whole-finding label qualifies and no verified contrary backward or
+  selector evidence overrides it. Optional diagnostic gaps remain recorded.
+- `unexplained_contrary_evidence`: a completed diagnostic contradicts an explanation. Reliable
+  same-input backward disagreement or fully covered flips not upstream of a mapped failing gradient
+  overrides otherwise reassuring labels. Without a complete explanation, failed fp64 comparability
+  or an insufficient completed eager control also supplies contrary evidence.
+- `unexplained_missing_evidence`: no complete explanation is available, but diagnostic errors,
+  skips, unverified mappings, unsupported operations, or limits do not establish contrary evidence.
+
+A partial mask map cannot establish that no relevant flip exists. Both missing and contrary reasons
+are retained when they coexist; contrary evidence determines the aggregate category. Inconclusive
+primary runs remain separate. None of these categories is an adjudicated bug label.
 
 Mask coverage is deliberately bounded. Recomputed intermediates, unknown expression forms,
 lowered max-pool scatter patterns, unavailable saved values, and graphs outside the supported AOT
@@ -142,6 +168,29 @@ observed two selector flips and an eager-only convolution-library change produce
 gradient discrepancy. The compiled backward agreed with eager backward on identical saved inputs.
 The 0.7 RMSE ratio is evidence of derivative sensitivity around activation boundaries; it should
 not be used as evidence of a compiler defect. See the follow-up measurements in [RESULTS](../RESULTS.md).
+
+## Cross-version accuracy advisory
+
+`model compare --numerics` and `sweep run` compare fp64 errors even when both environments already
+fail the primary tolerance. For every output or gradient target failing in either environment,
+the report records eager and compiled RMSE against that environment's own fp64 reference and
+`r = compiled_rmse / eager_rmse`. The union of failing targets is the denominator, including
+targets whose reference is missing. Registered-state and post-call input checks are excluded.
+
+The policy was declared before inspecting the 0.10 GPT-2 target table: flag `accuracy_regression`
+when the candidate's ratio is **greater than 2**, **at least twice** the baseline ratio, on **at
+least 20%** of the union. Reports retain qualifying/total and available/missing counts. They do not
+round the fraction before applying the threshold. This fixed engineering rule is advisory and
+has not been calibrated as a statistical test.
+
+An exact eager result with an inexact compiled result has an infinite ratio, represented by an
+explicit status and JSON `null`, never an invalid JSON infinity. A both-exact baseline qualifies
+as newly degraded only if the candidate exceeds the ratio criterion. An already-infinite baseline
+cannot establish further ratio growth. Missing/nonfinite measurements, failed references, and
+reference outputs below float64 do not qualify and remain in the denominator. Inspect absolute
+errors too: the ratio can rise because eager improved. The primary classification, reducer
+predicate, and exit code stay unchanged. A flagged pair is a candidate for investigation, not a
+confirmed compiler bug.
 
 ## Freezing internal graph values
 
@@ -174,6 +223,19 @@ layers would be a stronger reduction test. Suffix cutting and that middle-of-net
 are not implemented or validated by the 0.7 result.
 
 ## GPU environment and nightly checks
+
+Native execution commands and `sweep run` accept `--deterministic`. This opt-in policy calls
+`torch.use_deterministic_algorithms(True, warn_only=False)`, disables cuDNN benchmarking, enables
+cuDNN determinism, and fixes both `CUBLAS_WORKSPACE_CONFIG` and `HIPBLAS_WORKSPACE_CONFIG` to
+`:4096:8` before GPU work. The selected policy overrides inherited workspace values and is saved
+with the run, replayed, and retained in standalone exports. Default execution is unchanged;
+unsupported deterministic operations remain explicit errors, with no backend fallback.
+
+The workspace settings follow PyTorch's [deterministic algorithms documentation](https://docs.pytorch.org/docs/main/generated/torch.use_deterministic_algorithms.html)
+and [HIP workspace interface](https://docs.pytorch.org/docs/main/notes/hip.html).
+This policy can change kernels and performance. It does not guarantee equality across devices or
+PyTorch versions and does not weaken the repeated-reference stability rule. The BERT investigation
+in [RESULTS](../RESULTS.md) records the measured default and deterministic observations separately.
 
 The AMD validation uses a separate WSL environment, the RX 7900 XT, and AMD's PyTorch/ROCm
 packages. The Windows display driver was not changed. With an appropriate driver and WSL setup,

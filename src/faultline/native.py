@@ -390,7 +390,9 @@ class GraphRecorder:
 def evaluate_native(job, settings, directory):
     job.validate()
     settings.validate()
-    unavailable = portable.configure(settings.device, settings.threads, job.seed)
+    unavailable = portable.configure(
+        settings.device, settings.threads, job.seed, settings.deterministic
+    )
     if unavailable:
         return unavailable
     manifest = verify_native(job.bundle)

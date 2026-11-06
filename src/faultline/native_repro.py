@@ -29,7 +29,12 @@ def main():
             raise ValueError(f"Modified artifact: {name}")
     manifest = json.loads((bundle / "workload.json").read_text(encoding="utf-8"))
     settings = config["settings"]
-    unavailable = portable.configure(settings["device"], settings["threads"], manifest["seed"])
+    unavailable = portable.configure(
+        settings["device"],
+        settings["threads"],
+        manifest["seed"],
+        settings.get("deterministic", False),
+    )
     if unavailable:
         print(json.dumps(unavailable))
         return 2

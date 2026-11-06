@@ -46,4 +46,5 @@ def annotate_compiler_result(result, settings):
         "numerics", False
     )
     result["numerics_requested"] = settings.get("numerics", False)
+    result["deterministic"] = settings.get("deterministic", False)
     return result

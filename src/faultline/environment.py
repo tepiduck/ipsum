@@ -21,6 +21,7 @@ def describe():
         "faultline-ml",
         "torchvision",
         "transformers",
+        "tokenizers",
         "safetensors",
         "pillow",
     ):
@@ -51,6 +52,12 @@ def describe():
         "hip_version": torch.version.hip,
         "cuda_version": torch.version.cuda,
         "float32_matmul_precision": torch.get_float32_matmul_precision(),
+        "deterministic_algorithms": torch.are_deterministic_algorithms_enabled(),
+        "deterministic_warn_only": torch.is_deterministic_algorithms_warn_only_enabled(),
+        "blas_workspace": {
+            name: os.environ.get(name)
+            for name in ("CUBLAS_WORKSPACE_CONFIG", "HIPBLAS_WORKSPACE_CONFIG")
+        },
         "gpu_available": available,
         "devices": devices,
         "note": "GPU availability is discovery, not a successful compiler execution test.",

@@ -9,6 +9,11 @@ import io
 
 import torch
 
+if __package__:
+    from . import native_precision
+else:  # Standalone bundles use the same module without a Faultline installation.
+    import native_precision
+
 
 def clone_arguments(values, limit_bytes=512 * 1024**2):
     storages = {}
@@ -121,7 +126,7 @@ class MaskProbe:
         self.bytes = 0
         self.step = 0
 
-    def shadow(self, module, values):
+    def shadow(self, module, values, fp64=False):
         devices = sorted(
             {
                 v.device.index
@@ -130,7 +135,11 @@ class MaskProbe:
             }
         )
         with torch.random.fork_rng(devices=devices), torch.no_grad():
-            return copy.deepcopy(module)(*clone_arguments(values))
+            graph, arguments = copy.deepcopy(module), clone_arguments(values)
+            if fp64:
+                native_precision.promote_model(graph)
+                arguments = native_precision.promote_tree(arguments)
+            return graph(*arguments)
 
     def around(self, module, stage, key, compiled, values):
         if stage == "forward":
@@ -152,6 +161,12 @@ class MaskProbe:
         except Exception as exc:  # noqa: BLE001 -- optional user-graph replay
             self.errors.append({"stage": key, "error": f"{type(exc).__name__}: {exc}"})
             return compiled(values)
+        saved, snapshot_error = None, None
+        if stage == "backward":
+            try:
+                saved = clone_arguments(values)
+            except Exception as exc:  # noqa: BLE001 -- optional fp64 snapshot
+                snapshot_error = f"{type(exc).__name__}: {exc}"
         actual = compiled(values)  # May clear its boxed argument list.
         if stage == "forward":
             self.remember(shadow, actual, key)
@@ -173,7 +188,31 @@ class MaskProbe:
                 self.settings.get("rtol"),
                 self.settings.get("atol"),
             )
-            self.backward_checks.append({"stage": key, "step": self.step, **compared})
+
+            def reference():
+                if snapshot_error:
+                    raise ValueError(snapshot_error)
+                result = self.shadow(module, saved, fp64=True)
+                return (
+                    {
+                        str(i): value.detach().cpu()
+                        for i, value in enumerate(result)
+                        if isinstance(value, torch.Tensor)
+                    },
+                    [],
+                )
+
+            relative = native_precision.assess_backward_fp64(
+                reference,
+                (left, []),
+                (right, []),
+                self.compare,
+                self.policy,
+                self.settings.get("repeats", 2),
+            )
+            self.backward_checks.append(
+                {"stage": key, "step": self.step, **compared, "fp64_relative": relative}
+            )
             # Sequential first-order VJPs consume one forward tape per request.
             consumed = key.split(":", 1)[0]
             self.pairs = {

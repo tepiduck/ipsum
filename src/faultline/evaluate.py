@@ -52,6 +52,7 @@ class Settings:
     autocast: str | None = None
     fp64_advisory: bool = False
     numerics: bool = False
+    deterministic: bool = False
 
     def validate(self):
         valid = self.backend in BACKENDS or (
@@ -89,6 +90,8 @@ class Settings:
             raise ValueError("fp64_advisory must be boolean")
         if type(self.numerics) is not bool:
             raise ValueError("numerics must be boolean")
+        if type(self.deterministic) is not bool:
+            raise ValueError("deterministic must be boolean")
 
     def to_dict(self):
         data = asdict(self)
@@ -105,6 +108,8 @@ class Settings:
             data.pop("fp64_advisory")
         if not self.numerics:
             data.pop("numerics")
+        if not self.deterministic:
+            data.pop("deterministic")
         return data
 
 
@@ -117,8 +122,11 @@ def evaluate(case, settings):
         or settings.autocast
         or settings.fp64_advisory
         or settings.numerics
+        or settings.deterministic
     ):
-        raise ValueError("Compile modes and autocast currently require native model workloads")
+        raise ValueError(
+            "Compiler, numerical, and deterministic policies require native model workloads"
+        )
     if settings.backend == "mutant:aot-backward-scale":
         raise ValueError("aot-backward-scale is only supported by native AOT workloads")
     case.validate()

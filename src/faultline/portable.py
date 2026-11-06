@@ -6,6 +6,7 @@ boundary, where arbitrary backend exception classes are expected.
 """
 
 import math
+import os
 import re
 import time
 import traceback
@@ -181,7 +182,17 @@ def confirm_exception(exc, status, repeat, repeats):
     return {**original, "exception_confirmations": repeats}
 
 
-def configure(device, threads, seed):
+def deterministic_environment():
+    # Explicit opt-in policy, fixed across workers, replay, and standalone export.
+    return {"CUBLAS_WORKSPACE_CONFIG": ":4096:8", "HIPBLAS_WORKSPACE_CONFIG": ":4096:8"}
+
+
+def configure(device, threads, seed, deterministic=False):
+    if deterministic:
+        os.environ.update(deterministic_environment())
+        torch.use_deterministic_algorithms(True, warn_only=False)
+        torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
     if device.startswith("cuda"):
         if not torch.cuda.is_available():
             return {"status": "unavailable", "error": "No CUDA/ROCm device is available"}

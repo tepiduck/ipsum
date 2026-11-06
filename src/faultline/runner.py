@@ -78,6 +78,10 @@ def run_case(case, settings, directory, *, python=None):
     environment["OMP_NUM_THREADS"] = str(settings.threads)
     environment["TORCHINDUCTOR_COMPILE_THREADS"] = "1"
     environment["PYTHONHASHSEED"] = str(case.seed)
+    if settings.deterministic:
+        from .portable import deterministic_environment
+
+        environment.update(deterministic_environment())
     flags = (
         {"creationflags": subprocess.CREATE_NO_WINDOW}
         if os.name == "nt"
@@ -131,6 +135,7 @@ def run_case(case, settings, directory, *, python=None):
         "autocast": settings.autocast,
         "fp64_requested": settings.fp64_advisory or settings.numerics,
         "numerics_requested": settings.numerics,
+        "deterministic": settings.deterministic,
         "trace": case.to_dict().get("kind") in {"trace", "native"},
         "worker_wall_s": time.monotonic() - start,
         "peak_tree_rss_mb": peak / 1024**2,

@@ -93,14 +93,8 @@ print(json.dumps(result))
 def finding_context(result):
     context = result.get("numerical_context", {})
     labels = context.get("labels", [])
-    reassuring = {
-        "explained_by_discontinuity",
-        "comparable_to_eager_against_fp64",
-        "eager_control_sensitive",
-    }
-    suspicious = "discontinuity_present" in labels or any(
-        row.get("matches") is False
-        for row in context.get("masks", {}).get("backward_same_inputs", [])
+    triage = context.get("triage", {}).get("classification") or (
+        "agreement" if result["status"] == "pass" else "unexplained_missing_evidence"
     )
     return {
         "status": result["status"],
@@ -111,9 +105,10 @@ def finding_context(result):
         },
         "control_policy": context.get("control_policy"),
         "masks_status": context.get("masks", {}).get("status", "not_run"),
-        "has_full_diagnostic_label": bool(reassuring.intersection(labels)) and not suspicious,
-        "unexplained": result["status"] != "pass"
-        and (suspicious or not reassuring.intersection(labels)),
+        "triage": triage,
+        "triage_evidence": context.get("triage", {}),
+        "has_full_diagnostic_label": triage == "explained",
+        "unexplained": triage.startswith("unexplained_"),
         "primary_observation_status": result.get("primary_observation", {}).get("status"),
         "fp64_status": result.get("fp64_advisory", {}).get("status", "not_run"),
     }
@@ -128,17 +123,35 @@ def sweep_counts(rows, planned=None):
             "finding": 0,
             "inconclusive": 0,
             "unexplained_findings": 0,
+            "accuracy_regression": 0,
+            "explained": 0,
+            "unexplained_contrary_evidence": 0,
+            "unexplained_missing_evidence": 0,
         }
     )
     labels = Counter()
     for row in rows:
+        if row.get("accuracy_comparison", {}).get("accuracy_regression"):
+            counts["accuracy_regression"] += 1
         if row["classification"] == "inconclusive":
             counts["inconclusive"] += 1
         elif row["classification"] == "agreement":
             counts["fully_agree"] += 1
         else:
             counts["finding"] += 1
-            if any(side.get("unexplained") for side in (row["baseline"], row["candidate"])):
+            states = {
+                side.get("triage", "unexplained_missing_evidence")
+                for side in (row["baseline"], row["candidate"])
+            }
+            category = (
+                "unexplained_contrary_evidence"
+                if "unexplained_contrary_evidence" in states
+                else "unexplained_missing_evidence"
+                if "unexplained_missing_evidence" in states
+                else "explained"
+            )
+            counts[category] += 1
+            if category.startswith("unexplained_"):
                 counts["unexplained_findings"] += 1
         for label in set(row["baseline"].get("labels", []) + row["candidate"].get("labels", [])):
             labels[label] += 1
@@ -249,6 +262,11 @@ def run_sweep(
                         "classification": result["classification"],
                         "baseline": finding_context(result["baseline"]),
                         "candidate": finding_context(result["candidate"]),
+                        "accuracy_comparison": {
+                            k: v
+                            for k, v in result.get("accuracy_comparison", {}).items()
+                            if k != "targets"
+                        },
                         "report": str((root / "comparison/report.html").relative_to(output)),
                         "model": {
                             k: entry["model"][k]
@@ -307,6 +325,11 @@ def add_sweep_commands(commands, execution_options):
     run.add_argument("--candidate-python", default=sys.executable)
     run.add_argument("--output", type=Path, required=True)
     run.add_argument("--resume", action="store_true")
+    run.add_argument(
+        "--deterministic",
+        action="store_true",
+        help="require deterministic algorithms in both environments",
+    )
     execution_options(run)
     run.set_defaults(gradients=True, numerics=True, repeats=2, timeout=600, max_rss_mb=12288)
 

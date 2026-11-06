@@ -28,6 +28,7 @@ FILES = {
     "docs/numerics.md",
     "docs/sweeps.md",
     "docs/validation.json",
+    "docs/gpt2-accuracy.csv",
     "examples/capture_mlp.py",
     "examples/models.py",
     "examples/native_models.py",

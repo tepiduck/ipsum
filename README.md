@@ -126,6 +126,9 @@ faultline model replay faultline-runs/model --output faultline-runs/recheck
 Native runs also accept `--autocast float16|bfloat16` and Inductor's `--compile-mode` choices,
 including `reduce-overhead`. Autocast applies to forward execution; the loss and backward run
 outside that context. These policies are retained by replay, reduction, and standalone export.
+Use `--deterministic` to require deterministic algorithms and a fixed BLAS workspace policy.
+With `--numerics`, environment comparisons also report fp64-relative accuracy changes when both
+versions already fail tolerance. These advisories leave primary results and exit codes unchanged.
 
 New captures save fixed backward vectors for gradient checks, so each execution receives the same
 cotangents. Existing bundles retain their original loss-based policy. Add `--fp64-advisory` to

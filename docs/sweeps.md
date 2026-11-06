@@ -18,6 +18,8 @@ Use `--model NAME` repeatedly to prepare or run a subset. Each interpreter needs
 and their dependencies. The run defaults to Inductor, AOT capture, fixed VJP gradients, numerical
 diagnostics, two repeats, one thread, 600 seconds and 12 GiB of host RSS per worker. Override the
 execution budgets explicitly when needed. GPU memory has no separate watchdog.
+Use `--deterministic` to request the saved deterministic execution policy in both environments.
+This changes the experiment; results must identify the policy when compared with a default run.
 
 Preparation downloads actual pretrained weights, two photographs from official PyTorch example
 repositories, and two paragraphs from Project Gutenberg's public-domain *Alice's Adventures in
@@ -40,11 +42,15 @@ relaxation, automatic model replacement, or retry that erases a completed failur
 
 The report contains per-model baseline/candidate statuses, environment-gate classification,
 whole-finding labels, matched/total target counts, control policy, and mask coverage. Summary counts
-separate full agreement, findings, inconclusive pairs, and unexplained findings. Label counts can
+separate full agreement, accuracy advisories, explained findings, contrary-evidence findings,
+missing-evidence findings, and inconclusive pairs. Label counts can
 overlap: a model/device pair counts once for a label present in either version. A finding remains
-unexplained if either failing version lacks sufficient diagnostic evidence. `discontinuity_present`
-or a disagreeing same-input backward remains unexplained for triage,
-even alongside another label. A passing baseline with a candidate failure is a regression candidate;
+unexplained if either failing version lacks sufficient diagnostic evidence. Contrary evidence in
+either version takes precedence over missing evidence. A failed mask diagnostic alone does not
+override a complete eager-control explanation. Same-input backward uses its fp64-relative judgment
+while retaining the elementwise result. The [numerical evidence guide](numerics.md) defines these
+criteria and the fixed cross-version accuracy threshold. The HTML table shows the advisory and
+qualifying/total counts even when both versions already fail. A passing baseline with a candidate failure is a regression candidate;
 changes in model-library and vendor builds must be considered before attributing it to PyTorch.
 
 These are disagreement and diagnostic-coverage measurements. They are **not a false-positive rate**:

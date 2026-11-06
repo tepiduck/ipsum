@@ -129,6 +129,7 @@ def assess_fp64(
             other = reference()
             if not compare(high, other, policy)["matches"]:
                 return {"status": "unstable_reference", "note": note}
+            del other
         records = []
         for name, expected in high[0].items():
             if (
@@ -170,3 +171,41 @@ def assess_fp64(
         }
     except Exception as exc:  # noqa: BLE001 -- arbitrary user model's optional fp64 execution
         return {"status": "reference_error", "error": f"{type(exc).__name__}: {exc}", "note": note}
+
+
+def assess_backward_fp64(reference, eager, candidate, compare, policy, repeats):
+    """Judge same-input backward error relative to eager, retaining the raw evidence."""
+    evidence = assess_fp64(reference, eager, candidate, compare, policy, repeats)
+    judgments = []
+    if evidence["status"] == "complete":
+        for row in evidence["outputs"]:
+            agrees = None
+            if row.get("reference_dtype") == "torch.float64":
+                a, b = row.get("eager", {}).get("rmse"), row.get("candidate", {}).get("rmse")
+                if a is not None and b is not None:
+                    agrees = b <= 2.0 * a
+                elif a is not None and row.get("candidate", {}).get("nonfinite_error"):
+                    agrees = False
+            judgments.append({"target": row["target"], "agrees": agrees})
+    total = sum(value.is_floating_point() for value in eager[0].values())
+    available = sum(row["agrees"] is not None for row in judgments)
+    matched = sum(row["agrees"] is True for row in judgments)
+    agrees = (
+        False
+        if any(row["agrees"] is False for row in judgments)
+        else True
+        if total and available == total and matched == total
+        else None
+    )
+    return {
+        "agrees": agrees,
+        "matched": matched,
+        "available": available,
+        "total": total,
+        "outputs": judgments,
+        "fp64": evidence,
+        "criterion": "Every floating backward output has compiled RMSE <= 2 * eager RMSE "
+        "against repeated fp64 backward on identical compiled saved inputs. "
+        "Both exact qualifies; eager exact/compiled inexact disagrees. Missing, unstable, "
+        "unsupported, or explicitly downcast references are unknown, never agreement.",
+    }

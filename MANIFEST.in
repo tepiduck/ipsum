@@ -13,6 +13,7 @@ include docs/architecture.md docs/cli.md docs/validation.json
 include docs/diagnostics.md
 include docs/numerics.md
 include docs/sweeps.md
+include docs/gpt2-accuracy.csv
 global-exclude __pycache__ *.py[cod] AGENTS.md CLAUDE.md
 exclude tests/test_*.py
 prune reports

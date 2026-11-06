@@ -30,15 +30,25 @@ def test_accuracy_bands_and_sensitivity_labels_do_not_change_failure():
     }
     context = annotate(
         primary,
-        {"outputs": [{"target": "gradient", "accuracy_label": "comparable_to_eager_against_fp64"}]},
         {
+            "status": "complete",
+            "outputs": [
+                {
+                    "target": "gradient",
+                    "reference_dtype": "torch.float64",
+                    "accuracy_label": "comparable_to_eager_against_fp64",
+                }
+            ],
+        },
+        {
+            "status": "complete",
             "outputs": [
                 {
                     "target": "gradient",
                     "exceeds_primary_tolerance": True,
                     "control_to_candidate_rmse": 0.98,
                 }
-            ]
+            ],
         },
         {"flips": 2, "replay_matches_primary": True},
     )
@@ -78,12 +88,22 @@ def test_mixed_targets_never_receive_whole_finding_reassurance():
         "comparison": {"outputs": [{"target": name, "matches": False} for name in failed]},
     }
     fp64 = {
+        "status": "complete",
         "outputs": [
-            {"target": failed[0], "accuracy_label": "comparable_to_eager_against_fp64"},
-            {"target": failed[1], "accuracy_label": "candidate_farther_from_fp64"},
-        ]
+            {
+                "target": failed[0],
+                "reference_dtype": "torch.float64",
+                "accuracy_label": "comparable_to_eager_against_fp64",
+            },
+            {
+                "target": failed[1],
+                "reference_dtype": "torch.float64",
+                "accuracy_label": "candidate_farther_from_fp64",
+            },
+        ],
     }
     control = {
+        "status": "complete",
         "control": "onednn_disabled",
         "outputs": [
             {
