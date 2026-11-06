@@ -273,3 +273,16 @@ candidate regressions. Automatic reduction invokes the baseline first and reject
 that stops passing there; the candidate must then retain the original stable failure. A fresh
 dual-environment confirmation precedes export. Source-controlled CI pins both compiler releases
 and retains comparison artifacts even when the gate fails.
+
+## Pretrained sweep coordinator
+
+`sweep_models.py` resolves the pretrained catalog, prepares real inputs, and writes offline factories
+with exact model weights and inputs. `sweep.py` captures these through the native workload interface
+and executes the existing two-environment comparison. The coordinator does not implement another
+numerical oracle. Preparation and execution failures remain in the planned model denominator.
+
+Campaigns lock their output directory and record source, input, settings, and environment identity.
+Each attempt commits hashes of its result documents only after the comparison is complete. Resume
+verifies completed documents and starts a new attempt for interrupted work, retaining earlier
+artifacts. Numerical labels are advisory; counts distinguish pair agreement, stable findings,
+inconclusive execution, and findings without sufficient diagnostic evidence. See [sweeps](sweeps.md).

@@ -138,6 +138,13 @@ saved activation masks between AOT eager replay and compiled execution. Reports 
 observed mask flips and comparable fp64 error from the primary mismatch. These advisory labels
 leave the exit code and reduction predicate unchanged.
 
+`faultline sweep prepare` downloads and freezes a catalog of 20 pretrained vision and language
+models with real image/text inputs. `faultline sweep run` compares two environments, records
+per-target diagnostic coverage, and supports interruption/resume with evidence verification.
+See [pretrained sweeps](docs/sweeps.md) for commands, dependencies, input scope, and interpretation.
+The [recorded CPU and AMD sweep](RESULTS.md#version-09-pretrained-environment-sweep) includes
+gradient findings, unstable references, and diagnostic memory limits; it is not a model-correctness claim.
+
 Inputs can be a tensor, a positional tuple, a dictionary of keyword arguments, or
 `{"args": (...), "kwargs": {...}}`. Nested dictionaries, lists, and tuples are supported.
 Integer token IDs, boolean masks, mixed floating dtypes, noncontiguous views, and shared tensor

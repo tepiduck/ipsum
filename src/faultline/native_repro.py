@@ -96,6 +96,7 @@ def main():
             requests_selection=config.get("requests"),
             precision=precision,
             request_transform=request_transform,
+            gradient_hook=probe.observe_gradients if probe else None,
             step_hook=(lambda n: setattr(probe, "step", n)) if probe else None,
         )
 

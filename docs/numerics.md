@@ -91,7 +91,7 @@ mismatch; the advisory does not turn it into a pass.
    freshly loaded requests, retains aliasing/layouts, leaves integers and whole-model VJP cotangents unchanged,
    and avoids overflow to infinity. It is explicitly a different-input sensitivity control.
    No perturbable input, unsupported execution, nonfinite results, and unstable repeats have
-   separate statuses. `eager_control_sensitive` identifies failing targets where the control also
+   separate statuses. `eager_control_sensitive` requires every failing target to have a control that also
    exceeds the primary tolerance and its RMSE from eager is at least half the compiled/eager RMSE.
    Similar disagreement establishes sensitivity, not proof that a compiler defect is absent.
    For an independently saved derivative graph, floating graph inputs include lifted cotangents;
@@ -107,14 +107,29 @@ mismatch; the advisory does not turn it into a pass.
    eager and compiled backward outputs with **identical compiled saved inputs**.
 
 The mask diagnostic must reproduce the primary candidate observation and affected-target signature
-on every repeat. Changed diagnostic execution or unstable mask evidence cannot produce a
-`discontinuity_sensitive` label. A stable gradient mismatch with observed flips receives that label,
-with its coverage and same-input backward checks still visible. A faulty backward implementation
-can coexist with flips; this label does not dismiss the finding or establish complete causality.
+on every repeat. The returned model gradients are mapped to AOT backward outputs by exact storage
+identity and layout. Graph-local output positions are never treated as model parameter positions.
+Copied, accumulated, ambiguous, or otherwise unmapped gradients cannot satisfy downstream coverage.
+
+- `explained_by_discontinuity` requires observed flips, agreement in **every** same-input backward
+  check, no failed backward replay, and a mapped path from a flipped selector to **every** failing gradient.
+- `discontinuity_present` records flips when either the backward check disagrees or downstream
+  coverage is incomplete. It remains suspicious, including when another numerical label qualifies.
+- `comparable_to_eager_against_fp64` and `eager_control_sensitive` apply to the whole finding only
+  when all failing targets qualify. Per-target evidence remains available for mixed findings.
+
+Numerical context schema 2 records matched/total target counts under `label_coverage`, including
+the exact eager control policy (`onednn_disabled` or `input_one_ulp_up`). The two controls are
+different experiments and are not pooled as equivalent evidence. Changed diagnostic execution or
+unstable masks cannot qualify for either discontinuity label. The explanation label expresses this
+evidence criterion, not a proof of compiler correctness or an adjudicated false-positive label.
+Schema 1's `discontinuity_sensitive` and any-target aggregate labels are historical 0.8 behavior.
 
 Mask coverage is deliberately bounded. Recomputed intermediates, unknown expression forms,
 lowered max-pool scatter patterns, unavailable saved values, and graphs outside the supported AOT
-adapters remain unsupported. A graph with no recognized selectors reports `no_supported_masks`,
+adapters remain unsupported. Observed max-pool operations without established selector coverage
+produce an explicit coverage gap and `partial` status, even when the compared masks have zero flips.
+A graph with no recognized selectors reports `no_supported_masks`,
 not proof of smoothness. Joint shadow-input storage is limited to 512 MiB per graph call; retained
 paired outputs are limited to 256 MiB. The outer worker time and RSS budgets still apply.
 `partial` reports include supported comparisons and explicit omissions. These comparisons use

@@ -231,8 +231,13 @@ def main(argv=None):
     report = commands.add_parser("report", help="render an existing campaign")
     report.add_argument("directory", type=Path)
     report.add_argument("--open", action="store_true", help="open the local report in your browser")
+    from .sweep import add_sweep_commands, sweep_command
+
+    add_sweep_commands(commands, execution_options)
     args = parser.parse_args(argv)
     try:
+        if args.command == "sweep":
+            return sweep_command(args, settings_from)
         if args.command == "benchmark":
             from .historical import case_catalog, historical_benchmark
 

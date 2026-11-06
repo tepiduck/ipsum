@@ -13,7 +13,17 @@ from .storage import provenance
 
 def describe():
     packages = {}
-    for name in ("torch", "triton", "numpy", "psutil", "faultline-ml"):
+    for name in (
+        "torch",
+        "triton",
+        "numpy",
+        "psutil",
+        "faultline-ml",
+        "torchvision",
+        "transformers",
+        "safetensors",
+        "pillow",
+    ):
         try:
             packages[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:

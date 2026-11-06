@@ -197,6 +197,28 @@ Exit 0 means every selected case agreed; 1 means a stable discrepancy; 2 means a
 inconclusive or unavailable check, including when other cases disagreed. These are fixed synthetic
 component tests, not a claim of correctness for arbitrary models or GPU performance measurements.
 
+## Pretrained sweeps
+
+```bash
+faultline sweep list
+faultline sweep prepare --output workloads/pretrained
+faultline sweep run workloads/pretrained --baseline-python .stable/bin/python --candidate-python .nightly/bin/python --device cpu --output faultline-runs/pretrained
+```
+
+Install the optional `sweep` dependencies and the appropriate PyTorch/torchvision builds first.
+Preparation downloads and freezes pretrained checkpoints and real inputs. Repeated `--model NAME`
+selects a subset. Runs require Inductor, gradient checking, and numerical diagnostics; the defaults
+are two repeats, one thread, a 600-second timeout, and 12 GiB host RSS per worker. Both interpreters
+must have the model dependencies installed. Use `--resume` with the unchanged command after an
+interruption. Completed failures remain in the result, and changed evidence is rejected.
+
+The JSON/HTML report includes agreement, finding, inconclusive, unexplained, and overlapping label
+counts, with per-model control policies and target coverage. Exit codes follow the environment gate:
+1 if any pair has a regression or changed failure; otherwise 2 if any pair is inconclusive, and
+0 for agreement, recurring, or no-longer-observed findings. Exit 0 does not mean every model agrees.
+See [sweeps](sweeps.md) for the catalog,
+input provenance, artifact layout, and interpretation limits.
+
 ## Useful recipes
 
 Native `model run/compare` additionally accept `--autocast float16|bfloat16` and

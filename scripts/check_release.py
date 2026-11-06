@@ -26,6 +26,7 @@ FILES = {
     "docs/cli.md",
     "docs/diagnostics.md",
     "docs/numerics.md",
+    "docs/sweeps.md",
     "docs/validation.json",
     "examples/capture_mlp.py",
     "examples/models.py",

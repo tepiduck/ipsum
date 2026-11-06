@@ -166,37 +166,89 @@ def annotate(primary, fp64, control, masks):
         r["target"] for r in primary.get("comparison", {}).get("outputs", []) if not r["matches"]
     }
     fp64_rows = [r for r in fp64.get("outputs", []) if r["target"] in failed]
-    comparable = [
-        r["target"]
-        for r in fp64_rows
-        if r.get("accuracy_label") == "comparable_to_eager_against_fp64"
-    ]
-    sensitive = [
-        r["target"]
-        for r in control.get("outputs", [])
-        if r["target"] in failed
-        and r["exceeds_primary_tolerance"]
-        and r.get("control_to_candidate_rmse") is not None
-        and r["control_to_candidate_rmse"] >= 0.5
-    ]
+    comparable = sorted(
+        {
+            r["target"]
+            for r in fp64_rows
+            if r.get("accuracy_label") == "comparable_to_eager_against_fp64"
+        }
+    )
+    sensitive = sorted(
+        {
+            r["target"]
+            for r in control.get("outputs", [])
+            if r["target"] in failed
+            and r["exceeds_primary_tolerance"]
+            and r.get("control_to_candidate_rmse") is not None
+            and r["control_to_candidate_rmse"] >= 0.5
+        }
+    )
     labels = []
-    if comparable:
+    if failed and set(comparable) == failed:
         labels.append("comparable_to_eager_against_fp64")
-    if sensitive:
+    if failed and set(sensitive) == failed:
         labels.append("eager_control_sensitive")
+    flipped_outputs = {
+        (row["step"], row["stage"], index)
+        for row in masks.get("masks", [])
+        if row.get("status") == "complete" and row.get("flips", 0)
+        for index in row.get("affected_backward_outputs", [])
+    }
+    downstream = []
+    for target in sorted(failed):
+        mapping = masks.get("gradient_mapping", {}).get(target, {})
+        origins = mapping.get("origins", [])
+        if mapping.get("status") == "mapped" and len(origins) == 1:
+            origin = origins[0]
+            if (origin["step"], origin["stage"], origin["output"]) in flipped_outputs:
+                downstream.append(target)
+    checks = masks.get("backward_same_inputs", [])
+    backward_agrees = (
+        bool(checks)
+        and all(row.get("matches") is True for row in checks)
+        and not any(":backward:" in row.get("stage", "") for row in masks.get("errors", []))
+    )
     if (
         primary["status"] == "gradient_mismatch"
         and masks.get("replay_matches_primary")
         and masks.get("flips", 0)
     ):
-        labels.append("discontinuity_sensitive")
+        labels.append(
+            "explained_by_discontinuity"
+            if backward_agrees and failed and set(downstream) == failed
+            else "discontinuity_present"
+        )
+    coverage = {
+        "comparable_to_eager_against_fp64": {
+            "matched": len(comparable),
+            "total": len(failed),
+            "targets": comparable,
+        },
+        "eager_control_sensitive": {
+            "matched": len(sensitive),
+            "total": len(failed),
+            "targets": sensitive,
+            "control": control.get("control"),
+        },
+        "discontinuity_downstream": {
+            "matched": len(downstream),
+            "total": len(failed),
+            "targets": downstream,
+            "backward_same_inputs_agree": backward_agrees,
+        },
+    }
     return {
-        "schema_version": 1,
+        "schema_version": 2,
         "labels": labels,
+        "label_coverage": coverage,
+        "failing_targets": sorted(failed),
+        "control_policy": control.get("control"),
         "fp64_comparable_targets": comparable,
         "eager_sensitive_targets": sensitive,
         "eager_control": control,
         "masks": masks,
         "note": "Advisory labels describe evidence; the primary status, tolerances, failure "
-        "signature, and exit code are unchanged. Mask flips do not rule out a second defect.",
+        "signature, and exit code are unchanged. Whole-finding labels require all failing targets. "
+        "The discontinuity explanation requires same-input backward agreement and mapped downstream "
+        "coverage of every failing gradient; it is an evidence criterion, not a correctness proof.",
     }

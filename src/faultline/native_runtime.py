@@ -105,7 +105,9 @@ def capture_cotangents(model, requests, seed):
     return probes
 
 
-def observe_native(model, fn, requests, gradients=False, wrong_gradient=False, step_hook=None):
+def observe_native(
+    model, fn, requests, gradients=False, wrong_gradient=False, step_hook=None, gradient_hook=None
+):
     values, structures = {}, []
     for step, request in enumerate(requests):
         if step_hook:
@@ -182,6 +184,8 @@ def observe_native(model, fn, requests, gradients=False, wrong_gradient=False, s
                 if backward_outputs and targets
                 else (None,) * len(targets)
             )
+            if gradient_hook:
+                gradient_hook(step, targets, derivatives)
             for (name, value), derivative in zip(targets, derivatives, strict=True):
                 prefix = f"step:{step}:gradient:{name}"
                 values[prefix + ":present"] = torch.tensor(derivative is not None)
@@ -373,6 +377,7 @@ def make_native_execution(
     step_hook=None,
     precision=None,
     request_transform=None,
+    gradient_hook=None,
 ):
     """Construct one eager/compiled callable, restoring saved state for each whole trace."""
     bundle = Path(bundle)
@@ -444,6 +449,7 @@ def make_native_execution(
                 gradients,
                 compile_model is not None and settings["backend"] == "mutant:gradient-scale",
                 step_hook,
+                gradient_hook,
             )
         if device.startswith("cuda"):
             torch.cuda.synchronize()

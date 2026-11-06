@@ -10,7 +10,7 @@ from faultline.native_artifacts import export_native
 from faultline.native_masks import MaskProbe, clone_arguments
 from faultline.native_numerics import annotate, assess_control, perturb_inputs
 from faultline.native_precision import accuracy_label, error_stats
-from faultline.native_runtime import compare_native
+from faultline.native_runtime import compare_native, observe_native
 from faultline.runner import run_case
 from faultline.standalone import verify_standalone
 
@@ -45,11 +45,11 @@ def test_accuracy_bands_and_sensitivity_labels_do_not_change_failure():
     assert set(context["labels"]) == {
         "comparable_to_eager_against_fp64",
         "eager_control_sensitive",
-        "discontinuity_sensitive",
+        "discontinuity_present",
     }
     assert portable.same_failure(primary, {**primary, "numerical_context": context})
     assert (
-        "discontinuity_sensitive"
+        "discontinuity_present"
         not in annotate(primary, {}, {}, {"flips": 2, "status": "diagnostic_replay_changed"})[
             "labels"
         ]
@@ -69,6 +69,143 @@ def test_ulp_control_preserves_views_integer_roles_and_cotangents():
     assert ids.item() == 2**60 and mask.item() and torch.equal(tangent, torch.ones(4))
     with pytest.raises(ValueError, match="mixed-dtype"):
         perturb_inputs([{"args": (base, base.view(torch.int32)), "kwargs": {}}])
+
+
+def test_mixed_targets_never_receive_whole_finding_reassurance():
+    failed = ["step:0:gradient:a:value", "step:0:gradient:b:value"]
+    primary = {
+        "status": "gradient_mismatch",
+        "comparison": {"outputs": [{"target": name, "matches": False} for name in failed]},
+    }
+    fp64 = {
+        "outputs": [
+            {"target": failed[0], "accuracy_label": "comparable_to_eager_against_fp64"},
+            {"target": failed[1], "accuracy_label": "candidate_farther_from_fp64"},
+        ]
+    }
+    control = {
+        "control": "onednn_disabled",
+        "outputs": [
+            {
+                "target": failed[0],
+                "exceeds_primary_tolerance": True,
+                "control_to_candidate_rmse": 1.0,
+            }
+        ],
+    }
+    context = annotate(primary, fp64, control, {})
+    assert context["labels"] == []
+    assert context["label_coverage"]["comparable_to_eager_against_fp64"]["matched"] == 1
+    assert context["label_coverage"]["comparable_to_eager_against_fp64"]["total"] == 2
+    assert context["label_coverage"]["eager_control_sensitive"]["control"] == "onednn_disabled"
+    masks = {
+        "replay_matches_primary": True,
+        "flips": 1,
+        "backward_same_inputs": [{"matches": True}],
+        "masks": [
+            {
+                "status": "complete",
+                "flips": 1,
+                "step": 0,
+                "stage": "0:backward:0",
+                "affected_backward_outputs": [0],
+            }
+        ],
+        "gradient_mapping": {
+            target: {
+                "status": "mapped",
+                "origins": [{"step": 0, "stage": "0:backward:0", "output": i}],
+            }
+            for i, target in enumerate(failed)
+        },
+    }
+    context = annotate(primary, fp64, control, masks)
+    assert context["labels"] == ["discontinuity_present"]
+    assert context["label_coverage"]["discontinuity_downstream"]["matched"] == 1
+    assert context["label_coverage"]["discontinuity_downstream"]["total"] == 2
+
+
+@pytest.mark.parametrize("wrong_backward", [False, True])
+def test_planted_backward_fault_plus_real_mask_flip_stays_suspicious(monkeypatch, wrong_backward):
+    from functorch.compile import make_boxed_func
+
+    def compiler(module, inputs, backend, stage, **options):
+        def execute(values):
+            # Explicitly controlled forward perturbation near zero, then (optionally)
+            # a wrong backward. The shadow graph still runs the unmodified operator.
+            if stage == "forward":
+                return module(*[value + 2e-8 for value in values])
+            result = module(*values)
+            return tuple(
+                value * 2 if wrong_backward and isinstance(value, torch.Tensor) else value
+                for value in result
+            )
+
+        boxed = make_boxed_func(lambda *args: execute(list(args)))
+        if options.get("around"):
+
+            def wrapped(values):
+                return options["around"](boxed, values)
+
+            wrapped._boxed_call = True
+            return wrapped
+        return boxed
+
+    monkeypatch.setattr(native_aot, "compile_stage", compiler)
+    torch._dynamo.reset()
+    settings = Settings(backend="aot_eager", gradients=True, repeats=2).to_dict()
+    probe = MaskProbe(native_aot, native_compile, settings, compare_native, portable, {})
+    model = torch.nn.ReLU().eval()
+
+    def requests():
+        return [
+            {
+                "args": (torch.tensor([-1e-8, 1.0]),),
+                "kwargs": {},
+                "cotangents": {"output": torch.ones(2)},
+            }
+        ]
+
+    eager = observe_native(model, model, requests(), True)
+    with native_aot.capture_context(True):
+        compiled = torch.compile(model, backend=probe.backend)
+        candidate = observe_native(
+            model, compiled, requests(), True, gradient_hook=probe.observe_gradients
+        )
+    masks = {**probe.summary(), "replay_matches_primary": True}
+    assert masks["flips"] == 1, masks
+    assert all(row["matches"] for row in masks["backward_same_inputs"]) == (not wrong_backward)
+    primary = {
+        "status": "gradient_mismatch",
+        "comparison": compare_native(eager, candidate, portable),
+    }
+    context = annotate(primary, {}, {}, masks)
+    assert context["labels"] == [
+        "discontinuity_present" if wrong_backward else "explained_by_discontinuity"
+    ]
+    if not wrong_backward:
+        masks["errors"] = [{"stage": "1:backward:0", "error": "controlled replay failure"}]
+        assert annotate(primary, {}, {}, masks)["labels"] == ["discontinuity_present"]
+        masks["errors"] = []
+        masks["gradient_mapping"] = {}  # A copied/accumulated gradient cannot be guessed by value.
+        assert annotate(primary, {}, {}, masks)["labels"] == ["discontinuity_present"]
+
+
+def test_lowered_maxpool_is_explicit_incomplete_coverage():
+    graph = torch.fx.Graph()
+    offsets = graph.placeholder("offsets")
+    node = graph.call_function(
+        torch.ops.prims._low_memory_max_pool_offsets_to_indices.default,
+        (offsets, 2, 2, 2, 2, 0, 0, 1, 1, 4, 4),
+    )
+    graph.output((node,))
+    module = torch.fx.GraphModule(torch.nn.Module(), graph)
+    probe = MaskProbe(
+        native_aot, native_compile, Settings().to_dict(), compare_native, portable, {}
+    )
+    probe.inspect_backward(module, [torch.zeros(1, dtype=torch.int32)], "0:backward:0")
+    assert probe.summary()["status"] == "partial"
+    assert probe.summary()["masks"][0]["kind"] == "max_pool_lowered"
 
 
 def test_eager_control_restores_backend_after_failure(monkeypatch):
@@ -196,7 +333,7 @@ def factory():
     )
     context = result["numerical_context"]
     assert context["masks"]["status"] == "complete", context
-    assert context["masks"]["flips"] == 0 and "discontinuity_sensitive" not in context["labels"]
+    assert context["masks"]["flips"] == 0 and "explained_by_discontinuity" not in context["labels"]
     assert context["eager_control"]["status"] == "complete"
     if backend.startswith("mutant"):
         assert not all(c["matches"] for c in context["masks"]["backward_same_inputs"])

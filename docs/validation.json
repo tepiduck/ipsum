@@ -2303,6 +2303,4129 @@
     },
     "version": "0.7.0"
   },
+  "pretrained_sweep_validation": {
+    "campaigns": {
+      "amd": {
+        "cases": [
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 14
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 14,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 14,
+                  "total": 14
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 4,
+                  "total": 14
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 3,
+                  "total": 14
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 1,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3861.6953125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 66.94414679400052
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 14
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 14,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 14,
+                  "total": 14
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 4,
+                  "total": 14
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 3,
+                  "total": 14
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 1,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3794.68359375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 60.95543066100072
+            },
+            "classification": "recurring",
+            "id": "resnet18"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 27
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 1,
+                "comparable_to_eager_against_fp64": 16
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 17,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 16,
+                  "total": 17
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 13,
+                  "total": 17
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 14,
+                  "total": 17
+                }
+              },
+              "labels": [],
+              "mask_flips": 1,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4059.0234375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 66.51700479400006
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 27
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 1,
+                "comparable_to_eager_against_fp64": 16
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 17,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 16,
+                  "total": 17
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 13,
+                  "total": 17
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 14,
+                  "total": 17
+                }
+              },
+              "labels": [],
+              "mask_flips": 1,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4057.39453125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 68.51061699599995
+            },
+            "classification": "recurring",
+            "id": "resnet34"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 91
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 2,
+                "candidate_farther_from_fp64": 3,
+                "comparable_to_eager_against_fp64": 149
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 154,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 149,
+                  "total": 154
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 154
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 154,
+                  "total": 154
+                }
+              },
+              "labels": [
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4734.37109375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 91.68801272600012
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 91
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 2,
+                "candidate_farther_from_fp64": 3,
+                "comparable_to_eager_against_fp64": 149
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 154,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 149,
+                  "total": 154
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 154
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 154,
+                  "total": 154
+                }
+              },
+              "labels": [
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4322.4921875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 83.33651088100032
+            },
+            "classification": "recurring",
+            "id": "resnet50"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 208
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 1,
+                "candidate_farther_from_fp64": 9,
+                "comparable_to_eager_against_fp64": 95
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 105,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 95,
+                  "total": 105
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 105
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 97,
+                  "total": 105
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 5526.62890625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 102.17409188199963
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 208
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 1,
+                "candidate_farther_from_fp64": 9,
+                "comparable_to_eager_against_fp64": 95
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 105,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 95,
+                  "total": 105
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 105
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 97,
+                  "total": 105
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 5483.50390625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 100.4030351929996
+            },
+            "classification": "recurring",
+            "id": "resnet101"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 92
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 67
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 67,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 67,
+                  "total": 67
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 67
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 67,
+                  "total": 67
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64",
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4716.74609375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 75.2150961590005
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 92
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 67
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 67,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 67,
+                  "total": 67
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 67
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 67,
+                  "total": 67
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64",
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "unstable_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4317.953125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 71.03703950599993
+            },
+            "classification": "recurring",
+            "id": "resnext50_32x4d"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 22
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 22,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 22,
+                  "total": 22
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 22
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 10,
+                  "total": 22
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "no_supported_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4034.03125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 101.64107581999997
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 18
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 18,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 18,
+                  "total": 18
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 18
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 14,
+                  "total": 18
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "no_supported_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3929.6953125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 96.59446590699918
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_b0"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 143
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 15
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 15,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 15,
+                  "total": 15
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 15
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 14,
+                  "total": 15
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4371.85546875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 106.69872282099914
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 143
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 61
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 61,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 61,
+                  "total": 61
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 61
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 44,
+                  "total": 61
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3848.45703125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 108.28802342800009
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_b1"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 119
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 4
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 4,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 4,
+                  "total": 4
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 4
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 1,
+                  "total": 4
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4549.8359375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 102.48326381100014
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 119
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 5
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 5,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 5,
+                  "total": 5
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 5
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 4,
+                  "total": 5
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4026.85546875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 105.75893336799982
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_b2"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 150
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 2
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 2,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 2,
+                  "total": 2
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 2
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 1,
+                  "total": 2
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 5104.02734375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 121.7562471780002
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 150
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 4
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 4,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 4,
+                  "total": 4
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 4
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 2,
+                  "total": 4
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4527.83984375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 109.56901579399982
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_b3"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 267,
+                "ValueError": 1
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 10
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 10,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 10,
+                  "total": 10
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 10
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 6,
+                  "total": 10
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 5206.4453125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 113.88198446800016
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 267,
+                "ValueError": 1
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 11
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 11,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 11,
+                  "total": 11
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 11
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 6,
+                  "total": 11
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4744.50390625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 110.28639268700044
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_v2_s"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 15
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 15,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 15,
+                  "total": 15
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 15
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 2,
+                  "total": 15
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3715.48046875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 54.071644592000666
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 15
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 15,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 15,
+                  "total": 15
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 15
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 2,
+                  "total": 15
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3648.09375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 56.85267616800047
+            },
+            "classification": "recurring",
+            "id": "mobilenet_v2"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 1,
+                "comparable_to_eager_against_fp64": 83
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 84,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 83,
+                  "total": 84
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 84
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 79,
+                  "total": 84
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3492.9765625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 73.14276361200064
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 1,
+                "comparable_to_eager_against_fp64": 84
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 85,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 84,
+                  "total": 85
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 85
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 80,
+                  "total": 85
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 2982.83203125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 71.01766641199993
+            },
+            "classification": "changed_failure",
+            "id": "mobilenet_v3_small"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 55
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 55,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 55,
+                  "total": 55
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 55
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 48,
+                  "total": 55
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3840.51953125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 72.65056431499943
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "input_one_ulp_up",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 57
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 57,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 57,
+                  "total": 57
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 57
+                },
+                "eager_control_sensitive": {
+                  "control": "input_one_ulp_up",
+                  "matched": 49,
+                  "total": 57
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3350.11328125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 72.61154204099967
+            },
+            "classification": "changed_failure",
+            "id": "mobilenet_v3_large"
+          },
+          {
+            "baseline": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 4364.640625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 19.205990151999686
+            },
+            "candidate": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 4010.4453125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 19.461296514999958
+            },
+            "classification": "inconclusive",
+            "id": "vit_b_16"
+          },
+          {
+            "baseline": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 3416.171875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 12.49506266499975
+            },
+            "candidate": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 2911.6015625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 10.61792972999956
+            },
+            "classification": "inconclusive",
+            "id": "swin_t"
+          },
+          {
+            "baseline": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 3416.46875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 13.152219255000091
+            },
+            "candidate": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 2901.65234375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 10.969643228000677
+            },
+            "classification": "inconclusive",
+            "id": "convnext_tiny"
+          },
+          {
+            "baseline": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 4950.0234375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 22.919213644999218
+            },
+            "candidate": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 4955.6171875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 22.618951681999533
+            },
+            "classification": "inconclusive",
+            "id": "bert"
+          },
+          {
+            "baseline": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 5598.25390625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 30.04789238900048
+            },
+            "candidate": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 5553.33984375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 27.96324166100021
+            },
+            "classification": "inconclusive",
+            "id": "gpt2"
+          },
+          {
+            "baseline": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 3819.3125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 16.77078623200032
+            },
+            "candidate": {
+              "comparison_source": null,
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "not_run",
+              "gradient_mismatches": null,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": null,
+              "peak_tree_rss_mb": 3920.1796875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "unstable_reference",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 17.2252827479997
+            },
+            "classification": "inconclusive",
+            "id": "distilbert"
+          },
+          {
+            "baseline": {
+              "comparison_source": "primary_observation",
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "resource_limit",
+              "gradient_mismatches": 261,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 12301.140625,
+              "primary_observation_status": "gradient_mismatch",
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "resource_limit",
+              "unexplained": true,
+              "worker_source_verified": false,
+              "worker_wall_s": 183.9843857040005
+            },
+            "candidate": {
+              "comparison_source": "primary_observation",
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "resource_limit",
+              "gradient_mismatches": 261,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 12310.56640625,
+              "primary_observation_status": "gradient_mismatch",
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "resource_limit",
+              "unexplained": true,
+              "worker_source_verified": false,
+              "worker_wall_s": 169.30355280599997
+            },
+            "classification": "inconclusive",
+            "id": "smollm2"
+          }
+        ],
+        "classifications": {
+          "changed_failure": 7,
+          "inconclusive": 7,
+          "recurring": 6
+        },
+        "counts": {
+          "finding": 13,
+          "fully_agree": 0,
+          "inconclusive": 7,
+          "labels": {
+            "comparable_to_eager_against_fp64": 9,
+            "eager_control_sensitive": 2
+          },
+          "note": "Labels can overlap. Counts are model/environment-pair outcomes, not a measured false-positive rate.",
+          "pending": 0,
+          "planned": 20,
+          "unexplained_findings": 9
+        },
+        "device": "cuda:0",
+        "environments": {
+          "baseline": {
+            "cuda_version": null,
+            "devices": [
+              {
+                "architecture": "gfx1100",
+                "index": 0,
+                "name": "AMD Radeon RX 7900 XT",
+                "total_memory": 21412773888
+              },
+              {
+                "architecture": "gfx1031",
+                "index": 1,
+                "name": "AMD Radeon(TM) Graphics",
+                "total_memory": 17236561920
+              }
+            ],
+            "faultline_source_sha256": "879ffef78475373e833963b34b98a99cc784c32c75ba3bc5bc9be919512f6119",
+            "float32_matmul_precision": "highest",
+            "hip_version": "7.18.26441",
+            "packages": {
+              "faultline-ml": "0.9.0",
+              "numpy": "2.5.3",
+              "pillow": "12.3.0",
+              "psutil": "7.2.2",
+              "safetensors": "0.8.0",
+              "torch": "2.15.0+rocm10.3.0a20261105",
+              "torchvision": "0.30.0a0+rocm10.3.0a20261105",
+              "transformers": "5.22.1",
+              "triton": "3.9.0+git0a6e13e6.rocm10.3.0a20261105"
+            },
+            "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+            "python": "3.12.3"
+          },
+          "candidate": {
+            "cuda_version": null,
+            "devices": [
+              {
+                "architecture": "gfx1100",
+                "index": 0,
+                "name": "AMD Radeon RX 7900 XT",
+                "total_memory": 21412773888
+              },
+              {
+                "architecture": "gfx1031",
+                "index": 1,
+                "name": "AMD Radeon(TM) Graphics",
+                "total_memory": 17236561920
+              }
+            ],
+            "faultline_source_sha256": "879ffef78475373e833963b34b98a99cc784c32c75ba3bc5bc9be919512f6119",
+            "float32_matmul_precision": "highest",
+            "hip_version": "7.18.26441",
+            "packages": {
+              "faultline-ml": "0.9.0",
+              "numpy": "2.5.3",
+              "pillow": "12.3.0",
+              "psutil": "7.2.2",
+              "safetensors": "0.8.0",
+              "torch": "2.16.0a0+rocm10.3.0a20261105",
+              "torchvision": "0.30.0a0+rocm10.3.0a20261105",
+              "transformers": "5.22.1",
+              "triton": "3.9.0+gitb7ddcf86.rocm10.3.0a20261105"
+            },
+            "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+            "python": "3.12.3"
+          }
+        },
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cuda:0",
+          "gradients": true,
+          "max_rss_mb": 12288,
+          "numerics": true,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        }
+      },
+      "cpu": {
+        "cases": [
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 14,
+                "comparable_to_eager_against_fp64": 13
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 27,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 13,
+                  "total": 27
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 27
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 27,
+                  "total": 27
+                }
+              },
+              "labels": [
+                "eager_control_sensitive",
+                "discontinuity_present"
+              ],
+              "mask_flips": 3,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1601.3125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 62.24486945899997
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 14,
+                "comparable_to_eager_against_fp64": 13
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 27,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 13,
+                  "total": 27
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 27
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 27,
+                  "total": 27
+                }
+              },
+              "labels": [
+                "eager_control_sensitive",
+                "discontinuity_present"
+              ],
+              "mask_flips": 3,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1573.0859375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 62.73049287499998
+            },
+            "classification": "recurring",
+            "id": "resnet18"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 27
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 106
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 106,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 0,
+                  "total": 106
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 106
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 0,
+                  "total": 106
+                }
+              },
+              "labels": [
+                "discontinuity_present"
+              ],
+              "mask_flips": 3,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 2417.296875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 57.080306877
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 27
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 106
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 106,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 0,
+                  "total": 106
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 106
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 0,
+                  "total": 106
+                }
+              },
+              "labels": [
+                "discontinuity_present"
+              ],
+              "mask_flips": 3,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 2431.32421875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 57.70292698399999
+            },
+            "classification": "recurring",
+            "id": "resnet34"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 91
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 8,
+                "comparable_to_eager_against_fp64": 77
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 85,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 77,
+                  "total": 85
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 85
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 79,
+                  "total": 85
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 2943.32421875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 70.33210763399995
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 91
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 8,
+                "comparable_to_eager_against_fp64": 77
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 85,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 77,
+                  "total": 85
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 85
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 79,
+                  "total": 85
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 2948.8203125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 74.82426605599994
+            },
+            "classification": "recurring",
+            "id": "resnet50"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 208
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 149,
+                "comparable_to_eager_against_fp64": 47
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 196,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 47,
+                  "total": 196
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 196
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 37,
+                  "total": 196
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4670.75,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 88.27284443299993
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 208
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 149,
+                "comparable_to_eager_against_fp64": 47
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 196,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 47,
+                  "total": 196
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 196
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 37,
+                  "total": 196
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4687.1796875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 82.753447736
+            },
+            "classification": "recurring",
+            "id": "resnet101"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 92
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 35,
+                "comparable_to_eager_against_fp64": 77
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 112,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 77,
+                  "total": 112
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 112
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 112,
+                  "total": 112
+                }
+              },
+              "labels": [
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3056.16796875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 59.10870168300005
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 1,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 92
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 35,
+                "comparable_to_eager_against_fp64": 77
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 112,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 77,
+                  "total": 112
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 112
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 112,
+                  "total": 112
+                }
+              },
+              "labels": [
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3066.8984375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 65.98469680099993
+            },
+            "classification": "recurring",
+            "id": "resnext50_32x4d"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 2,
+                "comparable_to_eager_against_fp64": 30
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 32,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 30,
+                  "total": 32
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 32
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 11,
+                  "total": 32
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "no_supported_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1533.93359375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 110.46844391699995
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 1,
+                "comparable_to_eager_against_fp64": 32
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 33,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 32,
+                  "total": 33
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 33
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 10,
+                  "total": 33
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "no_supported_masks",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1535.1171875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 110.44473453700016
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_b0"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 143
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 1,
+                "candidate_farther_from_fp64": 18,
+                "comparable_to_eager_against_fp64": 16
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 35,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 16,
+                  "total": 35
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 35
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 29,
+                  "total": 35
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1973.7734375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 134.66448870299996
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 143
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 1,
+                "candidate_farther_from_fp64": 1,
+                "comparable_to_eager_against_fp64": 70
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 72,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 70,
+                  "total": 72
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 72
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 41,
+                  "total": 72
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 2001.4296875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 131.704050328
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_b1"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 119
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 1,
+                "comparable_to_eager_against_fp64": 6
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 7,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 6,
+                  "total": 7
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 7
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 2,
+                  "total": 7
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 2401.8203125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 147.63168770200014
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 119
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 6
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 6,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 6,
+                  "total": 6
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 6
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 3,
+                  "total": 6
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 2405.19140625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 143.87431402899983
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_b2"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 150
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 6
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 6,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 6,
+                  "total": 6
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 6
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 0,
+                  "total": 6
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3023.88671875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 157.44416103499998
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 150
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 4
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 4,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 4,
+                  "total": 4
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 4
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 1,
+                  "total": 4
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3050.6171875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 155.31761831799986
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_b3"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 267,
+                "ValueError": 1
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 12
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 12,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 12,
+                  "total": 12
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 12
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 3,
+                  "total": 12
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4404.09375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 165.87658441999997
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 267,
+                "ValueError": 1
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 1,
+                "comparable_to_eager_against_fp64": 25
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 26,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 25,
+                  "total": 26
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 26
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 4,
+                  "total": 26
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 4415.33203125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 160.76085614800013
+            },
+            "classification": "changed_failure",
+            "id": "efficientnet_v2_s"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 13,
+                "comparable_to_eager_against_fp64": 2
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 15,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 2,
+                  "total": 15
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 15
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 1,
+                  "total": 15
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1358.7421875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 55.70351801300012
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 13,
+                "comparable_to_eager_against_fp64": 2
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 15,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 2,
+                  "total": 15
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 15
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 1,
+                  "total": 15
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1360.52734375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 56.84682857300004
+            },
+            "classification": "recurring",
+            "id": "mobilenet_v2"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 104
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 104,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 104,
+                  "total": 104
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 104
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 88,
+                  "total": 104
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 822.69140625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 72.12147712700016
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 104
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 104,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 104,
+                  "total": 104
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 104
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 88,
+                  "total": 104
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 825.74609375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 72.32929843300008
+            },
+            "classification": "recurring",
+            "id": "mobilenet_v3_small"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 69
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 69,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 69,
+                  "total": 69
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 69
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 69,
+                  "total": 69
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64",
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1309.59375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 75.78303971100013
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "comparable_to_eager_against_fp64": 69
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 69,
+              "has_full_diagnostic_label": true,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 69,
+                  "total": 69
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": true,
+                  "matched": 0,
+                  "total": 69
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 69,
+                  "total": 69
+                }
+              },
+              "labels": [
+                "comparable_to_eager_against_fp64",
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 1313.66796875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 1,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": false,
+              "worker_source_verified": true,
+              "worker_wall_s": 74.54518798000026
+            },
+            "classification": "recurring",
+            "id": "mobilenet_v3_large"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 175,
+                "ValueError": 1
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 92,
+                "comparable_to_eager_against_fp64": 7
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 99,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 7,
+                  "total": 99
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 99
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 96,
+                  "total": 99
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 8249.07421875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 140.85041087399986
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 175,
+                "ValueError": 1
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 86,
+                "comparable_to_eager_against_fp64": 8
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 94,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 8,
+                  "total": 94
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 94
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 92,
+                  "total": 94
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 8260.76953125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 131.57998076099966
+            },
+            "classification": "changed_failure",
+            "id": "vit_b_16"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 130
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 44,
+                "comparable_to_eager_against_fp64": 44
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 88,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 44,
+                  "total": 88
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 88
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 88,
+                  "total": 88
+                }
+              },
+              "labels": [
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3340.10546875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 158.8722959040001
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 130
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_closer_to_fp64": 44,
+                "comparable_to_eager_against_fp64": 44
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 88,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 44,
+                  "total": 88
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 88
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 88,
+                  "total": 88
+                }
+              },
+              "labels": [
+                "eager_control_sensitive"
+              ],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3337.69921875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 154.3757292690002
+            },
+            "classification": "recurring",
+            "id": "swin_t"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 106
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 14,
+                "comparable_to_eager_against_fp64": 31
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 45,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 31,
+                  "total": 45
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 45
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 41,
+                  "total": 45
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3251.81640625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 88.71798456500028
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "RuntimeError": 1,
+                "Saved-mask pairs exceed 256 MiB limit": 106
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 14,
+                "comparable_to_eager_against_fp64": 31
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 45,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 31,
+                  "total": 45
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 45
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 39,
+                  "total": 45
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 3253.33203125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 89.47971806999976
+            },
+            "classification": "recurring",
+            "id": "convnext_tiny"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 189
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 13,
+                "comparable_to_eager_against_fp64": 155
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 168,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 155,
+                  "total": 168
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 168
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 163,
+                  "total": 168
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 10033.6484375,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 191.791917647
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 189
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 20,
+                "comparable_to_eager_against_fp64": 156
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 176,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 156,
+                  "total": 176
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 176
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 161,
+                  "total": 176
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 9940.76171875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 184.2161920010003
+            },
+            "classification": "changed_failure",
+            "id": "bert"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 147
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 3,
+                "comparable_to_eager_against_fp64": 129
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 132,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 129,
+                  "total": 132
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 132
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 0,
+                  "total": 132
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 11701.3046875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 253.07219468099947
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 147
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 71,
+                "comparable_to_eager_against_fp64": 70
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 141,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 70,
+                  "total": 141
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 141
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 0,
+                  "total": 141
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 11569.64453125,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 242.2334820800006
+            },
+            "classification": "changed_failure",
+            "id": "gpt2"
+          },
+          {
+            "baseline": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 65
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 2,
+                "comparable_to_eager_against_fp64": 53
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 55,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 53,
+                  "total": 55
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 55
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 40,
+                  "total": 55
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 6404.1796875,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 134.9807424390001
+            },
+            "candidate": {
+              "comparison_source": "completed_run",
+              "control_policy": "onednn_disabled",
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {
+                "Saved-mask pairs exceed 256 MiB limit": 65
+              },
+              "eager_control_status": "complete",
+              "failing_target_accuracy_labels": {
+                "candidate_farther_from_fp64": 3,
+                "comparable_to_eager_against_fp64": 61
+              },
+              "fp64_status": "complete",
+              "gradient_mismatches": 64,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {
+                "comparable_to_eager_against_fp64": {
+                  "matched": 61,
+                  "total": 64
+                },
+                "discontinuity_downstream": {
+                  "backward_same_inputs_agree": false,
+                  "matched": 0,
+                  "total": 64
+                },
+                "eager_control_sensitive": {
+                  "control": "onednn_disabled",
+                  "matched": 56,
+                  "total": 64
+                }
+              },
+              "labels": [],
+              "mask_flips": 0,
+              "masks_status": "partial",
+              "non_gradient_mismatches": 0,
+              "peak_tree_rss_mb": 6413.09765625,
+              "primary_observation_status": null,
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 1
+              },
+              "status": "gradient_mismatch",
+              "unexplained": true,
+              "worker_source_verified": true,
+              "worker_wall_s": 130.6887424459992
+            },
+            "classification": "changed_failure",
+            "id": "distilbert"
+          },
+          {
+            "baseline": {
+              "comparison_source": "primary_observation",
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "resource_limit",
+              "gradient_mismatches": 226,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": 1,
+              "peak_tree_rss_mb": 12289.02734375,
+              "primary_observation_status": "numerical_mismatch",
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "resource_limit",
+              "unexplained": true,
+              "worker_source_verified": false,
+              "worker_wall_s": 137.18615487500028
+            },
+            "candidate": {
+              "comparison_source": "primary_observation",
+              "control_policy": null,
+              "coverage_gaps": 0,
+              "diagnostic_error_types": {},
+              "eager_control_status": "not_run",
+              "failing_target_accuracy_labels": {},
+              "fp64_status": "resource_limit",
+              "gradient_mismatches": 223,
+              "has_full_diagnostic_label": false,
+              "label_coverage": {},
+              "labels": [],
+              "mask_flips": null,
+              "masks_status": "not_run",
+              "non_gradient_mismatches": 1,
+              "peak_tree_rss_mb": 12334.703125,
+              "primary_observation_status": "numerical_mismatch",
+              "same_input_backward": {
+                "agreed": 0,
+                "checks": 0
+              },
+              "status": "resource_limit",
+              "unexplained": true,
+              "worker_source_verified": false,
+              "worker_wall_s": 123.67602856400026
+            },
+            "classification": "inconclusive",
+            "id": "smollm2"
+          }
+        ],
+        "classifications": {
+          "changed_failure": 9,
+          "inconclusive": 1,
+          "recurring": 10
+        },
+        "counts": {
+          "finding": 19,
+          "fully_agree": 0,
+          "inconclusive": 1,
+          "labels": {
+            "comparable_to_eager_against_fp64": 5,
+            "discontinuity_present": 2,
+            "eager_control_sensitive": 4
+          },
+          "note": "Labels can overlap. Counts are model/environment-pair outcomes, not a measured false-positive rate.",
+          "pending": 0,
+          "planned": 20,
+          "unexplained_findings": 16
+        },
+        "device": "cpu",
+        "environments": {
+          "baseline": {
+            "cuda_version": null,
+            "devices": [],
+            "faultline_source_sha256": "879ffef78475373e833963b34b98a99cc784c32c75ba3bc5bc9be919512f6119",
+            "float32_matmul_precision": "highest",
+            "hip_version": null,
+            "packages": {
+              "faultline-ml": "0.9.0",
+              "numpy": "2.5.4",
+              "pillow": "13.0.0",
+              "psutil": "7.2.2",
+              "safetensors": "0.8.0",
+              "torch": "2.15.0+cpu",
+              "torchvision": "0.29.2+cpu",
+              "transformers": "5.22.1",
+              "triton": null
+            },
+            "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+            "python": "3.12.3"
+          },
+          "candidate": {
+            "cuda_version": null,
+            "devices": [],
+            "faultline_source_sha256": "879ffef78475373e833963b34b98a99cc784c32c75ba3bc5bc9be919512f6119",
+            "float32_matmul_precision": "highest",
+            "hip_version": null,
+            "packages": {
+              "faultline-ml": "0.9.0",
+              "numpy": "2.5.4",
+              "pillow": "13.0.0",
+              "psutil": "7.2.2",
+              "safetensors": "0.8.0",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torchvision": "0.30.0.dev20261105+cpu",
+              "transformers": "5.22.1",
+              "triton": null
+            },
+            "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+            "python": "3.12.3"
+          }
+        },
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cpu",
+          "gradients": true,
+          "max_rss_mb": 12288,
+          "numerics": true,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        }
+      }
+    },
+    "checkpoint_loader_validation": {
+      "model": "distilbert",
+      "provider_version": "5.22.1",
+      "revision_weights_inputs_and_parameter_count_match": true,
+      "scope": "Real cached checkpoint and real input preparation after normalizing loading-info sets; no network or model substitution.",
+      "unused_checkpoint_keys": [
+        "vocab_layer_norm.bias",
+        "vocab_layer_norm.weight",
+        "vocab_projector.bias",
+        "vocab_transform.bias",
+        "vocab_transform.weight"
+      ],
+      "verified": true
+    },
+    "counting": "Each model/device pair contributes once to labels present in either version. Unexplained findings include pairs where either failing version lacks sufficient evidence; labels can overlap.",
+    "evidence_note": "The sweep used the source fingerprint recorded in each environment. Afterward, preparation metadata was changed to serialize Transformers loading-info key sets as sorted lists. Numerical comparison and triage code were unchanged. A real cached checkpoint check verified identical weights and inputs after this preparation-only fix.",
+    "inputs": {
+      "schema_version": 1,
+      "scope": "Two real photographs and two public-domain prose paragraphs; not a representative accuracy dataset.",
+      "sources": [
+        {
+          "bytes": 661378,
+          "sha256": "f3f87bb8ab3c26c7ecfd3ac60421d7f32b0503d1d6c5baf8bac42ed93d86351a",
+          "url": "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
+        },
+        {
+          "bytes": 90796,
+          "sha256": "91c383f13fe7baf1c5306def5f50cc5bb0241e64065c081ad57671d33c503891",
+          "url": "https://raw.githubusercontent.com/pytorch/vision/main/gallery/assets/dog2.jpg"
+        },
+        {
+          "bytes": 174311,
+          "sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+          "url": "https://www.gutenberg.org/ebooks/11.txt.utf-8"
+        }
+      ]
+    },
+    "limitations": [
+      "Two dog photographs and two literary passages do not represent production traffic.",
+      "Text models expose final hidden states; prediction heads, generation caches, and optimizer steps are not tested.",
+      "Torchvision builds differ between the CPU environments; these are environment comparisons, not isolated PyTorch commit comparisons.",
+      "Both AMD builds use the same ROCm nightly SDK packaging; the 2.15 release-version baseline is not an AMD stable-channel package.",
+      "Unsupported diagnostic layouts, bounded saved-mask storage, and max-pool selector coverage remain explicit gaps.",
+      "Six AMD model pairs had unstable repeated eager references and did not reach compiler comparison. SmolLM2 exceeded the host RSS budget during diagnostics in all four environments; primary observations are retained.",
+      "No NVIDIA result, throughput claim, or newly confirmed upstream bug is established."
+    ],
+    "local_validation": {
+      "legacy": {
+        "passed": 31
+      },
+      "linux_compiler": {
+        "passed": 12,
+        "portable_deselected": 232
+      },
+      "loader_regression_after_fix": {
+        "passed": 3
+      },
+      "wheel_cli_smoke": "passed",
+      "windows_portable": {
+        "compiler_deselected": 12,
+        "passed": 231,
+        "skipped": 1
+      }
+    },
+    "models": [
+      {
+        "architecture": "resnet18",
+        "batch_size": 2,
+        "inputs_sha256": "d47fdb045c676671749edd874a135ead00f4593517409d7c4a52a78eef31dcf3",
+        "parameter_count": 11689512,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[256]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "ResNet18_Weights.IMAGENET1K_V1",
+        "weights_sha256": "08a25bf488271205a9a1a10d09713dc0c958c91e3226936b6f8cbe5b70bcc0e5",
+        "weights_url": "https://download.pytorch.org/models/resnet18-f37072fd.pth"
+      },
+      {
+        "architecture": "resnet34",
+        "batch_size": 2,
+        "inputs_sha256": "d47fdb045c676671749edd874a135ead00f4593517409d7c4a52a78eef31dcf3",
+        "parameter_count": 21797672,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[256]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "ResNet34_Weights.IMAGENET1K_V1",
+        "weights_sha256": "05295a2cc90eb67cdaa09efa959a861e14800bf470b3eeba96cd17d571895438",
+        "weights_url": "https://download.pytorch.org/models/resnet34-b627a593.pth"
+      },
+      {
+        "architecture": "resnet50",
+        "batch_size": 2,
+        "inputs_sha256": "2a5dfe47da3ce4f83f6480189a8f94e439e71f28e1992b3905aa73de9f217ac9",
+        "parameter_count": 25557032,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[232]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "ResNet50_Weights.IMAGENET1K_V2",
+        "weights_sha256": "a21690bba7014bf3e4e9cf6a6f92206fd0544c297ba917abc67a722b7385f58c",
+        "weights_url": "https://download.pytorch.org/models/resnet50-11ad3fa6.pth"
+      },
+      {
+        "architecture": "resnet101",
+        "batch_size": 2,
+        "inputs_sha256": "2a5dfe47da3ce4f83f6480189a8f94e439e71f28e1992b3905aa73de9f217ac9",
+        "parameter_count": 44549160,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[232]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "ResNet101_Weights.IMAGENET1K_V2",
+        "weights_sha256": "f02b5b033850731afca16543c980f622afa15ec814cf0dcc942794058c9d5e82",
+        "weights_url": "https://download.pytorch.org/models/resnet101-cd907fc2.pth"
+      },
+      {
+        "architecture": "resnext50_32x4d",
+        "batch_size": 2,
+        "inputs_sha256": "2a5dfe47da3ce4f83f6480189a8f94e439e71f28e1992b3905aa73de9f217ac9",
+        "parameter_count": 25028904,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[232]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "ResNeXt50_32X4D_Weights.IMAGENET1K_V2",
+        "weights_sha256": "8359001f78087652fb97e749de385dc7123e604a9707ef7dd606c038b92fb17d",
+        "weights_url": "https://download.pytorch.org/models/resnext50_32x4d-1a0047aa.pth"
+      },
+      {
+        "architecture": "efficientnet_b0",
+        "batch_size": 2,
+        "inputs_sha256": "772fb581d61802aea66f84218460a0f75c44dffa6349e7af5b9e590be68339ac",
+        "parameter_count": 5288548,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[256]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BICUBIC\n)",
+        "weights": "EfficientNet_B0_Weights.IMAGENET1K_V1",
+        "weights_sha256": "514b55f37ab5fb741780025874d0f4b31c80f2e50e77d8a2e3688e47c5aa7e9b",
+        "weights_url": "https://download.pytorch.org/models/efficientnet_b0_rwightman-7f5810bc.pth"
+      },
+      {
+        "architecture": "efficientnet_b1",
+        "batch_size": 2,
+        "inputs_sha256": "39fde8fd78c0b90d1108fbd3ec15218f607b36ff6f659c7f1acfdabf64a21c9c",
+        "parameter_count": 7794184,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[240]\n    resize_size=[255]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "EfficientNet_B1_Weights.IMAGENET1K_V2",
+        "weights_sha256": "ba2fb6fd259b3dbab7cd99941d7b3e1343e526cfa4067a9d6cf5d73eb08c847a",
+        "weights_url": "https://download.pytorch.org/models/efficientnet_b1-c27df63c.pth"
+      },
+      {
+        "architecture": "efficientnet_b2",
+        "batch_size": 2,
+        "inputs_sha256": "085899cb02872e8c92299dacb0836433646fb3c6e99cf202d3dd05a360b6e61f",
+        "parameter_count": 9109994,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[288]\n    resize_size=[288]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BICUBIC\n)",
+        "weights": "EfficientNet_B2_Weights.IMAGENET1K_V1",
+        "weights_sha256": "c01103861a84312651351d5d145011ede6fe0493161a4a45640a164cfa4d608e",
+        "weights_url": "https://download.pytorch.org/models/efficientnet_b2_rwightman-c35c1473.pth"
+      },
+      {
+        "architecture": "efficientnet_b3",
+        "batch_size": 2,
+        "inputs_sha256": "7bb7fdf6ad1a7843cce22e2c112600a1529235e29029db708d6369773fba3418",
+        "parameter_count": 12233232,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[300]\n    resize_size=[320]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BICUBIC\n)",
+        "weights": "EfficientNet_B3_Weights.IMAGENET1K_V1",
+        "weights_sha256": "3e69bc7b13ee7b602230c07357a1e2bab8cdad789f0e4827d324eacef55747e0",
+        "weights_url": "https://download.pytorch.org/models/efficientnet_b3_rwightman-b3899882.pth"
+      },
+      {
+        "architecture": "efficientnet_v2_s",
+        "batch_size": 2,
+        "inputs_sha256": "c16004f4a9916af1a2beb7700945df56df47d1716a221e6ddf871a587a9af4ea",
+        "parameter_count": 21458488,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[384]\n    resize_size=[384]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "EfficientNet_V2_S_Weights.IMAGENET1K_V1",
+        "weights_sha256": "0ffcda0b6eed4624b84df4760dedfd76515e9f7c0a7bba2944b719fcebc4a0df",
+        "weights_url": "https://download.pytorch.org/models/efficientnet_v2_s-dd5fe13b.pth"
+      },
+      {
+        "architecture": "mobilenet_v2",
+        "batch_size": 2,
+        "inputs_sha256": "2a5dfe47da3ce4f83f6480189a8f94e439e71f28e1992b3905aa73de9f217ac9",
+        "parameter_count": 3504872,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[232]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "MobileNet_V2_Weights.IMAGENET1K_V2",
+        "weights_sha256": "ceac42d76ffb71092619a0c81291e43a6f66e3fd8661af94c6be59b030904d6f",
+        "weights_url": "https://download.pytorch.org/models/mobilenet_v2-7ebf99e0.pth"
+      },
+      {
+        "architecture": "mobilenet_v3_small",
+        "batch_size": 2,
+        "inputs_sha256": "d47fdb045c676671749edd874a135ead00f4593517409d7c4a52a78eef31dcf3",
+        "parameter_count": 2542856,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[256]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "MobileNet_V3_Small_Weights.IMAGENET1K_V1",
+        "weights_sha256": "86761bcbbbb601d278e148d794e3acc5d74800e690840abf5828d115eb4b3cc7",
+        "weights_url": "https://download.pytorch.org/models/mobilenet_v3_small-047dcff4.pth"
+      },
+      {
+        "architecture": "mobilenet_v3_large",
+        "batch_size": 2,
+        "inputs_sha256": "2a5dfe47da3ce4f83f6480189a8f94e439e71f28e1992b3905aa73de9f217ac9",
+        "parameter_count": 5483032,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[232]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "MobileNet_V3_Large_Weights.IMAGENET1K_V2",
+        "weights_sha256": "df5e985a8aed931fd9b571f61664136c2df17a9c3baec3eb8c408e68539ef5c0",
+        "weights_url": "https://download.pytorch.org/models/mobilenet_v3_large-5c1a4163.pth"
+      },
+      {
+        "architecture": "vit_b_16",
+        "batch_size": 2,
+        "inputs_sha256": "d47fdb045c676671749edd874a135ead00f4593517409d7c4a52a78eef31dcf3",
+        "parameter_count": 86567656,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[256]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "ViT_B_16_Weights.IMAGENET1K_V1",
+        "weights_sha256": "f107ca8e4976202804c7e0e1c56425c91f3fad8450a676132e6dc9875d2fc7da",
+        "weights_url": "https://download.pytorch.org/models/vit_b_16-c867db91.pth"
+      },
+      {
+        "architecture": "swin_t",
+        "batch_size": 2,
+        "inputs_sha256": "48b5c254355085d387d0db4a81a9696a57a0e883004833519dc2fab646b69602",
+        "parameter_count": 28288354,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[232]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BICUBIC\n)",
+        "weights": "Swin_T_Weights.IMAGENET1K_V1",
+        "weights_sha256": "0b3724b667fee8e515a172ae6ddf403fdad5cf349b9ac1f00bf9f6b4ef29ff20",
+        "weights_url": "https://download.pytorch.org/models/swin_t-704ceda3.pth"
+      },
+      {
+        "architecture": "convnext_tiny",
+        "batch_size": 2,
+        "inputs_sha256": "cfb4d174c833e909cc1a942e61cb8887d0dfaf8b5b73bf13d92b06101ebef29d",
+        "parameter_count": 28589128,
+        "pretrained": true,
+        "provider": "torchvision",
+        "provider_version": "0.29.2+cpu",
+        "storage_dtype": "float32",
+        "transform": "ImageClassification(\n    crop_size=[224]\n    resize_size=[236]\n    mean=[0.485, 0.456, 0.406]\n    std=[0.229, 0.224, 0.225]\n    interpolation=InterpolationMode.BILINEAR\n)",
+        "weights": "ConvNeXt_Tiny_Weights.IMAGENET1K_V1",
+        "weights_sha256": "3bdec89eec3391b247b7db786ed5310c9a5b4214efa67f5aa1b49882f13e8c49",
+        "weights_url": "https://download.pytorch.org/models/convnext_tiny-983f1562.pth"
+      },
+      {
+        "architecture": "bert",
+        "attention": "sdpa",
+        "batch_size": 2,
+        "inputs_sha256": "6ab9dafb5800f91e51ee3c4b718524fd7624d942619b03795cc6064e439499c4",
+        "output": "last_hidden_state",
+        "parameter_count": 109482240,
+        "pretrained": true,
+        "provider": "huggingface",
+        "provider_version": "5.22.1",
+        "repository": "google-bert/bert-base-uncased",
+        "revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+        "sequence_length": 64,
+        "storage_dtype": "float32",
+        "use_cache": false,
+        "weights_sha256": "3b5f50ddccb88484a809a7c1edbdf20571972500b4700fab4fa84eebff62bf79"
+      },
+      {
+        "architecture": "gpt2",
+        "attention": "sdpa",
+        "batch_size": 2,
+        "inputs_sha256": "c3fde492dd760b1427d65b0c425a3970b9bcc91328d5706c4d243322345e01c7",
+        "output": "last_hidden_state",
+        "parameter_count": 124439808,
+        "pretrained": true,
+        "provider": "huggingface",
+        "provider_version": "5.22.1",
+        "repository": "openai-community/gpt2",
+        "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+        "sequence_length": 64,
+        "storage_dtype": "float32",
+        "use_cache": false,
+        "weights_sha256": "1a02da3b48d71d50154d97f1e06a944ca8eebf3a240104fb4fb1c3c9ba787e28"
+      },
+      {
+        "architecture": "distilbert",
+        "attention": "sdpa",
+        "batch_size": 2,
+        "inputs_sha256": "6ab9dafb5800f91e51ee3c4b718524fd7624d942619b03795cc6064e439499c4",
+        "output": "last_hidden_state",
+        "parameter_count": 66362880,
+        "pretrained": true,
+        "provider": "huggingface",
+        "provider_version": "5.22.1",
+        "repository": "distilbert/distilbert-base-uncased",
+        "revision": "12040accade4e8a0f71eabdb258fecc2e7e948be",
+        "sequence_length": 64,
+        "storage_dtype": "float32",
+        "use_cache": false,
+        "weights_sha256": "65dc7c28f363299ef50832546d49b21c6f0d0be8d633de560d61f7d68208f23c"
+      },
+      {
+        "architecture": "smollm2",
+        "attention": "sdpa",
+        "batch_size": 2,
+        "inputs_sha256": "9d2860f65e422edc7ef3c033e766c711f08bd16dee3f9bcb7cb34b8477baae5b",
+        "output": "last_hidden_state",
+        "parameter_count": 134515008,
+        "pretrained": true,
+        "provider": "huggingface",
+        "provider_version": "5.22.1",
+        "repository": "HuggingFaceTB/SmolLM2-135M",
+        "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+        "sequence_length": 64,
+        "storage_dtype": "float32",
+        "use_cache": false,
+        "weights_sha256": "509e34c02ca6a897ccfbcfc76ea158d2899b4d0d62a38adad139889af51745b0"
+      }
+    ],
+    "pretrained_standalone_verification": {
+      "baseline": {
+        "faultline_imports_blocked": true,
+        "labels_and_coverage_match": true,
+        "peak_tree_rss_mb": 1432.8828125,
+        "returncode": 1,
+        "status": "gradient_mismatch",
+        "verified": true,
+        "wall_s": 49.04508926299968
+      },
+      "candidate": {
+        "faultline_imports_blocked": true,
+        "labels_and_coverage_match": true,
+        "peak_tree_rss_mb": 1385.18359375,
+        "returncode": 1,
+        "status": "gradient_mismatch",
+        "verified": true,
+        "wall_s": 57.816823023000325
+      }
+    },
+    "recorded_utc": "2026-11-06T10:16:06.703070+00:00",
+    "release_validation_source_sha256": "edd8c40715ded9e103779208fce893e1ed5f197dfcb4710b9efb3963b3655973",
+    "scope": "20 pretrained models on fixed real inputs, compared in two environments per device. Diagnostic coverage, not an adjudicated false-positive rate.",
+    "version": "0.9.0"
+  },
   "real_compiler_counts": {
     "numerical_mismatch": 1,
     "pass": 17

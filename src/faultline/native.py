@@ -462,6 +462,7 @@ def evaluate_native(job, settings, directory):
             else None,
             precision=precision,
             request_transform=request_transform,
+            gradient_hook=probe.observe_gradients if probe else None,
         )
 
     def advisory(eager, candidate, primary):

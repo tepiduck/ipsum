@@ -116,6 +116,8 @@ class MaskProbe:
     def reset(self):
         self.pairs, self.owners = {}, []
         self.records, self.errors, self.backward_checks = [], [], []
+        self.gradient_outputs, self.gradient_owners, self.gradient_mapping = {}, [], {}
+        self.pool_coverage = []
         self.bytes = 0
         self.step = 0
 
@@ -131,6 +133,18 @@ class MaskProbe:
             return copy.deepcopy(module)(*clone_arguments(values))
 
     def around(self, module, stage, key, compiled, values):
+        if stage == "forward":
+            pools = [n.name for n in module.graph.nodes if "max_pool" in str(n.target)]
+            if pools:
+                self.pool_coverage.append(
+                    {
+                        "stage": key,
+                        "step": self.step,
+                        "nodes": pools,
+                        "status": "unverified",
+                        "reason": "Max-pool forward/backward selector coverage is not established",
+                    }
+                )
         if stage == "backward":
             self.inspect_backward(module, values, key)
         try:
@@ -148,6 +162,10 @@ class MaskProbe:
                     left[str(i)] = a.detach().cpu()
                 if isinstance(b, torch.Tensor):
                     right[str(i)] = b.detach().cpu()
+                    self.gradient_outputs.setdefault(tensor_key(b), []).append(
+                        {"stage": key, "step": self.step, "output": i}
+                    )
+                    self.gradient_owners.append(b)
             compared = self.compare(
                 (left, []),
                 (right, []),
@@ -169,6 +187,23 @@ class MaskProbe:
                 for a, b, _, _ in self.pairs.values()
             )
         return actual
+
+    def observe_gradients(self, step, targets, derivatives):
+        """Map actual returned gradients by storage identity, never by shape/value guesses.
+
+        Accumulated, copied, or reshaped gradients can remain unmapped. AOT output
+        ordinals are local to each graph and cannot be equated with parameter order.
+        """
+        for (name, _), value in zip(targets, derivatives, strict=True):
+            target = f"step:{step}:gradient:{name}:value"
+            origins = self.gradient_outputs.get(tensor_key(value), [])
+            origins = [x for x in origins if x["step"] == step]
+            self.gradient_mapping[target] = {
+                "status": "mapped" if len(origins) == 1 else "unmapped",
+                "origins": origins,
+            }
+        self.gradient_outputs.clear()
+        self.gradient_owners.clear()
 
     def remember(self, eager, candidate, key):
         for index, (a, b) in enumerate(zip(eager, candidate, strict=True)):
@@ -197,6 +232,22 @@ class MaskProbe:
                 self.bytes += required
 
     def inspect_backward(self, module, values, key):
+        for node in module.graph.nodes:
+            if (
+                "max_pool" in str(node.target)
+                and str(node.target) != "aten.max_pool2d_with_indices_backward.default"
+            ):
+                self.records.append(
+                    {
+                        "stage": key,
+                        "step": self.step,
+                        "node": node.name,
+                        "kind": "max_pool_lowered",
+                        "status": "unsupported",
+                        "error": "Lowered max-pool selector comparison is not implemented",
+                        "affected_backward_outputs": downstream_outputs(module, node),
+                    }
+                )
         left, right, origins = {}, {}, {}
         placeholders = [n for n in module.graph.nodes if n.op == "placeholder"]
         for node, value in zip(placeholders, values, strict=True):
@@ -279,7 +330,7 @@ class MaskProbe:
         complete = [r for r in self.records if r["status"] == "complete"]
         return {
             "status": "partial"
-            if self.errors or len(complete) != len(self.records)
+            if self.errors or self.pool_coverage or len(complete) != len(self.records)
             else "complete"
             if complete
             else "no_supported_masks",
@@ -288,6 +339,8 @@ class MaskProbe:
             "elements": sum(r["elements"] for r in complete),
             "errors": self.errors,
             "backward_same_inputs": self.backward_checks,
+            "gradient_mapping": self.gradient_mapping,
+            "coverage_gaps": self.pool_coverage,
             "note": "AOT eager forward replay versus compiled saved activations; not original-module "
             "mask matching. Flips establish sensitivity evidence, not complete causal attribution. "
             "Counts are per backward selector; reused selectors can count the same element twice.",

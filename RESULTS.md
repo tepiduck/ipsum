@@ -1,6 +1,6 @@
 # Validation results
 
-Recorded experiments: **November 5, 2026**. The [public experiment summary](docs/validation.json)
+Recorded experiments: **November 5–6, 2026**. The [public experiment summary](docs/validation.json)
 contains check outcomes, compiler counts, reduction sizes, and the source fingerprint used for
 those experiments. Raw local logs and machine paths are not distributed.
 
@@ -397,3 +397,104 @@ Local validation passed the portable suite, ten focused diagnostic tests, twelve
 Inductor tests, and 31 legacy tests. Tests cover wrong derivatives with identical forward results,
 missing gradients, changed saved activations, RNG and storage preservation, unstable controls,
 advisory labels, and worker/standalone parity. The wrong-backward control remains a stable failure.
+
+## Version 0.9 triage criteria
+
+Numerical context schema 2 replaces the any-flip label with two labels. `explained_by_discontinuity`
+requires flips, agreement in every completed same-input backward check, no failed backward replay,
+and a mapped path from a flipped selector to every failing model gradient. Gradient mapping uses
+actual tensor storage identity and layout; copied or accumulated gradients remain unmapped.
+`discontinuity_present` retains suspicion when those conditions are not met.
+
+Whole-finding fp64 comparability and eager-control sensitivity now require every failing target
+to qualify. Reports retain matched/total counts, the exact control policy, and partial mask coverage,
+including unverified max-pool selectors. These criteria do not change primary comparisons or
+reduction predicates. They are evidence labels, not proofs of correctness.
+
+A controlled AOT test combines a real ReLU mask flip with an optional doubled backward result.
+The correct backward receives the explanation label; the planted wrong backward remains suspicious.
+Mixed-target tests reject whole-finding reassurance when only one of two failing targets qualifies,
+including when only one gradient is downstream of a flip. A failed backward replay also blocks
+the explanation. Local validation passed 231 Windows portable tests (one platform skip),
+12 Linux Inductor tests, and 31 legacy tests.
+The built wheel's CLI and publication allowlist checks passed.
+
+## Version 0.9 pretrained environment sweep
+
+The [sweep commands](docs/sweeps.md) prepared 20 pretrained models: five ResNet/ResNeXt variants,
+five EfficientNets, three MobileNets, ViT-B/16, Swin-T, ConvNeXt-Tiny, BERT, GPT-2, DistilBERT,
+and SmolLM2-135M. Models range from 2,542,856 to 134,515,008 parameters. Each vision workload uses
+the same two dog photographs with its resolved weight enum's inference transforms. Each text
+workload uses two public-domain prose passages, padded/truncated to 64 tokens, and returns hidden
+states. Models run in evaluation mode with float32 storage and fixed captured VJP cotangents.
+These are concrete real-input paths, not representative task datasets or optimizer-step tests.
+
+Each device attempted all 20 model pairs, using identical frozen weights and inputs across its
+two interpreters. Settings were Inductor with AOT capture, gradient/numerical checks, two repeats,
+one thread, `rtol=1e-4`, `atol=1e-5`, 600 seconds and 12 GiB host RSS per worker. Campaigns ran
+sequentially on Ubuntu 24.04 / WSL, Python 3.12.3. No models were substituted, no tolerances were
+relaxed, and completed inconclusive results were retained.
+
+- CPU compared **2.15.0+cpu** with **2.16.0.dev20261105+cpu**. Matching torchvision versions were
+  **0.29.2+cpu** and **0.30.0.dev20261105+cpu**. Their differences are part of the environment change.
+- The **RX 7900 XT (gfx1100)** compared **2.15.0+rocm10.3.0a20261105** with
+  **2.16.0a0+rocm10.3.0a20261105**, both using torchvision **0.30.0a0+rocm10.3.0a20261105**.
+  Both came from AMD's [nightly package index](https://nightly.repo.amd.com/rocm/whl-next/), with the
+  same ROCm SDK snapshot. The 2.15 release-version baseline is **not an AMD stable-channel build**.
+- Transformers was **5.22.1** in all four environments. Exact package versions, input hashes,
+  checkpoint revisions/URLs, per-model results, target counts, and source fingerprints are in
+  `docs/validation.json` under `pretrained_sweep_validation`.
+
+| Result, counted per model/device pair | CPU | RX 7900 XT |
+|---|---:|---:|
+| Planned and attempted | 20 | 20 |
+| Full eager/compiled agreement in both versions | 0 | 0 |
+| Stable finding pairs | 19 | 13 |
+| Inconclusive pairs | 1 | 7 |
+| `comparable_to_eager_against_fp64` in either version | 5 | 9 |
+| `eager_control_sensitive` in either version | 4 | 2 |
+| `explained_by_discontinuity` in either version | 0 | 0 |
+| `discontinuity_present` in either version | 2 | 0 |
+| Finding pairs still unexplained | 16 | 9 |
+
+Labels overlap. A pair contributes once to a label present in either version; whole-finding labels
+still require every failing target **within that version** to qualify. A pair remains unexplained
+if either failing version lacks sufficient evidence. Disagreeing same-input backward checks or
+`discontinuity_present` retain suspicion even alongside another label. Inconclusive pairs are
+counted separately from unexplained stable findings.
+
+CPU had ten recurring and nine changed failure signatures; AMD had six recurring and seven changed
+signatures. **No pair had a passing baseline followed by a stable candidate failure.** A changed
+signature is not a newly failing model or a confirmed regression: both environments already failed,
+but different gradient targets exceeded tolerance. All completed finding pairs reported gradient
+discrepancies; their forward outputs stayed within the configured tolerance.
+
+The incomplete results are material:
+
+- SmolLM2 crossed the 12 GiB host RSS budget during diagnostics in **all four environments**.
+  Its saved CPU primary observations contain forward and gradient discrepancies; its AMD primary
+  observations contain gradient discrepancies. These remain observations inside inconclusive runs.
+- ViT, Swin, ConvNeXt, BERT, GPT-2, and DistilBERT had **unstable repeated eager references** in both
+  AMD environments. They stopped before compiler comparison. The cause of that instability was
+  not isolated by this experiment.
+- Some saved AOT backward graphs could not replay eagerly with their original layouts. Larger
+  graphs also exceeded saved-mask snapshot limits, and some AMD mask diagnostics were unstable.
+  These gaps prevented a discontinuity explanation; zero qualifying labels does not mean no
+  activation-boundary sensitivity exists. Max-pool coverage remains explicitly incomplete.
+
+These counts measure discrepancies and diagnostic coverage. They are **not a false-positive rate**
+and establish **no new compiler bug**. All 40 planned model/device pairs have recorded results,
+but eight pairs lack a complete usable comparison. The sweep identifies reference stability,
+diagnostic memory usage, and saved-graph replay coverage as concrete limits to investigate before
+treating these labels as an automatic correctness decision.
+
+Both exported CPU ResNet-18 scripts were independently rerun under supervision, from new working
+directories with all `faultline` imports blocked. They reproduced the original failure signatures,
+labels, and matched/total target coverage. This validates that representative pretrained export
+pair; the other exported scripts were not independently rerun in this experiment.
+
+After the sweep, the preparation loader was corrected to serialize Transformers' unused-checkpoint
+key sets as sorted JSON lists. A real cached DistilBERT preparation then produced exactly the same
+checkpoint revision, weight hash, input hash, and parameter count as the measured bundle. The
+numerical comparison and triage code did not change. Public evidence distinguishes the executed
+sweep source fingerprint from the final release-validation fingerprint.
