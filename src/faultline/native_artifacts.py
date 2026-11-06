@@ -37,7 +37,9 @@ def export_native(job, settings, output, expected=None):
         if (
             expected.get("compile_mode", "default") != settings.compile_mode
             or expected.get("autocast") != settings.autocast
-            or expected.get("fp64_requested", False) != settings.fp64_advisory
+            or expected.get("fp64_requested", False)
+            != (settings.fp64_advisory or settings.numerics)
+            or expected.get("numerics_requested", False) != settings.numerics
         ):
             raise ValueError("Saved outcome has a different compiler/autocast policy")
         for name in (
@@ -62,6 +64,8 @@ def export_native(job, settings, output, expected=None):
         "native_aot.py",
         "native_compile.py",
         "native_precision.py",
+        "native_numerics.py",
+        "native_masks.py",
         "portable.py",
     ):
         shutil.copyfile(source / name, output / name)
@@ -74,6 +78,8 @@ def export_native(job, settings, output, expected=None):
         "native_aot.py",
         "native_compile.py",
         "native_precision.py",
+        "native_numerics.py",
+        "native_masks.py",
         "portable.py",
         "workload/workload.json",
         *["workload/" + name for name in manifest["files"]],
@@ -182,6 +188,10 @@ def run_native(
         "parameter_count": result.get("parameter_count"),
         "injected_fault": settings.backend.startswith("mutant:"),
         "case_hash": job.digest(),
+        "numerical_labels": result.get("numerical_context", {}).get("labels", []),
+        "numerical_evidence": "run/outcome.json"
+        if settings.numerics or settings.fp64_advisory
+        else None,
     }
     if expected:
         summary["replay"] = (

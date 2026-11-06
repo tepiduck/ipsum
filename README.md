@@ -133,6 +133,11 @@ compare both paths with higher-precision eager execution and report per-tensor e
 distributions. It supplies numerical evidence without changing the primary verdict. See
 [gradient probes and numerical evidence](docs/numerics.md) for the scope and limitations.
 
+For gradient findings, `--aot --numerics` adds an eager execution control and compares supported
+saved activation masks between AOT eager replay and compiled execution. Reports distinguish
+observed mask flips and comparable fp64 error from the primary mismatch. These advisory labels
+leave the exit code and reduction predicate unchanged.
+
 Inputs can be a tensor, a positional tuple, a dictionary of keyword arguments, or
 `{"args": (...), "kwargs": {...}}`. Nested dictionaries, lists, and tuples are supported.
 Integer token IDs, boolean masks, mixed floating dtypes, noncontiguous views, and shared tensor

@@ -14,6 +14,12 @@ def native_options(parser, optional=False):
     )
     parser.add_argument("--autocast", choices=("float16", "bfloat16"))
     parser.add_argument("--fp64-advisory", action="store_true", default=None if optional else False)
+    parser.add_argument(
+        "--numerics",
+        action="store_true",
+        default=None if optional else False,
+        help="fp64 evidence and eager control; add --aot --gradients for saved masks",
+    )
 
 
 def add_model_commands(commands, execution_options):
@@ -89,6 +95,7 @@ def model_command(args, settings_from):
             "compile_mode",
             "autocast",
             "fp64_advisory",
+            "numerics",
         )
         overridden = any(getattr(args, name) is not None for name in names)
         result = diagnose_native(

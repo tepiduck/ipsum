@@ -206,6 +206,10 @@ are retained by saved-run operations. They are currently unavailable for compact
 `model capture --backward-probe vjp|loss` selects the backward input policy (new captures default
 to `vjp`; existing bundles retain their policy). `--fp64-advisory` on native runs, comparisons,
 or qualification adds higher-precision numerical evidence without changing the primary verdict.
+`--numerics` includes that advisory plus an eager sensitivity control. With `--aot --gradients`,
+it also runs a separate AOT saved-mask diagnostic. Per-tensor labels and mask coverage are in
+`run/outcome.json` under `fp64_advisory` and `numerical_context`; the HTML report links to this
+evidence. Replay and export retain the diagnostic policy. None of these labels changes exit codes.
 See [numerics](numerics.md) for the reference semantics and saved-bundle compatibility.
 
 `model diagnose BUNDLE_OR_RUN` executes the four-backend ladder. `benchmark list` and

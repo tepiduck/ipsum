@@ -93,6 +93,23 @@ def error_stats(actual, reference):
     }
 
 
+def accuracy_label(eager_error, candidate_error):
+    """Descriptive RMSE bands, never an acceptance tolerance or correctness decision."""
+    a, b = eager_error.get("rmse"), candidate_error.get("rmse")
+    if a is None or b is None:
+        return "unavailable"
+    if a == b == 0:
+        return "both_exact"
+    if a == 0:
+        return "eager_exact_candidate_differs"
+    ratio = b / a
+    if ratio < 0.5:
+        return "candidate_closer_to_fp64"
+    if ratio <= 2.0:
+        return "comparable_to_eager_against_fp64"
+    return "candidate_farther_from_fp64"
+
+
 def assess_fp64(
     reference, eager, candidate, compare, policy, repeats, *, reference_is_factory=False
 ):
@@ -142,8 +159,14 @@ def assess_fp64(
                     else None,
                     "eager_exact": a.get("rmse") == 0,
                     "candidate_exact": b.get("rmse") == 0,
+                    "accuracy_label": accuracy_label(a, b),
                 }
             )
-        return {"status": "complete", "outputs": records, "note": note}
+        return {
+            "status": "complete",
+            "outputs": records,
+            "ratio_band": [0.5, 2.0],
+            "note": note,
+        }
     except Exception as exc:  # noqa: BLE001 -- arbitrary user model's optional fp64 execution
         return {"status": "reference_error", "error": f"{type(exc).__name__}: {exc}", "note": note}

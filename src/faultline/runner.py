@@ -129,7 +129,8 @@ def run_case(case, settings, directory, *, python=None):
         "dynamic": settings.dynamic,
         "compile_mode": settings.compile_mode,
         "autocast": settings.autocast,
-        "fp64_requested": settings.fp64_advisory,
+        "fp64_requested": settings.fp64_advisory or settings.numerics,
+        "numerics_requested": settings.numerics,
         "trace": case.to_dict().get("kind") in {"trace", "native"},
         "worker_wall_s": time.monotonic() - start,
         "peak_tree_rss_mb": peak / 1024**2,
@@ -138,11 +139,13 @@ def run_case(case, settings, directory, *, python=None):
     if status is not None:
         result = {**base, "status": status, "fingerprint": status}
         checkpoint = directory / "primary-result.json"
-        if settings.fp64_advisory and checkpoint.exists():
+        if (settings.fp64_advisory or settings.numerics) and checkpoint.exists():
             primary = read_json(checkpoint)
             if primary.get("case_hash") == case.digest():
                 result["primary_observation"] = primary
                 result["fp64_advisory"] = {"status": status}
+                if settings.numerics:
+                    result["numerical_context"] = {"status": status}
     elif process.returncode != 0:
         result = {**base, "status": "crash", "fingerprint": f"crash:{process.returncode}"}
     elif not raw_path.exists():

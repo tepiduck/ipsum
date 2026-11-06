@@ -42,7 +42,9 @@ def scale_backward(module):
     return module
 
 
-def compile_stage(module, inputs, backend, stage, *, options=None, selected=True, observe=None):
+def compile_stage(
+    module, inputs, backend, stage, *, options=None, selected=True, observe=None, around=None
+):
     """Compile one already differentiated graph; return the backend's boxed ABI."""
     from functorch.compile import make_boxed_func
 
@@ -53,12 +55,13 @@ def compile_stage(module, inputs, backend, stage, *, options=None, selected=True
     )
     if not selected or backend in {"eager", "aot_eager", "mutant:aot-backward-scale"}:
         compiled = make_boxed_func(module.forward)
-        if observe is None:
+        if observe is None and around is None:
             return compiled
 
         def boxed(values):
-            observe(values)
-            return compiled(values)
+            if observe is not None:
+                observe(values)
+            return around(compiled, values) if around else compiled(values)
 
         boxed._boxed_call = True
         return boxed
@@ -67,14 +70,15 @@ def compile_stage(module, inputs, backend, stage, *, options=None, selected=True
     from torch._inductor.compile_fx import compile_fx_inner
 
     compiled = compile_fx_inner(module, inputs, **(options or {"is_backward": stage == "backward"}))
-    if observe is not None:
+    if observe is not None or around is not None:
         if not callable(getattr(compiled, "current_callable", None)):
             raise AOTUnsupported("Inductor OutputCode has no observable current_callable")
         original = compiled.current_callable
 
         def recorded(values):
-            observe(values)
-            return original(values)
+            if observe is not None:
+                observe(values)
+            return around(original, values) if around else original(values)
 
         # Keep OutputCode's type, cache metadata, runtime hooks, and CUDA graph flags intact.
         compiled.current_callable = recorded

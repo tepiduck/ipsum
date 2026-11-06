@@ -30,6 +30,7 @@ FILES = {
     "examples/capture_mlp.py",
     "examples/models.py",
     "examples/native_models.py",
+    "examples/relu_sensitivity.py",
     "scripts/validate_faultline.py",
     "scripts/validate_upgrades.py",
     "scripts/validate_native.py",

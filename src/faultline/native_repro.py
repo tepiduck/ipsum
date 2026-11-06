@@ -7,6 +7,8 @@ from pathlib import Path
 import native_aot
 import native_compile
 import native_graph
+import native_masks
+import native_numerics
 import native_precision
 import native_runtime
 import portable
@@ -79,19 +81,26 @@ def main():
             return torch.compile(model, backend=backend, dynamic=settings.get("dynamic", False))
         return native_runtime.compile_native_graph(model, backend)
 
-    def execution(candidate=False, precision=None):
+    def execution(candidate=False, precision=None, request_transform=None, probe=None):
+        def diagnostic_model(model, is_graph):
+            return torch.compile(
+                model, backend=probe.backend, dynamic=settings.get("dynamic", False)
+            )
+
         return native_runtime.make_native_execution(
             bundle,
             manifest,
             settings,
             native_graph.load_native_graph,
-            compile_model if candidate else None,
+            diagnostic_model if probe else compile_model if candidate else None,
             requests_selection=config.get("requests"),
             precision=precision,
+            request_transform=request_transform,
+            step_hook=(lambda n: setattr(probe, "step", n)) if probe else None,
         )
 
     def advisory(eager, candidate, primary):
-        return native_precision.assess_fp64(
+        fp64 = native_precision.assess_fp64(
             lambda: execution(precision=native_precision),
             eager,
             candidate,
@@ -100,6 +109,41 @@ def main():
             settings["repeats"],
             reference_is_factory=True,
         )
+        if settings.get("numerics"):
+            compare = native_runtime.compare_native
+            control = native_numerics.assess_control(
+                lambda transform: execution(request_transform=transform),
+                eager,
+                candidate,
+                settings,
+                compare,
+                portable,
+                native_precision.error_stats,
+            )
+            masks = {
+                "status": "unavailable",
+                "reason": "Requires a whole-model --aot --gradients run",
+            }
+            if (
+                config.get("aot")
+                and manifest["kind"] == "workload"
+                and settings["backend"] != "eager"
+            ):
+                torch._dynamo.reset()
+                probe = native_masks.MaskProbe(
+                    native_aot, native_compile, settings, compare, portable, config
+                )
+                masks = native_numerics.assess_masks(
+                    probe,
+                    lambda p: execution(probe=p),
+                    eager,
+                    candidate,
+                    settings,
+                    compare,
+                    portable,
+                )
+            primary["numerical_context"] = native_numerics.annotate(primary, fp64, control, masks)
+        return fp64
 
     try:
         with native_aot.capture_context(config.get("aot", False)):
@@ -108,7 +152,7 @@ def main():
                 lambda: execution(True),
                 settings,
                 portable,
-                advisory if settings.get("fp64_advisory") else None,
+                advisory if settings.get("fp64_advisory") or settings.get("numerics") else None,
             )
     except native_aot.AOTUnsupported as exc:
         result = {"status": "unsupported_aot", "error": str(exc)}

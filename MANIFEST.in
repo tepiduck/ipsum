@@ -8,6 +8,7 @@ include scripts/validate_aot.py
 include examples/capture_mlp.py
 include examples/models.py
 include examples/native_models.py
+include examples/relu_sensitivity.py
 include docs/architecture.md docs/cli.md docs/validation.json
 include docs/diagnostics.md
 include docs/numerics.md

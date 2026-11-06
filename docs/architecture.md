@@ -49,6 +49,12 @@ proposals. Each is checked against the same candidate and baseline predicates. G
 graphs do not use these cuts. Details of the probe policies, fp64 advisory, and boundary reductions
 are in [numerical evidence](numerics.md).
 
+Optional `--numerics` runs fp64, eager-control, and supported AOT saved-mask checks after the
+primary comparison. Mask shadow execution runs in a separate diagnostic replay and must reproduce
+the original candidate and failure targets across repeats. Advisory labels are not part of the
+reducer's acceptance signature. They never relax tolerances, change an exit code, or erase the
+underlying finding. Unsupported/partial evidence is retained explicitly.
+
 Standalone native bundles copy the same comparison, execution, and graph reconstruction modules
 used by workers. They verify file hashes and need no Faultline installation. Full-model bundles
 also need factory dependencies; graph bundles use standard PyTorch/operator/math targets. The

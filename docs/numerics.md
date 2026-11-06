@@ -53,6 +53,10 @@ For each floating output, loss (legacy captures), and gradient, the report recor
 - Median, 95th, and 99th percentile absolute errors from at most 32,768 regularly spaced elements.
   Each record gives the sampled count and stride. RMSE and maximum error use every element.
 - The reference output dtype, since an explicit cast can make it lower than float64.
+- A descriptive accuracy label: `comparable_to_eager_against_fp64` for a compiled/eager RMSE
+  ratio in [0.5, 2], `candidate_closer_to_fp64` below that band, and
+  `candidate_farther_from_fp64` above it. Zero errors and unavailable comparisons have separate
+  labels. The factor-of-two band is a reporting convention, not a correctness threshold.
 
 Large ratios must be considered alongside absolute errors. Promoting arithmetic changes its
 rounding and can change control flow or activation derivatives near discontinuities. A result
@@ -67,6 +71,62 @@ worker's total time/RSS limits include the advisory; `primary-result.json` check
 primary comparison first. If the advisory exceeds a budget, the run remains inconclusive and the
 coordinator includes that primary observation. Standalone scripts use the same advisory code, but
 need an external supervisor to enforce resource limits.
+
+## Mask and eager-control diagnostics
+
+```bash
+faultline model run workloads/model --gradients --aot --numerics --timeout 600 --max-rss-mb 12288 --output faultline-runs/model-numerics
+python examples/relu_sensitivity.py --output faultline-runs/resnet-sensitivity
+```
+
+The example uses random-weight torchvision ResNet-18, seed 21, synthetic inputs, and fixed VJP
+cotangents. It requires torchvision and a CPU Inductor toolchain. Exit 1 records a stable numerical
+mismatch; the advisory does not turn it into a pass.
+
+`--numerics` includes fp64 evidence and adds two checks after the stable primary comparison:
+
+1. **Eager control.** On CPU with oneDNN enabled, repeat eager with oneDNN disabled, restoring the
+   backend setting afterward. Otherwise, repeat eager after moving each finite floating input
+   storage value one representable step toward positive infinity. This input perturbation uses
+   freshly loaded requests, retains aliasing/layouts, leaves integers and whole-model VJP cotangents unchanged,
+   and avoids overflow to infinity. It is explicitly a different-input sensitivity control.
+   No perturbable input, unsupported execution, nonfinite results, and unstable repeats have
+   separate statuses. `eager_control_sensitive` identifies failing targets where the control also
+   exceeds the primary tolerance and its RMSE from eager is at least half the compiled/eager RMSE.
+   Similar disagreement establishes sensitivity, not proof that a compiler defect is absent.
+   For an independently saved derivative graph, floating graph inputs include lifted cotangents;
+   the ULP control perturbs those too. This is separate from the original-model VJP comparison.
+2. **AOT saved masks.** With a whole-model `--aot --gradients` workload, run a separate diagnostic
+   replay. At each forward compiler boundary, execute the same AOT graph eagerly on jointly cloned
+   inputs with restored PyTorch RNG. Match its outputs to the compiled outputs by position, then
+   to actual backward inputs by storage identity, offset, shape, stride, and dtype. This avoids
+   guessing correspondences from equal shapes or node names. Ambiguous aliases are unsupported.
+   Compare threshold/ReLU selectors, boolean `where` selectors (including supported clamp
+   comparisons), and explicit max-pool backward indices. Record exact flip counts, up to sixteen
+   changed flat indices, saved-input origins, and reachable backward output positions. Also compare
+   eager and compiled backward outputs with **identical compiled saved inputs**.
+
+The mask diagnostic must reproduce the primary candidate observation and affected-target signature
+on every repeat. Changed diagnostic execution or unstable mask evidence cannot produce a
+`discontinuity_sensitive` label. A stable gradient mismatch with observed flips receives that label,
+with its coverage and same-input backward checks still visible. A faulty backward implementation
+can coexist with flips; this label does not dismiss the finding or establish complete causality.
+
+Mask coverage is deliberately bounded. Recomputed intermediates, unknown expression forms,
+lowered max-pool scatter patterns, unavailable saved values, and graphs outside the supported AOT
+adapters remain unsupported. A graph with no recognized selectors reports `no_supported_masks`,
+not proof of smoothness. Joint shadow-input storage is limited to 512 MiB per graph call; retained
+paired outputs are limited to 256 MiB. The outer worker time and RSS budgets still apply.
+`partial` reports include supported comparisons and explicit omissions. These comparisons use
+**AOT eager graph replay**, which can differ from the original module's eager execution. Graph
+breaks and recomputation prevent claiming complete original-model mask coverage or precise
+layer-by-layer causal attribution.
+
+The ResNet finding illustrates why the fp64 ratio alone is insufficient: the follow-up check
+observed two selector flips and an eager-only convolution-library change produced a comparable
+gradient discrepancy. The compiled backward agreed with eager backward on identical saved inputs.
+The 0.7 RMSE ratio is evidence of derivative sensitivity around activation boundaries; it should
+not be used as evidence of a compiler defect. See the follow-up measurements in [RESULTS](../RESULTS.md).
 
 ## Freezing internal graph values
 
@@ -94,6 +154,9 @@ faultline model compare workloads/transformer-indexing --baseline-python .curren
 The recorded experiment uses PyTorch 2.15.0 as the passing control and 2.12.0 as the failing
 candidate. This tests localization of a known operation pattern in a larger constructed workload;
 it is not a new bug discovery or an unmodified pretrained-model benchmark.
+The location near the output favors this bounded prefix-cut search. A pattern between encoder
+layers would be a stronger reduction test. Suffix cutting and that middle-of-network experiment
+are not implemented or validated by the 0.7 result.
 
 ## GPU environment and nightly checks
 
@@ -112,6 +175,9 @@ python -m venv .rocm
 The versions above identify the tested environment, not a promise that every driver/OS combination
 works. See [RESULTS.md](../RESULTS.md) for measured coverage. NVIDIA/CUDA remains unvalidated.
 Requesting `reduce-overhead` does not prove graph capture was used; inspect compiler skip logs.
+No skip message in a log is also insufficient to establish capture; positive runtime capture or
+replay evidence is needed. The saved 0.7 `perf_hints` logs contained no matching skip messages,
+so those results remain execution passes with GPU graph capture unverified.
 
 The [nightly workflow](../.github/workflows/nightly.yml) runs daily and on manual dispatch. It tests
 the current CPU nightly's compiler adapters and compares native workloads against stable PyTorch

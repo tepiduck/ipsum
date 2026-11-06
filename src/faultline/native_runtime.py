@@ -372,6 +372,7 @@ def make_native_execution(
     before_run=None,
     step_hook=None,
     precision=None,
+    request_transform=None,
 ):
     """Construct one eager/compiled callable, restoring saved state for each whole trace."""
     bundle = Path(bundle)
@@ -428,6 +429,8 @@ def make_native_execution(
             requests = [requests[i] for i in requests_selection]
         if precision:
             requests = precision.promote_tree(requests)
+        if request_transform:
+            request_transform(requests)
         if before_run:
             before_run(invocations)
         with (

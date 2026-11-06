@@ -287,10 +287,13 @@ with agreeing forward outputs. The 2.15.0 input-gradient RMSE against the fp64 r
 | Compiled float32 | 1.8795e-5 |
 | Compiled/eager ratio | 1,850.6 |
 
-This supports investigating a difference in the compiled path; it does not establish a compiler
-defect. Fixed cotangents remove differences in the final backward seed, while forward intermediates
-and activation derivatives near branch boundaries can still differ. The model used random weights
-and synthetic inputs, not a pretrained checkpoint or task-quality evaluation.
+The large ratio alone does not implicate the compiler. Follow-up saved-mask diagnostics found two
+activation-selector flips, while eager execution with oneDNN disabled produced a comparable
+gradient discrepancy without compilation. Compiled and eager backward agreed when given identical
+saved inputs. This is evidence of derivative sensitivity at activation boundaries; the earlier
+wording directing investigation toward the compiled path was misleading. Fixed cotangents remove
+differences in the final backward seed, but do not fix internal activation branches. The model used
+random weights and synthetic inputs, not a pretrained checkpoint or task-quality evaluation.
 
 The CPU MLP with float32 storage and bfloat16 autocast also retained a gradient finding. Its
 input-gradient RMSE was **0.0009200 eager versus 0.0009088 compiled**, a ratio of **0.988**.
@@ -327,6 +330,9 @@ proposal, which removed the failure. Global minimality is not claimed.
 Both exported scripts were run independently under supervision: the baseline passed and the
 candidate reproduced the numerical failure. The original workload and rejected proposals remain
 in local evidence; exporting a smaller graph does not sanitize its retained values.
+The indexing operation is near the output, within reach of the twelve-boundary prefix search.
+This result does not validate reduction of a failure between encoder layers; suffix cutting and
+that harder placement remain unimplemented.
 
 ## Version 0.7 AMD GPU execution
 
@@ -351,3 +357,43 @@ skip, 11 actual CPU compiler tests, and 31 legacy tests**. The public JSON inclu
 executed source fingerprint, numerical metrics, reduction sizes, and GPU outcomes. A separate
 nightly CPU workflow now checks the compiler adapters and compares original-model workloads against
 stable PyTorch; a failed nightly is evidence to investigate, not an automatic upstream bug report.
+
+## Version 0.8 numerical sensitivity diagnostics
+
+`--numerics` adds advisory classifications, an eager execution control, and optional AOT saved-mask
+comparisons. It retains the primary status, tolerances, exit code, and reducer predicate. These
+checks ran on the same CPU and RX 7900 XT environments described above, with two repeats and fixed
+VJP cotangents. The executed source fingerprint and selected measurements are in
+`docs/validation.json` under `numerical_context_validation`.
+
+| Workload | Primary result | Additional evidence |
+|---|---|---|
+| Random-weight ResNet-18, CPU 2.15.0 | Gradient mismatch | `discontinuity_sensitive`, `eager_control_sensitive` |
+| Float32 MLP with bf16 autocast, CPU 2.15.0 | Gradient mismatch | Comparable fp64 error on the failing gradients; input-gradient RMSE ratio 0.988 |
+| Float32 MLP with bf16 autocast and AOT, ROCm 2.14.0 | Gradient mismatch | Comparable fp64 error on the failing first-layer bias gradient; ratio 0.978 |
+| Linear(4, 8) followed by ReLU, ROCm | Pass | 16 saved selector elements compared, zero flips; standalone verified |
+| 768-wide Linear/ReLU/Sigmoid/Tanh, ROCm | Pass | Recomputed ReLU selector explicitly unsupported; same-input backward agreement |
+
+For ResNet, sixteen supported selectors covered **1,505,280 entries** and contained **two flips**.
+One additional selector required recomputation and was not compared; lowered max-pool scatter
+selectors are outside the current coverage. The flips were in backward nodes `where_1` and
+`where_14`, consuming saved `relu_15` and `relu_2` values. These are AOT graph identifiers, not a
+claim that every original-module activation was inspected. With the compiled saved inputs held
+fixed, eager and compiled backward agreed under the original tolerances.
+
+Disabling oneDNN in eager execution produced input-gradient RMSE **2.1925e-5 relative to original
+eager**, versus **1.8795e-5 for compiled relative to original eager**: the eager-only discrepancy
+was 1.167 times as large. The diagnostic replay matched the primary candidate and affected targets
+on both repeats. Its exported standalone reproduced the complete numerical context. This supports
+activation-boundary sensitivity as the explanation of the large 0.7 fp64 ratio; it is not a new
+compiler bug. The general diagnostic still allows a separate backward defect to coexist with flips.
+
+The ROCm control perturbed floating input storage by one representable step and retained input
+layouts, aliases, integer roles, and captured cotangents. Its MLP has no recognized saved mask
+selectors and reports that explicitly. No GPU graph-capture claim is added: the saved 0.7
+`perf_hints` logs had no matching skip messages, but absence of a skip is not positive capture evidence.
+
+Local validation passed the portable suite, ten focused diagnostic tests, twelve actual CPU
+Inductor tests, and 31 legacy tests. Tests cover wrong derivatives with identical forward results,
+missing gradients, changed saved activations, RNG and storage preservation, unstable controls,
+advisory labels, and worker/standalone parity. The wrong-backward control remains a stable failure.

@@ -61,7 +61,7 @@ def settings_from(args):
     }
     if args.dynamic is not None:
         values["dynamic"] = {"static": False, "auto": None, "dynamic": True}[args.dynamic]
-    for name in ("compile_mode", "autocast", "fp64_advisory"):
+    for name in ("compile_mode", "autocast", "fp64_advisory", "numerics"):
         if getattr(args, name, None) is not None:
             values[name] = getattr(args, name)
     return Settings(**values)

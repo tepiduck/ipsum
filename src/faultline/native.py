@@ -419,18 +419,20 @@ def evaluate_native(job, settings, directory):
     bundle, directory = Path(job.bundle), Path(directory)
     recorders = []
 
-    def make_execution(candidate=False, precision=None):
+    def make_execution(candidate=False, precision=None, request_transform=None, probe=None):
         recorder = (
             GraphRecorder(
                 directory / "graphs", settings, job.only_graph, aot=job.aot, only_aot=job.only_aot
             )
-            if candidate
+            if candidate and probe is None
             else None
         )
         if recorder:
             recorders.append(recorder)
 
         def compile_model(model, is_graph):
+            if probe is not None:
+                return torch.compile(model, backend=probe.backend, dynamic=settings.dynamic)
             if is_graph and manifest.get("aot_stage"):
                 from .native_aot import replay_stage_backend
                 from .native_compile import mode_options
@@ -450,11 +452,16 @@ def evaluate_native(job, settings, directory):
             manifest,
             settings.to_dict(),
             load_native_graph,
-            compile_model if candidate else None,
+            compile_model if candidate or probe else None,
             requests_selection=job.requests,
             before_run=(lambda n: setattr(recorder, "enabled", n == 0)) if recorder else None,
-            step_hook=(lambda n: setattr(recorder, "current_step", n)) if recorder else None,
+            step_hook=(lambda n: setattr(probe, "step", n))
+            if probe
+            else (lambda n: setattr(recorder, "current_step", n))
+            if recorder
+            else None,
             precision=precision,
+            request_transform=request_transform,
         )
 
     def advisory(eager, candidate, primary):
@@ -462,7 +469,7 @@ def evaluate_native(job, settings, directory):
         from .native_runtime import compare_native
 
         atomic_json(directory / "primary-result.json", {"case_hash": job.digest(), **primary})
-        return native_precision.assess_fp64(
+        fp64 = native_precision.assess_fp64(
             lambda: make_execution(precision=native_precision),
             eager,
             candidate,
@@ -471,6 +478,44 @@ def evaluate_native(job, settings, directory):
             settings.repeats,
             reference_is_factory=True,
         )
+        if settings.numerics:
+            from . import native_aot, native_compile, native_numerics
+            from .native_masks import MaskProbe
+
+            control = native_numerics.assess_control(
+                lambda transform: make_execution(request_transform=transform),
+                eager,
+                candidate,
+                settings.to_dict(),
+                compare_native,
+                portable,
+                native_precision.error_stats,
+            )
+            masks = {
+                "status": "unavailable",
+                "reason": "Requires a whole-model --aot --gradients run",
+            }
+            if job.aot and manifest["kind"] == "workload" and settings.backend != "eager":
+                torch._dynamo.reset()
+                probe = MaskProbe(
+                    native_aot,
+                    native_compile,
+                    settings.to_dict(),
+                    compare_native,
+                    portable,
+                    {"only_graph": job.only_graph, "only_aot": job.only_aot},
+                )
+                masks = native_numerics.assess_masks(
+                    probe,
+                    lambda p: make_execution(probe=p),
+                    eager,
+                    candidate,
+                    settings.to_dict(),
+                    compare_native,
+                    portable,
+                )
+            primary["numerical_context"] = native_numerics.annotate(primary, fp64, control, masks)
+        return fp64
 
     from .native_aot import AOTUnsupported, annotate_aot_result, capture_context
 
@@ -481,7 +526,7 @@ def evaluate_native(job, settings, directory):
                 lambda: make_execution(True),
                 settings.to_dict(),
                 portable,
-                advisory if settings.fp64_advisory else None,
+                advisory if settings.fp64_advisory or settings.numerics else None,
             )
     except AOTUnsupported as exc:
         result = {"status": "unsupported_aot", "error": str(exc)}

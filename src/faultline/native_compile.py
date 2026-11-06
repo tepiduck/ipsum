@@ -42,5 +42,8 @@ def annotate_compiler_result(result, settings):
         result["status"] = "unsupported_backend"
     result["compile_mode"] = settings.get("compile_mode", "default")
     result["autocast"] = settings.get("autocast")
-    result["fp64_requested"] = settings.get("fp64_advisory", False)
+    result["fp64_requested"] = settings.get("fp64_advisory", False) or settings.get(
+        "numerics", False
+    )
+    result["numerics_requested"] = settings.get("numerics", False)
     return result
