@@ -145,7 +145,10 @@ def historical_benchmark(
             # Factories construct CPU data. Both compiler workers load the same binary snapshot
             # on the explicitly selected device; this is not a fallback execution of a GPU check.
             bundle = capture_workload(
-                f"{source}:{spec['factory']}", directory / "bundle", replace(policy, device="cpu")
+                f"{source}:{spec['factory']}",
+                directory / "bundle",
+                replace(policy, device="cpu"),
+                backward_probe="loss",
             )
             comparison = compare_native_environments(
                 bundle,

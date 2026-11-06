@@ -12,7 +12,8 @@ files must be named explicitly. Factory dependencies and external files are not 
 `model run` compares the original module with `torch.compile(module)`. It restores saved state at
 the start of every whole request stream, while retaining one compiled callable across repeats and
 requests. It compares nested outputs, post-call tensor inputs, final registered buffers and
-parameters, and optionally a fixed scalar loss plus input/parameter derivatives. Missing derivatives
+parameters, and optionally input/parameter derivatives. New captures use saved VJP cotangents;
+legacy captures use the original scalar-loss policy. Missing derivatives
 are distinct from zeros. Integer and boolean comparisons are exact, including int64 values beyond
 float64 precision. Comparison storage retains two anchor observations and the current repeat;
 memory still grows with model size and request-stream length. Timings include reset, copying,
@@ -41,6 +42,12 @@ failure signature. A final uncached evaluation is reserved; dual-environment che
 interpreters. Graph shape reduction and multi-graph interaction minification are not implemented.
 The full original snapshot is retained, including when no graph can be isolated. Attempt records
 and proposals consume disk space; large models and long request streams can make reduction costly.
+
+Forward-only Dynamo graphs also support frozen tensor boundaries. A supervised worker executes
+the eager graph, jointly snapshots retained inputs and internal tensors, and emits bounded cut
+proposals. Each is checked against the same candidate and baseline predicates. Gradient and AOT
+graphs do not use these cuts. Details of the probe policies, fp64 advisory, and boundary reductions
+are in [numerical evidence](numerics.md).
 
 Standalone native bundles copy the same comparison, execution, and graph reconstruction modules
 used by workers. They verify file hashes and need no Faultline installation. Full-model bundles

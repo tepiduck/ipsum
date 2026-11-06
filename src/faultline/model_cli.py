@@ -13,6 +13,7 @@ def native_options(parser, optional=False):
         default=None if optional else "default",
     )
     parser.add_argument("--autocast", choices=("float16", "bfloat16"))
+    parser.add_argument("--fp64-advisory", action="store_true", default=None if optional else False)
 
 
 def add_model_commands(commands, execution_options):
@@ -21,6 +22,7 @@ def add_model_commands(commands, execution_options):
     capture = sub.add_parser("capture", help="freeze a trusted factory's state and nested inputs")
     capture.add_argument("factory", help="model.py:factory returning (eval model, inputs)")
     capture.add_argument("--trace", action="store_true")
+    capture.add_argument("--backward-probe", choices=("vjp", "loss"), default="vjp")
     capture.add_argument(
         "--include", action="append", default=[], help="explicit local source or checkpoint asset"
     )
@@ -86,6 +88,7 @@ def model_command(args, settings_from):
             "dynamic",
             "compile_mode",
             "autocast",
+            "fp64_advisory",
         )
         overridden = any(getattr(args, name) is not None for name in names)
         result = diagnose_native(
@@ -114,6 +117,7 @@ def model_command(args, settings_from):
             trace=args.trace,
             include=args.include,
             python=args.python,
+            backward_probe=args.backward_probe,
         )
         print(f"Captured workload: {path}")
         return 0

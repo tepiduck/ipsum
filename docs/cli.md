@@ -203,6 +203,11 @@ Native `model run/compare` additionally accept `--autocast float16|bfloat16` and
 `--compile-mode default|reduce-overhead|max-autotune|max-autotune-no-cudagraphs`. These settings
 are retained by saved-run operations. They are currently unavailable for compact-IR cases.
 
+`model capture --backward-probe vjp|loss` selects the backward input policy (new captures default
+to `vjp`; existing bundles retain their policy). `--fp64-advisory` on native runs, comparisons,
+or qualification adds higher-precision numerical evidence without changing the primary verdict.
+See [numerics](numerics.md) for the reference semantics and saved-bundle compatibility.
+
 `model diagnose BUNDLE_OR_RUN` executes the four-backend ladder. `benchmark list` and
 `benchmark historical` expose the versioned historical corpus. `qualify` additionally accepts
 `--require-cuda`, `--no-aot`, and the `buffer_update` / `shape_sequence` workloads. Detailed

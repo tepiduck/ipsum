@@ -3,6 +3,7 @@
 .baseline/
 .candidate/
 .historical/
+.rocm/
 __pycache__/
 *.egg-info/
 .pytest_cache/

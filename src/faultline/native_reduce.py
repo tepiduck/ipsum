@@ -212,6 +212,32 @@ def reduce_native(
         if best.requests is not None:
             requests = [requests[i] for i in best.requests]
         before = graph_complexity(module, requests)
+        if (
+            not settings.gradients
+            and not graph_manifest.get("aot_stage")
+            and calls < max_evaluations - 2
+        ):
+            calls += 1
+            directory = output / "attempts" / f"{calls:04d}"
+            captured = run_case(
+                replace(best, operation="boundaries"),
+                replace(settings, backend="eager", fp64_advisory=False),
+                directory / "capture",
+                python=candidate_python,
+            )
+            attempts.append(
+                {"evaluation": calls, "stage": "capture-boundaries", "status": captured["status"]}
+            )
+            atomic_json(output / "attempts.json", attempts)
+            for cut in captured.get("boundaries", []):
+                if calls >= max_evaluations - 1:
+                    break
+                proposal = NativeJob.create(directory / "capture" / cut["bundle"])
+                result, _ = evaluate(proposal, "freeze-boundary")
+                if same_failure(target, result):
+                    best, target = proposal, result
+                    module, requests, _ = load_native_graph(best.bundle)
+                    break
         while calls < max_evaluations - 1:
             accepted = False
             for smaller, inputs in bypass_proposals(module, requests):

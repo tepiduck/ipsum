@@ -7,6 +7,7 @@ from pathlib import Path
 import native_aot
 import native_compile
 import native_graph
+import native_precision
 import native_runtime
 import portable
 import torch
@@ -78,7 +79,7 @@ def main():
             return torch.compile(model, backend=backend, dynamic=settings.get("dynamic", False))
         return native_runtime.compile_native_graph(model, backend)
 
-    def execution(candidate=False):
+    def execution(candidate=False, precision=None):
         return native_runtime.make_native_execution(
             bundle,
             manifest,
@@ -86,12 +87,28 @@ def main():
             native_graph.load_native_graph,
             compile_model if candidate else None,
             requests_selection=config.get("requests"),
+            precision=precision,
+        )
+
+    def advisory(eager, candidate, primary):
+        return native_precision.assess_fp64(
+            lambda: execution(precision=native_precision),
+            eager,
+            candidate,
+            native_runtime.compare_native,
+            portable,
+            settings["repeats"],
+            reference_is_factory=True,
         )
 
     try:
         with native_aot.capture_context(config.get("aot", False)):
             result = native_runtime.check_native(
-                execution(), lambda: execution(True), settings, portable
+                execution(),
+                lambda: execution(True),
+                settings,
+                portable,
+                advisory if settings.get("fp64_advisory") else None,
             )
     except native_aot.AOTUnsupported as exc:
         result = {"status": "unsupported_aot", "error": str(exc)}
@@ -116,6 +133,9 @@ def main():
         dynamic=settings.get("dynamic", False),
         trace=True,
         native=True,
+        backward_probe=manifest.get("backward_probe", "loss")
+        if not manifest.get("aot_stage")
+        else "aot_outputs",
         injected_fault=settings["backend"].startswith("mutant:"),
         repeats=settings["repeats"],
         rtol=settings.get("rtol"),

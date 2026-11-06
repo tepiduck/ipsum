@@ -15,12 +15,14 @@ from . import portable
 from .environment import describe
 from .native_graph import load_native_graph, mutate_native, save_native_graph
 from .native_runtime import (
+    capture_cotangents,
     check_native,
     compile_native_graph,
     load_native_factory,
     make_native_execution,
     request_from_inputs,
     tensor_leaves,
+    workload_imports,
 )
 from .storage import atomic_json, read_json
 
@@ -46,7 +48,7 @@ def seal_native(directory, manifest):
 def verify_native(directory):
     directory = Path(directory).resolve()
     manifest = read_json(directory / "workload.json")
-    if manifest["schema_version"] not in {1, 2} or manifest["kind"] not in {
+    if manifest["schema_version"] not in {1, 2, 3} or manifest["kind"] not in {
         "workload",
         "native-graph",
     }:
@@ -56,6 +58,10 @@ def verify_native(directory):
         or manifest.get("aot_stage") not in {"forward", "backward"}
     ):
         raise ValueError("Version-2 bundles must identify a valid AOT graph stage")
+    if manifest["schema_version"] == 3 and (
+        manifest["kind"] != "workload" or manifest.get("backward_probe") != "vjp"
+    ):
+        raise ValueError("Version-3 bundles must declare captured VJP probes")
     for name, digest in manifest["files"].items():
         path = (directory / name).resolve()
         if not path.is_relative_to(directory) or not path.is_file() or file_hash(path) != digest:
@@ -88,7 +94,7 @@ class NativeJob:
         )
 
     def validate(self):
-        if self.operation not in {"capture", "evaluate"}:
+        if self.operation not in {"capture", "evaluate", "boundaries"}:
             raise ValueError("Unsupported native operation")
         if type(self.aot) is not bool or (
             self.only_aot is not None
@@ -132,9 +138,14 @@ class NativeJob:
         return hashlib.sha256(json.dumps(data, sort_keys=True).encode()).hexdigest()
 
 
-def capture_workload(factory, output, settings, *, trace=False, include=(), python=None):
+def capture_workload(
+    factory, output, settings, *, trace=False, include=(), python=None, backward_probe="vjp"
+):
     from .compare_envs import interpreter
     from .runner import run_case
+
+    if backward_probe not in {"loss", "vjp"}:
+        raise ValueError("Backward probe must be loss or vjp")
 
     source, separator, function = factory.rpartition(":")
     if not separator or not function.isidentifier():
@@ -166,7 +177,8 @@ def capture_workload(factory, output, settings, *, trace=False, include=(), pyth
     seal_native(
         output,
         {
-            "schema_version": 1,
+            "schema_version": 3 if backward_probe == "vjp" else 1,
+            **({"backward_probe": "vjp"} if backward_probe == "vjp" else {}),
             "kind": "workload",
             "factory": function,
             "sources": sources,
@@ -220,6 +232,14 @@ def capture_native(job):
     name, keys, position, gaussian, cached = np.random.get_state()
     payload["numpy_rng"] = (name, keys.tolist(), position, gaussian, cached)
     torch.save(payload, directory / "snapshot.pt")
+    if manifest.get("backward_probe") == "vjp":
+        with workload_imports(directory):
+            probes = capture_cotangents(model, requests, job.seed)
+        # Probe execution can mutate buffers and inputs. Reload the untouched snapshot.
+        payload = torch.load(directory / "snapshot.pt", weights_only=True)
+        for request, probe in zip(payload["requests"], probes, strict=True):
+            request["cotangents"] = probe
+        torch.save(payload, directory / "snapshot.pt")
     manifest.update(
         parameter_count=sum(p.numel() for p in model.parameters()),
         request_count=len(requests),
@@ -376,6 +396,10 @@ def evaluate_native(job, settings, directory):
     manifest = verify_native(job.bundle)
     if job.operation == "capture":
         return capture_native(job)
+    if job.operation == "boundaries":
+        from .native_boundaries import capture_boundaries
+
+        return capture_boundaries(job, settings, directory)
     if settings.backend.startswith("mutant:") and settings.backend not in {
         "mutant:relu-as-neg",
         "mutant:sum-as-mean",
@@ -395,7 +419,7 @@ def evaluate_native(job, settings, directory):
     bundle, directory = Path(job.bundle), Path(directory)
     recorders = []
 
-    def make_execution(candidate=False):
+    def make_execution(candidate=False, precision=None):
         recorder = (
             GraphRecorder(
                 directory / "graphs", settings, job.only_graph, aot=job.aot, only_aot=job.only_aot
@@ -430,6 +454,22 @@ def evaluate_native(job, settings, directory):
             requests_selection=job.requests,
             before_run=(lambda n: setattr(recorder, "enabled", n == 0)) if recorder else None,
             step_hook=(lambda n: setattr(recorder, "current_step", n)) if recorder else None,
+            precision=precision,
+        )
+
+    def advisory(eager, candidate, primary):
+        from . import native_precision
+        from .native_runtime import compare_native
+
+        atomic_json(directory / "primary-result.json", {"case_hash": job.digest(), **primary})
+        return native_precision.assess_fp64(
+            lambda: make_execution(precision=native_precision),
+            eager,
+            candidate,
+            compare_native,
+            portable,
+            settings.repeats,
+            reference_is_factory=True,
         )
 
     from .native_aot import AOTUnsupported, annotate_aot_result, capture_context
@@ -437,7 +477,11 @@ def evaluate_native(job, settings, directory):
     try:
         with capture_context(job.aot):
             result = check_native(
-                make_execution(), lambda: make_execution(True), settings.to_dict(), portable
+                make_execution(),
+                lambda: make_execution(True),
+                settings.to_dict(),
+                portable,
+                advisory if settings.fp64_advisory else None,
             )
     except AOTUnsupported as exc:
         result = {"status": "unsupported_aot", "error": str(exc)}
@@ -471,8 +515,13 @@ def evaluate_native(job, settings, directory):
             if manifest.get("aot_stage") == "backward"
             else "Saved AOT forward outputs; no additional differentiation"
             if manifest.get("aot_stage")
+            else "Captured Rademacher cotangents; shared vector-Jacobian product"
+            if manifest.get("backward_probe") == "vjp"
             else "sum(output.square().mean()) over floating tensor outputs"
         ),
+        backward_probe=manifest.get("backward_probe", "loss")
+        if not manifest.get("aot_stage")
+        else "aot_outputs",
     )
     return result
 

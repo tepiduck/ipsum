@@ -50,6 +50,7 @@ class Settings:
     dynamic: bool | None = False
     compile_mode: str = "default"
     autocast: str | None = None
+    fp64_advisory: bool = False
 
     def validate(self):
         valid = self.backend in BACKENDS or (
@@ -83,6 +84,8 @@ class Settings:
             raise ValueError("Compile modes require the inductor backend")
         if self.autocast not in {None, "float16", "bfloat16"}:
             raise ValueError("Autocast must be float16 or bfloat16")
+        if type(self.fp64_advisory) is not bool:
+            raise ValueError("fp64_advisory must be boolean")
 
     def to_dict(self):
         data = asdict(self)
@@ -95,6 +98,8 @@ class Settings:
             data.pop("compile_mode")
         if self.autocast is None:
             data.pop("autocast")
+        if not self.fp64_advisory:
+            data.pop("fp64_advisory")
         return data
 
 
@@ -102,7 +107,7 @@ def evaluate(case, settings):
     from .trace import Trace
 
     settings.validate()
-    if settings.compile_mode != "default" or settings.autocast:
+    if settings.compile_mode != "default" or settings.autocast or settings.fp64_advisory:
         raise ValueError("Compile modes and autocast currently require native model workloads")
     if settings.backend == "mutant:aot-backward-scale":
         raise ValueError("aot-backward-scale is only supported by native AOT workloads")

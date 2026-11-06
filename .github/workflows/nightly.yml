@@ -1,0 +1,32 @@
+name: Nightly compiler compatibility
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 8 * * *'
+permissions:
+  contents: read
+jobs:
+  nightly-cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y g++
+      - run: python -m venv .baseline
+      - run: .baseline/bin/python -m pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+      - run: .baseline/bin/python -m pip install numpy psutil
+      - run: python -m pip install --pre torch --index-url https://download.pytorch.org/whl/nightly/cpu
+      - run: python -m pip install -e '.[dev]'
+      - name: Exercise compiler adapters and standalone replay
+        run: python -m pytest -q -m compiler
+      - name: Compare original-model workloads against the stable release
+        if: ${{ !cancelled() }}
+        run: python scripts/validate_native.py --compiler --baseline-python .baseline/bin/python --output faultline-runs/nightly
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: faultline-nightly-evidence
+          path: faultline-runs/nightly

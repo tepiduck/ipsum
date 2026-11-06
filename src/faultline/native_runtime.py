@@ -86,6 +86,25 @@ def request_from_inputs(inputs):
     return {"args": args, "kwargs": kwargs}
 
 
+def capture_cotangents(model, requests, seed):
+    generator = torch.Generator(device="cpu").manual_seed(seed)
+    probes = []
+    with torch.no_grad():
+        for request in requests:
+            outputs = model(*request["args"], **request["kwargs"])
+            probes.append(
+                {
+                    name: torch.randint(0, 2, value.shape, generator=generator)
+                    .float()
+                    .mul_(2)
+                    .sub_(1)
+                    for name, value in tensor_leaves(outputs, "output")
+                    if value.is_floating_point()
+                }
+            )
+    return probes
+
+
 def observe_native(model, fn, requests, gradients=False, wrong_gradient=False, step_hook=None):
     values, structures = {}, []
     for step, request in enumerate(requests):
@@ -130,18 +149,37 @@ def observe_native(model, fn, requests, gradients=False, wrong_gradient=False, s
             differentiable = [v for _, v in leaves if v.is_floating_point()]
             if not differentiable:
                 raise ValueError("Gradient checking needs a floating-point output")
-            loss = sum(value.square().mean() for value in differentiable)
-            if wrong_gradient:
-                loss = loss.detach() + 2 * (loss - loss.detach())
-            values[f"step:{step}:loss"] = loss.detach().cpu().clone()
+            probes = request.get("cotangents")
+            if probes is None:
+                loss = sum(value.square().mean() for value in differentiable)
+                values[f"step:{step}:loss"] = loss.detach().cpu().clone()
+                backward_outputs = [loss] if loss.requires_grad else []
+                vectors = None
+            else:
+                floating = {name: value for name, value in leaves if value.is_floating_point()}
+                if set(floating) != set(probes) or any(
+                    floating[name].shape != probe.shape for name, probe in probes.items()
+                ):
+                    raise ValueError("Output contract differs from captured cotangents")
+                backward_outputs = [value for value in floating.values() if value.requires_grad]
+                vectors = [
+                    probes[name].to(device=value.device, dtype=value.dtype)
+                    for name, value in floating.items()
+                    if value.requires_grad
+                ]
             targets = inputs + [
                 (f"parameter:{name}", p)
                 for name, p in model.named_parameters()
                 if p.requires_grad and id(p) not in seen
             ]
             derivatives = (
-                torch.autograd.grad(loss, [p for _, p in targets], allow_unused=True)
-                if loss.requires_grad and targets
+                torch.autograd.grad(
+                    backward_outputs,
+                    [p for _, p in targets],
+                    grad_outputs=vectors,
+                    allow_unused=True,
+                )
+                if backward_outputs and targets
                 else (None,) * len(targets)
             )
             for (name, value), derivative in zip(targets, derivatives, strict=True):
@@ -149,6 +187,8 @@ def observe_native(model, fn, requests, gradients=False, wrong_gradient=False, s
                 values[prefix + ":present"] = torch.tensor(derivative is not None)
                 # Keep only actual gradients, rather than full-sized zero placeholders.
                 if derivative is not None:
+                    if wrong_gradient:
+                        derivative = derivative * 2
                     values[prefix + ":value"] = derivative.detach().cpu().clone()
     for name, buffer in model.named_buffers():
         values[f"state:buffer:{name}"] = buffer.detach().cpu().clone()
@@ -235,7 +275,7 @@ def native_failure_key(comparison):
     )
 
 
-def check_native(reference, candidate_factory, settings, policy):
+def check_native(reference, candidate_factory, settings, policy, advisory=None):
     """Keep two anchor observations in memory, irrespective of the repeat count."""
     rtol, atol = settings.get("rtol"), settings.get("atol")
     repeats = settings["repeats"]
@@ -295,13 +335,16 @@ def check_native(reference, candidate_factory, settings, policy):
         if initial_comparison["kind"] == "structure"
         else "numerical_mismatch"
     )
-    return {
+    result = {
         "status": status,
         "comparison": initial_comparison,
         "cold_execution_s": duration,
         "warm_execution_s": times,
         "timing_note": "Includes reset and observation overhead; not a benchmark.",
     }
+    if advisory is not None:
+        result["fp64_advisory"] = advisory(first, initial, result)
+    return result
 
 
 def reset_native_rng(payload, seed):
@@ -328,6 +371,7 @@ def make_native_execution(
     requests_selection=None,
     before_run=None,
     step_hook=None,
+    precision=None,
 ):
     """Construct one eager/compiled callable, restoring saved state for each whole trace."""
     bundle = Path(bundle)
@@ -344,8 +388,10 @@ def make_native_execution(
             raise ValueError("The workload factory no longer returns an eval model")
         model.to(device)
     model.eval()
+    if precision:
+        precision.promote_model(model)
     fn = compile_model(model, is_graph) if compile_model else model
-    if settings.get("autocast") and not manifest.get("aot_stage"):
+    if settings.get("autocast") and not manifest.get("aot_stage") and not precision:
         forward = fn
 
         def autocast_forward(*args, **kwargs):
@@ -373,9 +419,15 @@ def make_native_execution(
             for name, parameter in model.named_parameters():
                 parameter.requires_grad_(payload["trainable"][name])
             requests = payload["requests"]
+            if manifest.get("backward_probe") == "vjp" and any(
+                not isinstance(request.get("cotangents"), dict) for request in requests
+            ):
+                raise ValueError("Captured VJP bundle is missing its cotangents")
             reset_native_rng(payload, manifest["seed"])
         if requests_selection is not None:
             requests = [requests[i] for i in requests_selection]
+        if precision:
+            requests = precision.promote_tree(requests)
         if before_run:
             before_run(invocations)
         with (

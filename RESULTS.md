@@ -51,8 +51,8 @@ CI runs the portable suite on Windows and Linux, the compiler suite on Linux, a 
 upgrade gate, and historical calibration. GPU qualification is a separate manual workflow.
 
 CPU eager corpus tests cover float16, bfloat16, float32, and float64. The compiled 18-case campaign
-used float32. GPU execution, distributed execution, and arbitrary-model coverage have not been
-established. Forward/backward and dynamic-shape coverage for version 0.3 is described below.
+used float32. Later sections record additional forward/backward, dynamic-shape, and AMD GPU checks.
+Distributed execution and arbitrary-model coverage have not been established.
 Diagnostic timing fields are not throughput or speedup evidence.
 
 The recorded experiment predates the terminal interface release. Current behavior is checked by
@@ -267,3 +267,87 @@ faultline qualify --device cpu --dtype float32 --workload buffer_update --worklo
 The benchmark returns 0 for a conclusive completed measurement, even when a fixture does not
 reproduce. CI selects the two paired historical cases and uses `--require-paired` to enforce them.
 See [diagnostics](docs/diagnostics.md) for the artifact fields, exit codes, and remaining limitations.
+
+## Version 0.7 fixed backward probes and native numerical evidence
+
+New native captures save fixed Rademacher cotangents for each request/output. Eager and compiled
+backward receive the same vectors. The tests verify that an output offset does not change the
+gradient seed, that a wrong derivative remains detectable at zero-valued outputs, and that probe
+capture leaves initial state unchanged. Existing bundles retain their square-loss policy. The
+fp64 advisory compares both executions with promoted eager computation without changing the
+primary verdict. [Numerics](docs/numerics.md) describes the policies and their limits.
+
+ResNet-18 was rerun with these VJP probes on CPU under PyTorch 2.14.1 and 2.15.0, with two repeats,
+one thread, `rtol=1e-4`, and `atol=1e-5`. It still reported `gradient_mismatch` in both releases,
+with agreeing forward outputs. The 2.15.0 input-gradient RMSE against the fp64 reference was:
+
+| Execution | RMSE against the promoted reference |
+|---|---|
+| Eager float32 | 1.0156e-8 |
+| Compiled float32 | 1.8795e-5 |
+| Compiled/eager ratio | 1,850.6 |
+
+This supports investigating a difference in the compiled path; it does not establish a compiler
+defect. Fixed cotangents remove differences in the final backward seed, while forward intermediates
+and activation derivatives near branch boundaries can still differ. The model used random weights
+and synthetic inputs, not a pretrained checkpoint or task-quality evaluation.
+
+The CPU MLP with float32 storage and bfloat16 autocast also retained a gradient finding. Its
+input-gradient RMSE was **0.0009200 eager versus 0.0009088 compiled**, a ratio of **0.988**.
+Both paths were similarly far from the promoted reference; the measured compiled error was slightly
+smaller. This gives substantially different numerical context from the ResNet finding without
+automatically dismissing either result. Convolution and masked attention passed this CPU autocast
+matrix. The original compact-IR matmul/softmax example's similar eager/compiled fp64 errors remain
+recorded in the earlier campaign above.
+
+## Version 0.7 known bug embedded in a transformer
+
+The constructed indexing experiment used the **48,917,120-parameter**, six-layer transformer.
+An aggregation after the classifier consumed actual transformer outputs and applied the operation
+pattern from [issue #183986](https://github.com/pytorch/pytorch/issues/183986). No manual graph break
+or compiler mutant was inserted. This deliberately places a known operation pattern in a larger
+random-weight workload; it is not a newly discovered bug in an unmodified production model.
+
+PyTorch **2.15.0 passed** and **2.12.0 failed numerically** on the same frozen workload. One Dynamo
+graph was captured. Its whole-model failure survived compilation isolation and independent graph
+replay. Freezing an internal tensor then removed the transformer prefix:
+
+| Stage | Call operations | Tensor input elements |
+|---|---:|---:|
+| Original independent graph | 15 | 48,917,248 |
+| Retained indexing graph | 4 | 12 |
+
+The original graph uses PyTorch's fused transformer-layer operations, which explains the small
+operation count despite the parameter count. The retained graph constructs its integer indices
+as constants; those constants are not counted as tensor inputs. Reduction used **seven evaluations**,
+including supervised boundary capture and uncached final confirmation. The baseline remained passing
+whenever a proposal was accepted. The four-operation result could not be shortened by its bypass
+proposal, which removed the failure. Global minimality is not claimed.
+
+Both exported scripts were run independently under supervision: the baseline passed and the
+candidate reproduced the numerical failure. The original workload and rejected proposals remain
+in local evidence; exporting a smaller graph does not sanitize its retained values.
+
+## Version 0.7 AMD GPU execution
+
+These checks ran on the **AMD Radeon RX 7900 XT (gfx1100)** in Ubuntu 24.04 / WSL, using a separate
+environment with **PyTorch 2.14.0+rocm10.1.0**, reported HIP runtime **7.16.26385**, and
+Triton **3.8.0+git669b31ac.rocm10.1.0**. The Windows display driver was **32.0.32015.7029** and
+was not changed. Runs explicitly required ROCm and used `cuda:0`; they did not fall back to CPU.
+
+| Matrix | Result |
+|---|---|
+| MLP, convolution, masked attention × float32/float16/bfloat16 storage | All 9 passed forward/backward checks with AOT capture |
+| Float32 storage, bf16 autocast, dynamic shapes, normal backend caching | MLP and changing-shape sequence reported gradient discrepancies; buffer mutation passed |
+| `reduce-overhead`, float32 MLP/buffer mutation/changing-shape sequence | All 3 passed forward/backward checks |
+
+The autocast findings use the original per-output dtype thresholds and remain in the evidence.
+Their same-device promoted references completed. A passing requested compile mode does not prove
+that GPU graph capture was used. These are component and sequence checks on one AMD configuration,
+not throughput measurements, general training validation, or NVIDIA/CUDA coverage.
+
+The local release checks passed **215 portable Linux tests, 214 Windows tests with one platform
+skip, 11 actual CPU compiler tests, and 31 legacy tests**. The public JSON includes the common
+executed source fingerprint, numerical metrics, reduction sizes, and GPU outcomes. A separate
+nightly CPU workflow now checks the compiler adapters and compares original-model workloads against
+stable PyTorch; a failed nightly is evidence to investigate, not an automatic upstream bug report.

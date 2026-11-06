@@ -822,6 +822,560 @@
     "version": "0.4.0"
   },
   "note": "Public summaries of measured experiments with source fingerprints. Local paths and raw machine logs are omitted. Top-level results describe the original campaign; upgrade_experiments describes the new workflows.",
+  "numerical_validation": {
+    "date": "2026-11-05",
+    "embedded_transformer": {
+      "baseline": {
+        "backward_probe": "vjp",
+        "failed_tensor_count": 0,
+        "failed_tensor_rmse_ratio_range": null,
+        "fp64_status": null,
+        "graph_count": 1,
+        "selected_fp64_outputs": [],
+        "status": "pass",
+        "torch": "2.15.0+cpu"
+      },
+      "candidate": {
+        "backward_probe": "vjp",
+        "failed_tensor_count": 1,
+        "failed_tensor_rmse_ratio_range": null,
+        "fp64_status": null,
+        "graph_count": 1,
+        "selected_fp64_outputs": [],
+        "status": "numerical_mismatch",
+        "torch": "2.12.0+cpu"
+      },
+      "compiler_fault_injected": false,
+      "constructed_historical_pattern": "https://github.com/pytorch/pytorch/issues/183986",
+      "manual_graph_break_inserted": false,
+      "parameters": 48917120,
+      "reduction": {
+        "budget_exhausted": false,
+        "confirmed": true,
+        "evaluations": 7,
+        "localization": [
+          {
+            "graph": 0,
+            "graph_status": "numerical_mismatch",
+            "stage": "dynamo",
+            "whole_model_failure_retained": true
+          }
+        ],
+        "original_complexity": [
+          1,
+          15,
+          48917248
+        ],
+        "predicate": "same stable failure AND baseline passes",
+        "reduced_complexity": [
+          1,
+          4,
+          12
+        ]
+      },
+      "standalone": {
+        "baseline": {
+          "peak_tree_rss_mb": 892.8828125,
+          "status": "pass",
+          "verified": true,
+          "wall_s": 14.340955540999857
+        },
+        "candidate": {
+          "peak_tree_rss_mb": 805.91015625,
+          "status": "numerical_mismatch",
+          "verified": true,
+          "wall_s": 18.967681842000047
+        }
+      }
+    },
+    "experiment_source_sha256": "167fd8a2ed5891327c6113cb98a095b711c0a88c6c7999a40e29dc0eedf59a64",
+    "gpu_environment": {
+      "architecture": "gfx1100",
+      "device": "cuda:0",
+      "gpu": "AMD Radeon RX 7900 XT",
+      "nvidia_cuda_validated": false,
+      "os": "Ubuntu 24.04 / WSL",
+      "reported_hip_runtime": "7.16.26385",
+      "torch": "2.14.0+rocm10.1.0",
+      "triton": "3.8.0+git669b31ac.rocm10.1.0",
+      "windows_driver_version": "32.0.32015.7029"
+    },
+    "note": "Numerical evidence does not change the primary verdict or establish compiler defects. ResNet/transformer use random weights and synthetic data. The transformer contains a deliberately placed known issue pattern; it is not a new bug discovery. Requested reduce-overhead mode does not prove graph capture was used.",
+    "probe": "One captured Rademacher VJP per request/output; existing bundles retain their saved policy",
+    "qualification": {
+      "autocast_sequences": {
+        "aot_capture": false,
+        "cases": [
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 1,
+            "failed_tensor_rmse_ratio_range": [
+              0.9775283744594817,
+              0.9775283744594817
+            ],
+            "fp64_status": "complete",
+            "graph_count": 2,
+            "id": "mlp-float32",
+            "selected_fp64_outputs": [],
+            "status": "gradient_mismatch",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": "complete",
+            "graph_count": 1,
+            "id": "buffer_update-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 4,
+            "failed_tensor_rmse_ratio_range": [
+              0.6076257276158785,
+              0.8508967002222062
+            ],
+            "fp64_status": "complete",
+            "graph_count": 1,
+            "id": "shape_sequence-float32",
+            "selected_fp64_outputs": [],
+            "status": "gradient_mismatch",
+            "torch": "2.14.0+rocm10.1.0"
+          }
+        ],
+        "settings": {
+          "atol": null,
+          "autocast": "bfloat16",
+          "backend": "inductor",
+          "device": "cuda:0",
+          "dynamic": true,
+          "fp64_advisory": true,
+          "gradients": true,
+          "max_rss_mb": 4096,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        },
+        "status": "discrepancy"
+      },
+      "cpu_autocast": {
+        "aot_capture": false,
+        "cases": [
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 6,
+            "failed_tensor_rmse_ratio_range": [
+              0.7362884241840675,
+              0.9878233159128664
+            ],
+            "fp64_status": "complete",
+            "graph_count": 1,
+            "id": "mlp-float32",
+            "selected_fp64_outputs": [
+              {
+                "candidate": {
+                  "elements": 128,
+                  "max_abs": 0.0028686045130702498,
+                  "p50_abs": 0.0005396180072260275,
+                  "p95_abs": 0.0017825198577664178,
+                  "p99_abs": 0.002558267043980391,
+                  "rmse": 0.000908792261274639,
+                  "sample_stride": 1,
+                  "sampled_elements": 128
+                },
+                "candidate_exact": false,
+                "candidate_to_eager_rmse": 0.9878233159128664,
+                "eager": {
+                  "elements": 128,
+                  "max_abs": 0.0028686045130702498,
+                  "p50_abs": 0.0005241478506170789,
+                  "p95_abs": 0.002052930689290286,
+                  "p99_abs": 0.002461464270719152,
+                  "rmse": 0.0009199947466666209,
+                  "sample_stride": 1,
+                  "sampled_elements": 128
+                },
+                "eager_exact": false,
+                "reference_dtype": "torch.float64",
+                "target": "step:0:gradient:input[0][0]:value"
+              }
+            ],
+            "status": "gradient_mismatch",
+            "torch": "2.15.0+cpu"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": "complete",
+            "graph_count": 1,
+            "id": "convolution-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.15.0+cpu"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": "complete",
+            "graph_count": 1,
+            "id": "attention-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.15.0+cpu"
+          }
+        ],
+        "settings": {
+          "atol": null,
+          "autocast": "bfloat16",
+          "backend": "inductor",
+          "device": "cpu",
+          "fp64_advisory": true,
+          "gradients": true,
+          "max_rss_mb": 4096,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 300
+        },
+        "status": "discrepancy"
+      },
+      "dtypes": {
+        "aot_capture": true,
+        "cases": [
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "mlp-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "convolution-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "attention-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "mlp-float16",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "convolution-float16",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "attention-float16",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "mlp-bfloat16",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "convolution-bfloat16",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "attention-bfloat16",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          }
+        ],
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cuda:0",
+          "gradients": true,
+          "max_rss_mb": 4096,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        },
+        "status": "pass"
+      },
+      "reduce_overhead": {
+        "aot_capture": false,
+        "cases": [
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "mlp-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 1,
+            "id": "buffer_update-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          },
+          {
+            "backward_probe": "vjp",
+            "failed_tensor_count": 0,
+            "failed_tensor_rmse_ratio_range": null,
+            "fp64_status": null,
+            "graph_count": 3,
+            "id": "shape_sequence-float32",
+            "selected_fp64_outputs": [],
+            "status": "pass",
+            "torch": "2.14.0+rocm10.1.0"
+          }
+        ],
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "compile_mode": "reduce-overhead",
+          "device": "cuda:0",
+          "gradients": true,
+          "max_rss_mb": 4096,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600.0
+        },
+        "status": "pass"
+      }
+    },
+    "resnet18": {
+      "baseline": {
+        "backward_probe": "vjp",
+        "failed_tensor_count": 57,
+        "failed_tensor_rmse_ratio_range": [
+          388.30395470195685,
+          1850.6183563064385
+        ],
+        "fp64_status": "complete",
+        "graph_count": 1,
+        "selected_fp64_outputs": [
+          {
+            "candidate": {
+              "elements": 150528,
+              "max_abs": 0.00022470342061165112,
+              "p50_abs": 2.0523681386335098e-06,
+              "p95_abs": 4.3258715987006674e-05,
+              "p99_abs": 7.679379385489031e-05,
+              "rmse": 1.8794988047733863e-05,
+              "sample_stride": 5,
+              "sampled_elements": 30106
+            },
+            "candidate_exact": false,
+            "candidate_to_eager_rmse": 1850.6183563064385,
+            "eager": {
+              "elements": 150528,
+              "max_abs": 6.302126343352144e-08,
+              "p50_abs": 5.906309964547052e-09,
+              "p95_abs": 2.08052038522602e-08,
+              "p99_abs": 2.957850735703718e-08,
+              "rmse": 1.0156058370265974e-08,
+              "sample_stride": 5,
+              "sampled_elements": 30106
+            },
+            "eager_exact": false,
+            "reference_dtype": "torch.float64",
+            "target": "step:0:gradient:input[0][0]:value"
+          },
+          {
+            "candidate": {
+              "elements": 9408,
+              "max_abs": 0.013556429456361818,
+              "p50_abs": 0.001974556769119312,
+              "p95_abs": 0.005825193821435444,
+              "p99_abs": 0.007867993449694174,
+              "rmse": 0.00298351066708195,
+              "sample_stride": 1,
+              "sampled_elements": 9408
+            },
+            "candidate_exact": false,
+            "candidate_to_eager_rmse": 1348.8344814360428,
+            "eager": {
+              "elements": 9408,
+              "max_abs": 1.441045703742816e-05,
+              "p50_abs": 1.3806474729594065e-06,
+              "p95_abs": 4.3230185281739605e-06,
+              "p99_abs": 6.424488170255764e-06,
+              "rmse": 2.2119175541134904e-06,
+              "sample_stride": 1,
+              "sampled_elements": 9408
+            },
+            "eager_exact": false,
+            "reference_dtype": "torch.float64",
+            "target": "step:0:gradient:parameter:conv1.weight:value"
+          }
+        ],
+        "status": "gradient_mismatch",
+        "torch": "2.14.1+cpu"
+      },
+      "candidate": {
+        "backward_probe": "vjp",
+        "failed_tensor_count": 57,
+        "failed_tensor_rmse_ratio_range": [
+          388.30395470195685,
+          1850.6183563064385
+        ],
+        "fp64_status": "complete",
+        "graph_count": 1,
+        "selected_fp64_outputs": [
+          {
+            "candidate": {
+              "elements": 150528,
+              "max_abs": 0.00022470342061165112,
+              "p50_abs": 2.0523681386335098e-06,
+              "p95_abs": 4.3258715987006674e-05,
+              "p99_abs": 7.679379385489031e-05,
+              "rmse": 1.8794988047733863e-05,
+              "sample_stride": 5,
+              "sampled_elements": 30106
+            },
+            "candidate_exact": false,
+            "candidate_to_eager_rmse": 1850.6183563064385,
+            "eager": {
+              "elements": 150528,
+              "max_abs": 6.302126343352144e-08,
+              "p50_abs": 5.906309964547052e-09,
+              "p95_abs": 2.08052038522602e-08,
+              "p99_abs": 2.957850735703718e-08,
+              "rmse": 1.0156058370265974e-08,
+              "sample_stride": 5,
+              "sampled_elements": 30106
+            },
+            "eager_exact": false,
+            "reference_dtype": "torch.float64",
+            "target": "step:0:gradient:input[0][0]:value"
+          },
+          {
+            "candidate": {
+              "elements": 9408,
+              "max_abs": 0.013556429456361818,
+              "p50_abs": 0.001974556769119312,
+              "p95_abs": 0.005825193821435444,
+              "p99_abs": 0.007867993449694174,
+              "rmse": 0.00298351066708195,
+              "sample_stride": 1,
+              "sampled_elements": 9408
+            },
+            "candidate_exact": false,
+            "candidate_to_eager_rmse": 1348.8344814360428,
+            "eager": {
+              "elements": 9408,
+              "max_abs": 1.441045703742816e-05,
+              "p50_abs": 1.3806474729594065e-06,
+              "p95_abs": 4.3230185281739605e-06,
+              "p99_abs": 6.424488170255764e-06,
+              "rmse": 2.2119175541134904e-06,
+              "sample_stride": 1,
+              "sampled_elements": 9408
+            },
+            "eager_exact": false,
+            "reference_dtype": "torch.float64",
+            "target": "step:0:gradient:parameter:conv1.weight:value"
+          }
+        ],
+        "status": "gradient_mismatch",
+        "torch": "2.15.0+cpu"
+      },
+      "classification": "recurring",
+      "input": "synthetic 1x3x224x224",
+      "parameters": 11689512,
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "fp64_advisory": true,
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600.0
+      },
+      "weights": "random"
+    },
+    "tests": {
+      "cpu_compiler_passed": 11,
+      "legacy_passed": 31,
+      "linux_portable_passed": 215,
+      "windows_portable_passed": 214,
+      "windows_portable_skipped": 1
+    },
+    "version": "0.7.0"
+  },
   "real_compiler_counts": {
     "numerical_mismatch": 1,
     "pass": 17

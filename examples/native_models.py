@@ -36,6 +36,29 @@ def transformer():
     return TokenEncoder().eval(), {"tokens": tokens, "padding_mask": mask}
 
 
+class TransformerIndexing(TokenEncoder):
+    """Known #183986 operation pattern embedded in a random-weight transformer.
+
+    The aggregation consumes actual transformer outputs. No graph break or compiler mutant
+    is inserted; this is a constructed localization experiment, not a newly discovered bug.
+    """
+
+    def forward(self, tokens, padding_mask):
+        hidden = self.encoder(self.embedding(tokens), src_key_padding_mask=padding_mask)
+        values = self.classifier(hidden)[0, :3, :4]
+        storage = values.new_zeros((1, values.shape[1]))
+        destinations = torch.tensor([0, 2, 0], device=values.device)
+        return storage.expand(5, -1).index_add(0, destinations, values)
+
+
+def transformer_indexing():
+    torch.manual_seed(21)
+    tokens = torch.randint(0, 8192, (2, 32))
+    mask = torch.zeros(2, 32, dtype=torch.bool)
+    mask[1, 24:] = True
+    return TransformerIndexing().eval(), {"tokens": tokens, "padding_mask": mask}
+
+
 class ExpandedIndexAdd(nn.Module):
     """Historical stride-zero indexing regression, PyTorch issue #183986.
 

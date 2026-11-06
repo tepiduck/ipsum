@@ -104,8 +104,8 @@ faultline qualify --require-cuda --dtype float32 --compile-mode reduce-overhead 
 ```
 
 `--dtype` controls stored model/input dtype; `--autocast` controls execution and leaves storage
-unchanged. Autocast wraps forward only. The native gradient oracle still uses its fixed mean-square
-loss and existing per-output dtype tolerances; small low-precision accumulation differences can
+unchanged. Autocast wraps forward only. New native captures use saved VJP probes; existing loss-based
+captures retain their policy. With the existing per-output dtype tolerances, low-precision accumulation differences can
 therefore produce findings in float32 parameter gradients. Such findings need numerical assessment.
 Replay and reduction preserve both autocast and compile mode. Already differentiated AOT graphs
 contain their casts and are not autocast or differentiated again.
@@ -120,7 +120,8 @@ matmul precision.
 The manual [GPU workflow](../.github/workflows/gpu.yml) requires a self-hosted Linux runner labeled
 `cuda` or `rocm`, with its matching PyTorch environment already prepared. It runs dtype, autocast,
 state/shape, and compile-mode checks and uploads evidence. It does not run on public pull requests
-or provision a GPU. No NVIDIA or AMD hardware result is claimed until an actual run is recorded.
+or provision a GPU. AMD RX 7900 XT / WSL measurements are recorded in [RESULTS.md](../RESULTS.md).
+NVIDIA/CUDA remains unvalidated.
 
 ## Remaining work
 
@@ -129,8 +130,8 @@ reduction, task-level quality metrics, RNG-specific classification, and a broade
 are not implemented. Safetensors cannot directly replace the current snapshots without reconstructing
 shared storage and views; preserving those layouts is part of reproducing the bugs above.
 
-The existing fp64 advisory is on the compact-IR path; native models do not yet receive an fp64
-reference. Explicit rounding, overflow, and dtype conversions are program
+Native models can opt into `--fp64-advisory`; see [numerical evidence](numerics.md) for its reference
+policy and limitations. Explicit rounding, overflow, and dtype conversions are program
 semantics, so a compiler result closer to fp64 is not automatically correct. Historical calibration
 and controlled fault injection serve different purposes and are reported separately. Compiler
 fuzzing research such as [NNSmith](https://github.com/ise-uiuc/nnsmith) targets test generation and coverage; Faultline's current focus is

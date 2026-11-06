@@ -44,6 +44,14 @@ def same_failure(baseline, result):
         and result.get("graph_stage", "dynamo") == baseline.get("graph_stage", "dynamo")
         and result.get("compile_mode", "default") == baseline.get("compile_mode", "default")
         and result.get("autocast") == baseline.get("autocast")
+        and result.get(
+            "backward_probe",
+            "aot_outputs" if result.get("graph_stage") in {"forward", "backward"} else "loss",
+        )
+        == baseline.get(
+            "backward_probe",
+            "aot_outputs" if baseline.get("graph_stage") in {"forward", "backward"} else "loss",
+        )
     )
 
 

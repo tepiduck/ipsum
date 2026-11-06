@@ -37,6 +37,7 @@ def export_native(job, settings, output, expected=None):
         if (
             expected.get("compile_mode", "default") != settings.compile_mode
             or expected.get("autocast") != settings.autocast
+            or expected.get("fp64_requested", False) != settings.fp64_advisory
         ):
             raise ValueError("Saved outcome has a different compiler/autocast policy")
         for name in (
@@ -60,6 +61,7 @@ def export_native(job, settings, output, expected=None):
         "native_graph.py",
         "native_aot.py",
         "native_compile.py",
+        "native_precision.py",
         "portable.py",
     ):
         shutil.copyfile(source / name, output / name)
@@ -71,6 +73,7 @@ def export_native(job, settings, output, expected=None):
         "native_graph.py",
         "native_aot.py",
         "native_compile.py",
+        "native_precision.py",
         "portable.py",
         "workload/workload.json",
         *["workload/" + name for name in manifest["files"]],

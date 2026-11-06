@@ -99,7 +99,8 @@ for the supported GPU, driver, OS, and PyTorch combinations.
 
 Both runtime requirements reject a mismatched installation.
 The optional [GPU workflow](.github/workflows/gpu.yml) runs on a prepared self-hosted Linux runner;
-it does not provision hardware. Neither CUDA nor ROCm hardware execution has been validated here.
+it does not provision hardware. RX 7900 XT / WSL results are recorded in [RESULTS.md](RESULTS.md).
+NVIDIA/CUDA execution remains unvalidated. See [the tested ROCm setup](docs/numerics.md#gpu-environment-and-nightly-checks).
 
 ## Checking an existing model
 
@@ -125,6 +126,12 @@ faultline model replay faultline-runs/model --output faultline-runs/recheck
 Native runs also accept `--autocast float16|bfloat16` and Inductor's `--compile-mode` choices,
 including `reduce-overhead`. Autocast applies to forward execution; the loss and backward run
 outside that context. These policies are retained by replay, reduction, and standalone export.
+
+New captures save fixed backward vectors for gradient checks, so each execution receives the same
+cotangents. Existing bundles retain their original loss-based policy. Add `--fp64-advisory` to
+compare both paths with higher-precision eager execution and report per-tensor error ratios and
+distributions. It supplies numerical evidence without changing the primary verdict. See
+[gradient probes and numerical evidence](docs/numerics.md) for the scope and limitations.
 
 Inputs can be a tensor, a positional tuple, a dictionary of keyword arguments, or
 `{"args": (...), "kwargs": {...}}`. Nested dictionaries, lists, and tuples are supported.
@@ -162,6 +169,8 @@ must also keep the baseline passing. A fresh worker confirms the final result. I
 be isolated or serialized, the full model reproducer remains available. Shape reduction and
 minification across interacting graphs are not implemented for native workloads.
 
+Forward-only reduction can also replace a graph prefix with a frozen internal tensor, preserving
+its recorded input layout. Each accepted proposal must retain the failure and pass the baseline.
 For a gradient failure, add `--aot` to capture the compiler's forward and backward graphs:
 
 ```bash
