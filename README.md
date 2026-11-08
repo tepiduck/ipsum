@@ -141,10 +141,14 @@ saved activation masks between AOT eager replay and compiled execution. Reports 
 observed mask flips and comparable fp64 error from the primary mismatch. These advisory labels
 leave the exit code and reduction predicate unchanged.
 
-`faultline sweep prepare` downloads and freezes a catalog of 20 pretrained vision and language
+`faultline sweep prepare` downloads and freezes the original catalog of 20 pretrained vision and language
 models with real image/text inputs. `faultline sweep run` compares two environments, records
 per-target diagnostic coverage, and supports interruption/resume with evidence verification.
 See [pretrained sweeps](docs/sweeps.md) for commands, dependencies, input scope, and interpretation.
+Use `--set held-out` for nine additional model families or `--set all` for all 29. Reports include
+absolute fp64 errors, noise-floor triage, and a distributional cross-version accuracy advisory.
+`faultline bisect` can localize a CPU accuracy shift across isolated nightly installations;
+see [the bisection workflow](docs/bisect.md) for its predicate and resume behavior.
 The [recorded CPU and AMD sweep](RESULTS.md#version-09-pretrained-environment-sweep) includes
 gradient findings, unstable references, and diagnostic memory limits; it is not a model-correctness claim.
 
@@ -347,6 +351,7 @@ reproducers. See [comparison classifications and exit codes](docs/cli.md).
 | `demo` | Run the injected-fault example |
 | `doctor` | Inspect runtime and optionally probe compilation |
 | `qualify` | Check forward/backward execution across a device's dtype/workload matrix |
+| `bisect` | Localize an advisory CPU accuracy shift across isolated nightly builds |
 | `benchmark` | Measure historical-issue detection, reduction, and standalone reproduction |
 | `model` | Capture, compare, replay, reduce, or export original-model workloads |
 | `generate` | Create a seeded, frozen JSON case |

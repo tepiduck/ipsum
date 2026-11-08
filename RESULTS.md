@@ -1,6 +1,6 @@
 # Validation results
 
-Recorded experiments: **November 5–6, 2026**. The [public experiment summary](docs/validation.json)
+Recorded experiments: **November 5–8, 2026**. The [public experiment summary](docs/validation.json)
 contains check outcomes, compiler counts, reduction sizes, and the source fingerprint used for
 those experiments. Raw local logs and machine paths are not distributed.
 
@@ -628,3 +628,286 @@ candidate. CPU ResNet-18 and deterministic AMD BERT standalone exports were reru
 `faultline` imports blocked; both retained their primary signatures, labels, triage, target
 coverage, and execution policy. The clean wheel passed an isolated install, CLI, and eager-corpus
 check. The staged source, wheel, and source archive were checked against the publication allowlist.
+
+## Version 0.11 CPU nightly bisection
+
+The GPT-2 investigation used the original frozen pretrained workload and fixed VJP probes. A
+Conv1D/addmm workload with input shape 2×64×768 and a single full GPT-2 block were tried first,
+with three fresh baseline/candidate worker pairs each. Median compiled/fp64 gradient-error growth
+was 1.000× for Conv1D and 0.995× for the block. Prefixes of two, four, and eight blocks measured
+1.009×, 0.990×, and 1.007× in one screening pair each. None reproduced the full-model shift. A
+twelve-block prefix attempt lost its worker and is inconclusive. The full frozen GPT-2 model
+therefore remained the smallest tested workload that reliably reproduced the shift; no minimal
+reproducer is claimed.
+
+The bisection policy was fixed before searching: a threshold of **1.4×** median gradient-error
+growth against the per-target median of three fresh PyTorch 2.15.0 CPU observations. Each nightly
+ran in three fresh workers, with two internal repeats, one thread, a 900-second timeout, and a
+12 GiB host-memory limit. All three scores had to meet the threshold to count as shifted; an
+unavailable or mixed result could not count as good. The 147 paired gradient targets had finite,
+strictly positive compiled/fp64 errors in every baseline observation. This excludes one exact
+gradient and differs from the all-value-target distributional advisory below.
+
+The original [GPT-2 table](docs/gpt2-accuracy.csv) contains two different growth measures.
+Its 137 increases among 148 finite ratio-growth entries refer to compiled/eager error ratios
+(including the model output). Absolute compiled/fp64 error increases on 144 of 148 gradients,
+or 145 of 149 value targets including the output. The 0.11 distributional advisory uses the
+latter measure; the bisection uses the 147 gradients with strictly positive baseline errors.
+
+| CPU nightly | Fresh observations | Median compiled/fp64 error growth | Advisory |
+|---|---:|---:|---|
+| 2026-10-05 | 3 | 1.000× | Not shifted |
+| 2026-10-20 | 3 | 1.000× | Not shifted |
+| 2026-10-27 | 3 | 1.000× | Not shifted |
+| 2026-10-31 | 3 | 1.000× | Not shifted |
+| 2026-11-02 | 3 | 1.000× | Not shifted |
+| **2026-11-04** | **3 + 3 independent confirmations** | **1.000×** | **Last good under this predicate** |
+| **2026-11-05** | **3 + 3 independent confirmations** | **1.710×** | **First bad under this predicate** |
+
+Every nightly observation retained the primary `gradient_mismatch` status. All three scores
+within each date were identical. The search used 31 compatible Python 3.12 Linux CPU wheels from
+the [official nightly index](https://download.pytorch.org/whl/nightly/cpu/torch/), starting at the
+[2.15 branch cut](https://dev-discuss.pytorch.org/t/pytorch-release-2-15-branch-cut-is-complete/3461).
+November 3 had no compatible wheel and remains explicitly missing. Binary search assumes a
+monotone transition; the sampled dates do not rule out an earlier temporary shift. The
+[per-observation table](docs/bisection-011.csv) retains dates, primary statuses, wheel hashes,
+source SHAs, and scores.
+
+The last-good and first-bad wheel snapshot SHAs are `7f24a19c0967db04f2d5ba44c1e56eca489932ec`
+and `084f8661f5bb5de149860f74d82f5313766f4256`. Their release commit messages identify underlying
+main SHAs `2e10e9e8998bf3d420dac3530dfff53bf784c880` and
+`b7b26ca70e5b0d33b5e4f43ec213b2e6810c14cb`: a
+[78-commit source interval](https://github.com/pytorch/pytorch/compare/2e10e9e8998bf3d420dac3530dfff53bf784c880...b7b26ca70e5b0d33b5e4f43ec213b2e6810c14cb).
+Both boundary builds use oneDNN 3.14.1, so a oneDNN version change alone does not account for
+the adjacent-nightly boundary.
+
+A post-bisection control tested the interval's
+[wide-broadcast materialization change](https://github.com/pytorch/pytorch/commit/1933a0a9ee51f2b03ad3cababd727b442d23630e).
+Setting `torch._inductor.config.realize_broadcast_reuse_threshold = 10**12` in the November 5
+process disabled its new trigger without editing installed packages. Two fresh runs retained
+exactly the same 0.773967 median log2 growth (1.710×) as two default-setting runs. This intervention
+does not support attributing the shift to that heuristic. The date boundary is established;
+the individual causal commit remains unresolved. An accuracy shift may reflect an intended
+algorithm or code-generation trade-off. No compiler defect is claimed and no upstream issue
+was filed.
+
+The reusable [`faultline bisect` workflow](docs/bisect.md) installs each nightly in a separate
+environment, supervises installation and execution, preserves logs and partial attempts, and
+checks source, workload, settings, dependency locks, environment identity, and committed evidence
+before resuming. Missing wheels and failed installations remain separate from accuracy results.
+The experiment used an earlier frozen 0.11 source snapshot; subsequent changes added installation
+retry and interrupted-initialization recovery without changing the numerical predicate.
+
+Three setup attempts were preserved before the completed campaign: a WSL clock correction made
+the old process-creation-time watchdog misidentify its live parent; the system lacked `ensurepip`;
+and a full environment freeze included an unrelated local package unavailable from PyPI. Linux
+worker identity now uses kernel process-start ticks, with PID-reuse and clock-correction tests.
+The successful campaign pinned the model dependency closure and installed each CPU wheel
+separately. No baseline model environment was upgraded to make the search work.
+
+## Version 0.11 advisory policy and retrospective application
+
+The [fixed policy](docs/v011-policy.json) was motivated by GPT-2's 0.10 result. `accuracy_shift`
+requires at least eight paired value targets, 80% fp64 coverage, 75% worsening, median compiled
+error growth of at least 1.25×, and a one-sided paired sign-test p-value at most 0.01. It examines
+all output and gradient values, including those within the primary tolerance. Ties remain in
+the fraction and median and leave only the sign-test trials. Correlated targets make the p-value
+descriptive; it is not a calibrated probability that the model or compiler is incorrect.
+
+The unchanged rule was applied retrospectively to all 40 original 0.10 CPU/AMD pairs. The
+[complete per-pair table](docs/accuracy-shift-010.csv) includes unavailable pairs, coverage,
+worsening/improving/tied counts, median log2 growth, and p-values. **CPU GPT-2 and CPU BERT flag;
+no AMD pair flags.** GPT-2 has the largest median growth among the 38 available pairs, but it is
+not the only flagged model. This ranking does not establish a statistically calibrated outlier.
+
+| Distribution of per-pair median log2 growth | Planned | Available | Minimum | 25th percentile | Median | 75th percentile | Maximum |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| CPU | 20 | 19 | -0.006229 | -4.13e-13 | 0 | 0 | 0.770341 |
+| AMD deterministic | 20 | 19 | -0.065776 | 0 | 0 | 0 | 0.264394 |
+
+Percentiles use inclusive linear interpolation over available pair medians. Unavailable pairs
+are reported separately rather than assigned zero growth.
+
+| 0.10 pair | Paired targets | Worsened | Median growth | Sign-test p | `accuracy_shift` |
+|---|---:|---:|---:|---:|---|
+| CPU GPT-2 | 149/149 | 145/149 | 1.706× | 1.51e-39 | Yes |
+| CPU BERT | 198/198 | 179/198 | 1.308× | 7.74e-35 | Yes |
+| CPU DistilBERT | 101/101 | 84/101 | 1.149× | 1.30e-12 | No: growth below threshold |
+| AMD EfficientNet-B1 | 303/303 | 241/303 | 1.201× | 9.15e-27 | No: growth below threshold |
+| AMD GPT-2 | 149/149 | 0/149 | 1.000× | 1 | No |
+| AMD BERT | 198/198 | 0/198 | 1.000× | 1 | No |
+
+This application is exploratory, not held-out validation. SmolLM2 lacks paired fp64 evidence on
+both devices and remains in the denominator. The old fraction-based `accuracy_regression` rule
+is unchanged, including its zero flags on these 40 pairs. In two actual same-version comparisons
+between the three fresh 2.15.0 GPT-2 baseline observations, all 149 value errors tied: median log2
+growth 0, p=1, and no shift flag. A planted uniform 1.5× degradation flags in the behavior tests.
+
+The numerical floor uses **c=32**, chosen before the new sweeps:
+`max(eager_rmse, eager_control_rmse_vs_same_fp64, 32 * 2^-24 * RMS(fp64_reference))`.
+Compiled RMSE must exceed twice this floor to supply positive fp64 contrary evidence. This is an
+engineering allowance, not a fitted error bound. Unsupported controls are recorded as unavailable;
+same-input backward currently has no alternate backward control. The old errors, ratios, and
+ratio-band labels remain in the evidence for comparison.
+
+Incomplete comparability or eager-control coverage now means missing evidence, with matched/total
+counts. Contrary evidence requires a completed beyond-floor fp64 check, a same-input backward
+check beyond that floor, or a mapped failing gradient not downstream of observed flips. Tests
+cover all three categories and partial explanations. These changes affect advisory reporting
+only. Primary statuses, tolerances, failure signatures, reducer predicates, and existing command
+exit codes are unchanged. The 0.10 artifacts and results above are preserved.
+
+The repeated CPU EfficientNet-B0 candidate illustrates both effects of the floor. Its same-input
+backward output 9 retains eager RMSE 1.76419e-6, compiled RMSE 5.29149e-6, and the old ratio 2.99938.
+Reference RMS 2.97174 gives a floor of 5.66813e-6 and a cutoff of 1.13363e-5, so that target no
+longer supplies contrary evidence. Of fourteen backward outputs beyond twice eager error in the
+old candidate check, thirteen are now within twice their floor. Output 19 still exceeds its floor:
+compiled RMSE 9.49417e-6 versus a cutoff of 7.62523e-6. The whole finding therefore remains
+`unexplained_contrary_evidence`. The errors and legacy ratios are unchanged; the declared c=32
+is not adjusted to clear the remaining target. These are AOT backward output positions, not
+original-model parameter indices. Full values are retained in `noise_floor_examples` in
+[validation.json](docs/validation.json).
+
+## Version 0.11 held-out and original-model sweeps
+
+The held-out catalog adds RegNet-Y-400MF, DenseNet-121, ShuffleNet-V2-x1.0, SqueezeNet-1.1,
+MNASNet-1.0, T5-small's encoder, RoBERTa-base, OPT-125M, and Pythia-160M. All nine use pretrained
+weights and the same real-input policy as the original catalog. The original twenty frozen
+workloads are reused. Model identities, weights, inputs, and checkpoint revisions are retained.
+
+The first preparation completed eight models and rejected OPT's missing embedding weight.
+The existing safetensors conversion stores that tied weight under `lm_head.weight`; direct
+base-model loading would initialize an embedding randomly. Preparation now loads the declared
+causal-language-model weight tie and then extracts its base model, with no missing or mismatched
+weights permitted. The repaired OPT preparation used the same pinned checkpoint and byte-identical
+input sources. Its successful bundle was combined with the eight completed preparations in a
+new directory. The original failed attempt remains preserved; no model was substituted.
+
+CPU uses PyTorch 2.15.0+cpu versus 2.16.0.dev20261105+cpu. AMD uses the RX 7900 XT with
+2.15.0+rocm10.3.0a20261105 versus 2.16.0a0+rocm10.3.0a20261105 and explicit deterministic
+execution. These are the same environments as 0.10. Both sets use gradients, AOT capture,
+numerical diagnostics, two repeats, one thread, 600 seconds and 12 GiB of host RSS per worker.
+The thresholds above were fixed before these sweeps and are not adjusted for their outcomes.
+
+An initial CPU campaign completed seven pairs before being stopped for a memory fix. RoBERTa
+exceeded 12 GiB during diagnostics in both environments. The eager-control handoff retained an
+unneeded model-state snapshot alongside the output/gradient values used by fp64 comparison.
+It now retains only those value tensors, without copying them or changing their layouts. A
+behavior test verifies identical advisory fields with the full and compact observations. All
+completed results and the interrupted eighth attempt were preserved. The full campaign was
+restarted in new directories with the same thresholds, inputs, and memory budget.
+
+Both RoBERTa CPU environments then completed with full fp64 coverage, peaking at 12,104 and
+12,070 MiB, below the unchanged 12,288 MiB limit. The first six completed model pairs reproduced
+their primary comparisons, fp64 measurements, and numerical-context records exactly after this
+change. The old RoBERTa runs were stopped at the memory limit, so their unrestricted peak memory
+is unknown; no percentage memory reduction is inferred from those truncated observations.
+
+The completed rerun keeps every selected model in the denominator:
+
+| Catalog / device | Models | Fully agree | Explained | Contrary evidence | Missing evidence | Inconclusive | Old ratio flag | `accuracy_shift` |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| Held-out / AMD deterministic | 9 | 1 | 6 | 2 | 0 | 0 | 0 | 0 |
+| Held-out / CPU | 9 | 0 | 5 | 4 | 0 | 0 | 1 | 1 |
+| Original / AMD deterministic | 20 | 0 | 16 | 3 | 0 | 1 | 0 | 0 |
+| Original / CPU | 20 | 0 | 13 | 6 | 0 | 1 | 0 | 2 |
+
+The five outcome columns partition each catalog/device set. The last two advisory columns
+are independent flags and are not additional partition categories. Explained means the
+recorded diagnostic criteria are met, not independently adjudicated correctness. These
+counts are not a false-positive rate.
+
+SmolLM2 exceeds the unchanged 12 GiB host-memory budget during diagnostics in both versions
+on both devices. Its two model/device pairs stay inconclusive, with completed primary
+observations retained and all 273 value targets unavailable to the distributional advisory.
+The other 56 pairs have full paired fp64 coverage. No model was removed from the denominator.
+
+The [complete 58-pair table](docs/accuracy-shift-011.csv) retains every model, primary status,
+triage category, coverage, worsening/improving/tied counts, median log2 growth, and sign-test
+p-value. The distribution below summarizes per-pair median log2 growth, including unflagged pairs:
+
+| Catalog / device | Planned | Available | Minimum | 25th percentile | Median | 75th percentile | Maximum |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Held-out / AMD deterministic | 9 | 9 | 0 | 0 | 0 | 0 | 0.124031 |
+| Held-out / CPU | 9 | 9 | -0.00550835 | 0 | 0 | 0 | 0.367669 |
+| Original / AMD deterministic | 20 | 19 | -0.0657764 | 0 | 0 | 0 | 0.264394 |
+| Original / CPU | 20 | 19 | -0.00622877 | -4.13003e-13 | 0 | 0 | 0.770341 |
+
+The unchanged distributional rule flags these pairs:
+
+| Catalog / device / model | Paired / total | Worsened / paired | Median growth | Sign-test p |
+|---|---:|---:|---:|---:|
+| Held-out / CPU / Pythia-160M | 148/148 | 132/148 | 1.290× | 7.45e-25 |
+| Original / CPU / BERT | 198/198 | 179/198 | 1.308× | 7.74e-35 |
+| Original / CPU / GPT-2 | 149/149 | 145/149 | 1.706× | 1.51e-39 |
+
+This is completed held-out application of the predeclared engineering rule: nine new
+pretrained models on both devices, with no threshold changes after seeing their results.
+It validates application and repeatability on these workloads, not statistical calibration
+or broad production-model coverage. The two real input examples per model remain a limited input set.
+
+CPU Pythia is also reproduced independently through both exported scripts with all Faultline
+imports blocked. Both exports retain the original primary outcome, every fp64 error, labels,
+and coverage. Recomputing `accuracy_shift` from those fresh observations reproduces every
+field of the sweep advisory. CPU OPT and deterministic AMD ShuffleNet exports also pass
+independent execution with matching evidence and execution policy.
+
+Pythia's candidate also meets the per-version fp64 comparability criterion. That does not
+contradict its cross-version shift: error can grow by 1.29× while remaining below twice the
+candidate environment's noise floor. The two advisories answer different questions and neither
+changes its primary numerical mismatch.
+
+RegNet illustrates why the two accuracy advisories are separate. On CPU, the old ratio rule
+flags 185/208 failing targets (88.9%), while all 227 paired compiled/fp64 errors are unchanged.
+Its eager denominator changed. The new rule records 227 ties, median log2 growth 0, p=1, and
+no accuracy shift. The old flag remains visible; neither rule modifies the primary result.
+
+AMD BERT and DistilBERT's previously missing-evidence pairs now have complete fp64 explanations.
+Candidate coverage is 174/174 and 48/48 failing targets, respectively. Results closer to fp64
+qualify under the new upper-bound criterion; their old ratios of 0.283 and 0.328 remain recorded.
+Unsupported same-input backward replay and unavailable integer-input ULP controls still appear
+as diagnostic gaps. These explanation labels do not erase the primary discrepancies.
+
+All 80 original-catalog primary observations (20 models × two devices × two environments)
+reproduce the saved 0.10 primary status and comparison exactly. All 76 stored failure
+fingerprints match. The remaining four memory-limit checkpoints precede fingerprint
+serialization; applying the unchanged fingerprint function with the recorded native Inductor
+and gradient settings gives identical fingerprints, with those derivations marked in the evidence.
+All 76 completed fp64 observations also retain identical eager/compiled error statistics,
+ratios, reference dtypes, exact-result flags, and legacy labels. New advisory labels do not
+rewrite the old evidence. Full environments and executed source hashes
+are recorded in [validation.json](docs/validation.json); editable package metadata in those
+unchanged environments can retain the prior version, so the source hash identifies the harness.
+
+## Version 0.11 executed checks
+
+| Check | Result |
+|---|---|
+| Windows portable tests, Python 3.12.10 / PyTorch 2.15.0+cpu | 282 passed, 1 skipped; 12 compiler tests deselected |
+| Linux CPU Inductor tests, Python 3.12.3 / PyTorch 2.15.0+cpu | 12 passed |
+| Compiler validation campaign | All 14 checks passed; real-compiler corpus: 17 passes and 1 unconfirmed numerical discrepancy |
+| Legacy tests | 31 passed with asyncio auto mode; legacy source was unchanged by later Faultline-only edits |
+| Ruff lint and requested formatting checks | Passed; 80 files formatted |
+| Independent standalone exports with Faultline imports blocked | OPT CPU; both Pythia CPU environments; deterministic AMD ShuffleNet |
+
+The behavior tests cover uniform 1.5× degradation, unchanged-version results, mixed targets,
+noise-floor terms, incomplete versus contrary evidence, backward/selector disagreement,
+environment installation failures, interrupted initialization, resume compatibility, and
+independent bisection confirmation. Neither the numerical policy nor the execution budgets
+were retuned after the held-out results.
+
+The final executed harness source hash is
+`9eb40b2a72a15d214b5cac7bf45594565c781116374f67d62bcbbc9c7d78dc2b`.
+The Git-normalized source hash is
+`94152d83a320d1c9da32c0e5658f624462d645573fe769eaeeb7a1eb2cebedf0`.
+The difference is verified CRLF/LF normalization only, with affected filenames recorded in
+the evidence. Published CSV hashes refer to UTF-8/LF bytes. No primary comparison, tolerance,
+failure-signature function, reducer predicate, or existing command exit code was changed.
+
+The release allowlist audit checked 106 tracked files, 57 wheel members, and 109 source-archive
+members. Private guides, notes, model weights, environments, and local experiment directories
+are excluded from those distributions. An isolated import from the installed 0.11.0 wheel
+matches the Git source hash above. Its version command, deterministic model options, bisection
+retry options, held-out sweep options, and repeated eager corpus all pass. The evidence audit
+also verifies the published CSV hashes, every previous validation record, the unchanged original
+GPT-2 CSV bytes, and the unchanged primary/signature/reducer files.

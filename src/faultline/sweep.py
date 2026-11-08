@@ -12,11 +12,11 @@ from .evaluate import Settings
 from .native import capture_workload, file_hash, verify_native
 from .native_artifacts import compare_native_environments, write_native_report
 from .storage import atomic_json, campaign_lock, now, provenance, read_json
-from .sweep_models import MODELS, prepare_model, real_inputs
+from .sweep_models import HELD_OUT_MODELS, MODELS, ORIGINAL_MODELS, prepare_model, real_inputs
 
 
 def selected_models(names):
-    selected = list(names or MODELS)
+    selected = list(names or ORIGINAL_MODELS)
     if not selected or len(set(selected)) != len(selected) or not set(selected) <= set(MODELS):
         raise ValueError("Select distinct models from the pretrained catalog")
     return selected
@@ -124,6 +124,7 @@ def sweep_counts(rows, planned=None):
             "inconclusive": 0,
             "unexplained_findings": 0,
             "accuracy_regression": 0,
+            "accuracy_shift": 0,
             "explained": 0,
             "unexplained_contrary_evidence": 0,
             "unexplained_missing_evidence": 0,
@@ -133,6 +134,8 @@ def sweep_counts(rows, planned=None):
     for row in rows:
         if row.get("accuracy_comparison", {}).get("accuracy_regression"):
             counts["accuracy_regression"] += 1
+        if row.get("accuracy_shift", {}).get("accuracy_shift"):
+            counts["accuracy_shift"] += 1
         if row["classification"] == "inconclusive":
             counts["inconclusive"] += 1
         elif row["classification"] == "agreement":
@@ -267,6 +270,11 @@ def run_sweep(
                             for k, v in result.get("accuracy_comparison", {}).items()
                             if k != "targets"
                         },
+                        "accuracy_shift": {
+                            k: v
+                            for k, v in result.get("accuracy_shift", {}).items()
+                            if k != "targets"
+                        },
                         "report": str((root / "comparison/report.html").relative_to(output)),
                         "model": {
                             k: entry["model"][k]
@@ -317,10 +325,12 @@ def add_sweep_commands(commands, execution_options):
     sub.add_parser("list", help="list the built-in pretrained models")
     prepare = sub.add_parser("prepare", help="download pretrained weights and freeze real inputs")
     prepare.add_argument("--model", action="append", choices=MODELS)
+    prepare.add_argument("--set", choices=("original", "held-out", "all"), dest="catalog_set")
     prepare.add_argument("--output", type=Path, required=True)
     run = sub.add_parser("run", help="compare prepared models with stable/nightly interpreters")
     run.add_argument("prepared", type=Path)
     run.add_argument("--model", action="append", choices=MODELS)
+    run.add_argument("--set", choices=("original", "held-out", "all"), dest="catalog_set")
     run.add_argument("--baseline-python", required=True)
     run.add_argument("--candidate-python", default=sys.executable)
     run.add_argument("--output", type=Path, required=True)
@@ -338,8 +348,15 @@ def sweep_command(args, settings_from):
     if args.sweep_command == "list":
         print("\n".join(MODELS))
         return 0
+    if args.model and args.catalog_set:
+        raise ValueError("Choose --model or --set, not both")
+    names = args.model or {
+        "original": ORIGINAL_MODELS,
+        "held-out": HELD_OUT_MODELS,
+        "all": MODELS,
+    }.get(args.catalog_set, ORIGINAL_MODELS)
     if args.sweep_command == "prepare":
-        result = prepare_sweep(args.output, args.model)
+        result = prepare_sweep(args.output, names)
         return 0 if all(row["status"] == "ready" for row in result["models"]) else 2
     result = run_sweep(
         args.prepared,
@@ -347,7 +364,7 @@ def sweep_command(args, settings_from):
         args.baseline_python,
         args.candidate_python,
         settings_from(args),
-        names=args.model,
+        names=names,
         resume=args.resume,
     )
     print(json.dumps(result["counts"], indent=2))

@@ -14,6 +14,8 @@ include docs/diagnostics.md
 include docs/numerics.md
 include docs/sweeps.md
 include docs/gpt2-accuracy.csv
+include docs/accuracy-shift-010.csv docs/accuracy-shift-011.csv docs/bisection-011.csv
+include docs/bisect.md docs/v011-policy.json
 global-exclude __pycache__ *.py[cod] AGENTS.md CLAUDE.md
 exclude tests/test_*.py
 prune reports

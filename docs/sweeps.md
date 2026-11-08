@@ -1,9 +1,25 @@
 # Pretrained model sweeps
 
-The `sweep` commands prepare a fixed catalog of 20 pretrained models and compare two execution
-environments. The catalog contains 16 torchvision classifiers and four Hugging Face base models:
+The `sweep` commands prepare pretrained models and compare two execution environments.
+The original default catalog contains 16 torchvision classifiers and four Hugging Face base models:
 BERT, GPT-2, DistilBERT, and SmolLM2-135M (Llama architecture). Text workloads return the final hidden
 states; task-specific prediction heads and generation caches are not exercised.
+
+The nine-model `--set held-out` catalog adds RegNet-Y-400MF, DenseNet-121, ShuffleNet-V2-x1.0,
+SqueezeNet-1.1, MNASNet-1.0, the T5-small encoder, RoBERTa-base, OPT-125M, and Pythia-160M.
+These were selected before the 0.11 held-out validation. `--set original` selects the existing
+20; `--set all` selects all 29. `--model` and `--set` are mutually exclusive. The default stays
+the original catalog so existing prepared directories remain usable.
+
+T5 loads the encoder only. RoBERTa omits the unused pooler rather than initializing a missing
+pooler randomly. All remaining model parameters must come from the pinned checkpoint.
+OPT-125M uses the existing [SFconvertbot safetensors conversion](https://huggingface.co/facebook/opt-125m/discussions/51)
+at commit `1f9886ce095904096e22b0f4d9e7ba932fa7df2a`; its main revision has only pickle weights.
+The loader first resolves its declared embedding/head weight tie through `AutoModelForCausalLM`,
+then extracts the base model. Direct base-model loading would miss the embedding stored under
+the head's name. Missing or mismatched weights still fail preparation.
+Preparation requires safetensors at the selected revision and never requests an automatic
+upstream conversion. The resolved revision and its source are recorded in the workload manifest.
 
 ```bash
 # Install the matching PyTorch/torchvision build in each environment first.
@@ -12,6 +28,8 @@ faultline sweep list
 faultline sweep prepare --output workloads/pretrained
 faultline sweep run workloads/pretrained --baseline-python .stable/bin/python --candidate-python .nightly/bin/python --device cpu --output faultline-runs/pretrained-cpu
 faultline sweep run workloads/pretrained --baseline-python .rocm-stable/bin/python --candidate-python .rocm-nightly/bin/python --device cuda:0 --output faultline-runs/pretrained-amd
+faultline sweep prepare --set held-out --output workloads/held-out
+faultline sweep run workloads/held-out --set held-out --baseline-python .rocm-stable/bin/python --candidate-python .rocm-nightly/bin/python --device cuda:0 --deterministic --output faultline-runs/held-out-amd
 ```
 
 Use `--model NAME` repeatedly to prepare or run a subset. Each interpreter needs the model libraries

@@ -1,6 +1,7 @@
 """Cross-environment accuracy evidence, independent of the primary upgrade gate."""
 
 import math
+import statistics
 
 # Declared before inspecting the 0.10 GPT-2 target-level results. Do not tune to a sweep.
 ACCURACY_POLICY = {
@@ -9,6 +10,136 @@ ACCURACY_POLICY = {
     "fraction_gte": 0.2,
     "denominator": "union of output/gradient targets failing in either environment",
 }
+
+# GPT-2 motivated this policy. Fixed in docs/v011-policy.json before the held-out sweep.
+SHIFT_POLICY = {
+    "fraction_gte": 0.75,
+    "median_growth_gte": 1.25,
+    "one_sided_sign_p_lte": 0.01,
+    "minimum_paired_targets": 8,
+    "minimum_coverage": 0.8,
+}
+
+
+def sign_test(worse, better):
+    """Exact one-sided paired sign test; equal-error ties are excluded."""
+    n = worse + better
+    return sum(math.comb(n, k) for k in range(worse, n + 1)) / (1 << n) if n else 1.0
+
+
+def accuracy_shift(baseline, candidate):
+    """Distribution of absolute compiled/fp64 errors, independently of failure labels."""
+    primary = [
+        r if "comparison" in r else r.get("primary_observation", {}) for r in (baseline, candidate)
+    ]
+    targets = {
+        row["target"]
+        for result in primary
+        for row in result.get("comparison", {}).get("outputs", [])
+        if not row["target"].startswith("state:")
+        and ":input_after:" not in row["target"]
+        and not (":gradient:" in row["target"] and row["target"].endswith(":present"))
+    }
+    sides = []
+    for result in (baseline, candidate):
+        evidence = result.get("fp64_advisory", {})
+        sides.append(
+            {
+                row["target"]: row.get("candidate", {}).get("rmse")
+                for row in evidence.get("outputs", [])
+                if evidence.get("status") == "complete"
+                and row.get("reference_dtype") == "torch.float64"
+            }
+        )
+    rows, logs = [], []
+    worse = better = ties = 0
+    for target in sorted(targets):
+        a, b = (side.get(target) for side in sides)
+        valid = all(isinstance(x, (float, int)) and math.isfinite(x) and x >= 0 for x in (a, b))
+        row = {
+            "target": target,
+            "baseline_compiled_rmse": a if valid else None,
+            "candidate_compiled_rmse": b if valid else None,
+            "log2_growth": None,
+            "status": "missing_or_nonfinite",
+        }
+        if valid:
+            worse += b > a
+            better += b < a
+            ties += b == a
+            value = (
+                0.0
+                if a == b
+                else math.inf
+                if a == 0
+                else -math.inf
+                if b == 0
+                else math.log2(b) - math.log2(a)
+            )
+            logs.append(value)
+            row.update(
+                status="finite"
+                if math.isfinite(value)
+                else "baseline_exact"
+                if a == 0
+                else "candidate_exact",
+                log2_growth=value if math.isfinite(value) else None,
+            )
+        rows.append(row)
+    paired, total = len(logs), len(targets)
+    median = statistics.median(logs) if logs else None
+    median_status = (
+        "missing"
+        if median is None
+        else "finite"
+        if math.isfinite(median)
+        else "positive_infinity"
+        if median == math.inf
+        else "negative_infinity"
+        if median == -math.inf
+        else "indeterminate"
+    )
+    fraction = worse / paired if paired else None
+    coverage = paired / total if total else 0.0
+    p = sign_test(worse, better)
+    sufficient = (
+        all("comparison" in r for r in primary)
+        and paired >= SHIFT_POLICY["minimum_paired_targets"]
+        and coverage >= SHIFT_POLICY["minimum_coverage"]
+    )
+    flagged = bool(
+        sufficient
+        and fraction >= SHIFT_POLICY["fraction_gte"]
+        and median >= math.log2(SHIFT_POLICY["median_growth_gte"])
+        and p <= SHIFT_POLICY["one_sided_sign_p_lte"]
+    )
+    return {
+        "schema_version": 1,
+        "status": "complete"
+        if paired == total and total
+        else "partial"
+        if paired
+        else "unavailable",
+        "accuracy_shift": flagged,
+        "labels": ["accuracy_shift"] if flagged else [],
+        "paired": paired,
+        "total": total,
+        "coverage": coverage,
+        "worsened": worse,
+        "improved": better,
+        "ties": ties,
+        "fraction_worsened": fraction,
+        "median_log2_growth": median if median_status == "finite" else None,
+        "median_status": median_status,
+        "sign_test_p": p,
+        "sufficient_evidence": sufficient,
+        "policy": dict(SHIFT_POLICY),
+        "targets": rows,
+        "note": "Advisory accuracy shift, not a compiler defect. GPT-2 motivated the fixed thresholds. "
+        "Targets share computations; the sign-test p-value is descriptive, not a calibrated model-level probability. "
+        "Missing references remain in coverage; equal-error ties remain in the fraction and median. "
+        "The 0.10 application is retrospective; held-out validation is recorded separately.",
+    }
 
 
 def error_ratio(record):

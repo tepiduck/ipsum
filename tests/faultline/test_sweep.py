@@ -11,7 +11,10 @@ from faultline.evaluate import Settings
 from faultline.storage import atomic_json
 
 
-def test_pretrained_loader_serializes_key_sets_and_rejects_missing_weights(tmp_path, monkeypatch):
+@pytest.mark.parametrize("name", ["distilbert", "t5_small_encoder", "roberta_base", "opt_125m"])
+def test_pretrained_loader_serializes_key_sets_and_rejects_missing_weights(
+    tmp_path, monkeypatch, name
+):
     import importlib.metadata
 
     inputs = tmp_path / "inputs"
@@ -35,28 +38,42 @@ def test_pretrained_loader_serializes_key_sets_and_rejects_missing_weights(tmp_p
     def load_model(*args, **kwargs):
         assert kwargs["output_loading_info"] and kwargs["use_safetensors"]
         assert kwargs["trust_remote_code"] is False
-        return inner, loading
+        assert kwargs["attn_implementation"] == "sdpa"
+        assert kwargs.get("add_pooling_layer") is (False if name == "roberta_base" else None)
+        return (SimpleNamespace(base_model=inner) if name == "opt_125m" else inner), loading
 
     monkeypatch.setitem(
         sys.modules,
         "huggingface_hub",
-        SimpleNamespace(model_info=lambda _: SimpleNamespace(sha="fixed-revision")),
+        SimpleNamespace(
+            model_info=lambda *a, **kw: SimpleNamespace(
+                sha="fixed-revision", siblings=[SimpleNamespace(rfilename="model.safetensors")]
+            )
+        ),
     )
     monkeypatch.setitem(
         sys.modules,
         "transformers",
         SimpleNamespace(
             AutoModel=SimpleNamespace(from_pretrained=load_model),
+            AutoModelForCausalLM=SimpleNamespace(from_pretrained=load_model),
+            T5EncoderModel=SimpleNamespace(from_pretrained=load_model),
             AutoTokenizer=SimpleNamespace(from_pretrained=lambda *a, **kw: Tokenizer()),
         ),
     )
     monkeypatch.setattr(importlib.metadata, "version", lambda _: "fixture-version")
-    spec = sweep_models.prepare_model("distilbert", tmp_path / "model", inputs)
+    spec = sweep_models.prepare_model(name, tmp_path / "model", inputs)
     assert spec["unused_checkpoint_keys"] == ["head.bias", "head.weight"]
+    saved = torch.load(tmp_path / "model/weights.pt", weights_only=True)
+    assert set(saved) == {"inner.weight", "inner.bias"}
+    assert torch.equal(saved["inner.weight"], inner.weight)
+    if name == "opt_125m":
+        assert spec["checkpoint_loader"] == "AutoModelForCausalLM"
+        assert spec["loader"] == "AutoModel"
     assert json.loads((tmp_path / "model/model.json").read_text()) == spec
     loading["missing_keys"].add("encoder.weight")
     with pytest.raises(ValueError, match="did not fully initialize"):
-        sweep_models.prepare_model("distilbert", tmp_path / "incomplete", inputs)
+        sweep_models.prepare_model(name, tmp_path / "incomplete", inputs)
 
 
 def test_sweep_denominators_and_suspicious_mixed_evidence():

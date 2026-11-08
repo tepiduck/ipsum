@@ -12,6 +12,27 @@ import psutil
 from .storage import atomic_json, read_json
 
 
+def process_identity(pid):
+    """Linux start ticks avoid wall-clock/WSL boot-time corrections changing a live PID."""
+    if sys.platform == "linux":
+        stat = Path(f"/proc/{pid}/stat").read_text()
+        fields = stat[stat.rindex(")") + 2 :].split()
+        return {"linux_start_ticks": int(fields[19])}
+    return {"create_time": psutil.Process(pid).create_time()}
+
+
+def parent_alive(pid, identity):
+    try:
+        parent = psutil.Process(pid)
+        if not parent.is_running() or parent.status() == psutil.STATUS_ZOMBIE:
+            return False
+        if isinstance(identity, (float, int)):  # Older worker protocol records.
+            return parent.create_time() == identity
+        return process_identity(pid) == identity
+    except (psutil.Error, OSError):
+        return False
+
+
 def stop_tree(process, observed=None):
     # Only the process started by this invocation and its descendants are targeted.
     try:
@@ -69,7 +90,7 @@ def run_case(case, settings, directory, *, python=None):
             "worker_protocol": 2,
             "case": case.to_dict(),
             "settings": settings.to_dict(),
-            "parent": [os.getpid(), psutil.Process().create_time()],
+            "parent": [os.getpid(), process_identity(os.getpid())],
         },
     )
     environment = os.environ.copy()

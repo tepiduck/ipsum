@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "declared_date": "2026-11-08",
+  "motivation": "GPT-2 CPU 0.10 results motivated these rules. This is not a blinded discovery rule; retrospective application is exploratory and held-out application must be reported separately.",
+  "bisect": {
+    "window_start": "2026-10-05",
+    "window_end": "2026-11-05",
+    "branch_cut_source": "https://dev-discuss.pytorch.org/t/pytorch-release-2-15-branch-cut-is-complete/3461",
+    "metric": "median log2(candidate compiled RMSE / fixed baseline compiled RMSE) over paired gradient targets with finite, strictly positive fp64 errors",
+    "growth_gte": 1.4,
+    "fresh_worker_observations": 3,
+    "classification": "All three scores at or above threshold: shifted; all below: not shifted; mixed scores or unavailable evidence: inconclusive. No primary verdict is changed.",
+    "reference": "Per-target median of three fresh 2.15.0 CPU observations; target identities and workload/settings fixed before searching dates.",
+    "scope": "A binary search assumes a monotone transition over available nightly builds. Report tested dates, absent builds, neighbor confirmations, and the upstream SHA interval; do not infer a specific commit without additional evidence."
+  },
+  "accuracy_shift": {
+    "scope": "All output/gradient value targets with fp64 evidence, independently of primary tolerance failures; registered-state and post-call-input checks excluded.",
+    "worsening_fraction_gte": 0.75,
+    "median_growth_gte": 1.25,
+    "one_sided_sign_test_p_lte": 0.01,
+    "minimum_paired_targets": 8,
+    "minimum_coverage": 0.8,
+    "coverage_denominator": "Union of output/gradient value targets observed in the primary comparison in either environment.",
+    "ties": "Equal errors count as zero growth and are excluded only from the sign-test trials.",
+    "zeros": "Both exact: zero log growth and a tie; newly nonzero: positive infinity; newly exact: negative infinity. Extended values use explicit JSON statuses, never nonfinite JSON numbers.",
+    "missing": "Missing, nonfinite, non-fp64, or failed reference evidence remains in coverage denominators and cannot count as agreement.",
+    "statistics": "Target errors are correlated; the sign-test p-value is descriptive, not a calibrated model-level probability or proof of a defect. Report all pair values and counts, not just flags.",
+    "validation": "Retrospective application to the 40 original 0.10 pairs is exploratory. Mark held-out validation only after applying these unchanged thresholds to new model sweeps."
+  },
+  "noise_floor": {
+    "c": 32,
+    "unit_roundoff": 5.960464477539063e-8,
+    "formula": "max(eager_vs_fp64_rmse, eager_control_vs_fp64_rmse when available, c * 2^-24 * RMS(fp64_reference))",
+    "farther_criterion": "compiled_vs_fp64_rmse > 2 * floor",
+    "scope": "Advisory comparability, same-input backward checks, and contrary evidence only. Keep all original error/ratio fields and all primary comparison policies.",
+    "control": "Use an eager control measured against the same fp64 reference; never substitute control-versus-eager RMSE. Unsupported or absent controls are explicitly omitted from the max and recorded.",
+    "rationale": "A fixed 32-unit-roundoff scale term prevents a nearly exact eager reference from being the sole denominator. It is an engineering floor, not a rigorous operation-count error bound or an estimate fitted to these models."
+  },
+  "held_out_models": [
+    "regnet_y_400mf", "densenet121", "shufflenet_v2_x1_0", "squeezenet1_1",
+    "mnasnet1_0", "t5_small_encoder", "roberta_base", "opt_125m", "pythia_160m"
+  ],
+  "preservation": "0.10 data, primary statuses, tolerances, failure signatures, reducer predicates, and existing command exit codes remain unchanged. No upstream issue is filed automatically."
+}

@@ -6,7 +6,7 @@ import shutil
 import sys
 from pathlib import Path
 
-from .accuracy import accuracy_comparison
+from .accuracy import accuracy_comparison, accuracy_shift
 from .compare_envs import classification, gate_status, interpreter
 from .evaluate import Settings
 from .native import NativeJob, file_hash, verify_native
@@ -132,6 +132,17 @@ def write_native_report(output, summary):
             f"{evidence.get('available', 0)} with paired fp64 evidence ({evidence.get('status')})"
         )
 
+    def shift_cell(evidence):
+        if not evidence:
+            return "not requested"
+        return html.escape(
+            f"{'accuracy_shift' if evidence.get('accuracy_shift') else 'not flagged'}; "
+            f"worse {evidence.get('worsened')}/{evidence.get('paired')}; "
+            f"median log2 growth {evidence.get('median_log2_growth')} "
+            f"({evidence.get('median_status')}); sign p={evidence.get('sign_test_p')}; "
+            f"coverage {evidence.get('paired')}/{evidence.get('total')}"
+        )
+
     table = ""
     if summary.get("cases"):
         rows = []
@@ -147,11 +158,14 @@ def write_native_report(output, summary):
             rows.append(
                 f"<tr><td>{label}</td><td>{html.escape(case['status'])}</td>"
                 f"<td>{accuracy_cell(case.get('accuracy_comparison'))}</td>"
+                f"<td>{shift_cell(case.get('accuracy_shift'))}</td>"
                 f"<td>{html.escape(triage)}</td></tr>"
             )
         table = (
             "<table><tr><th>Workload</th><th>Primary outcome</th>"
-            "<th>Accuracy advisory</th><th>Numerical triage</th></tr>" + "".join(rows) + "</table>"
+            "<th>Fraction advisory</th><th>Distributional accuracy shift</th><th>Numerical triage</th></tr>"
+            + "".join(rows)
+            + "</table>"
         )
     if "accuracy_comparison" in summary:
         table += (
@@ -165,6 +179,12 @@ def write_native_report(output, summary):
             + html.escape(json.dumps(summary["counts"], indent=2))
             + "</pre>"
             + table
+        )
+    if "accuracy_shift" in summary:
+        table += (
+            "<h2>Distributional accuracy shift</h2><p>"
+            + shift_cell(summary["accuracy_shift"])
+            + "</p>"
         )
     (output / "report.html").write_text(
         '<!doctype html><meta charset="utf-8"><title>Faultline model comparison</title>'
@@ -309,6 +329,8 @@ def compare_native_environments(
     }
     if settings.numerics:
         summary["accuracy_comparison"] = accuracy_comparison(baseline, candidate)
+    if settings.numerics or settings.fp64_advisory:
+        summary["accuracy_shift"] = accuracy_shift(baseline, candidate)
     export_native(job, candidate_settings, output / "candidate-reproducer", candidate)
     export_native(job, settings, output / "baseline-reproducer", baseline)
     write_native_report(output, summary)

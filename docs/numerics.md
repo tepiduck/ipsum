@@ -53,10 +53,26 @@ For each floating output, loss (legacy captures), and gradient, the report recor
 - Median, 95th, and 99th percentile absolute errors from at most 32,768 regularly spaced elements.
   Each record gives the sampled count and stride. RMSE and maximum error use every element.
 - The reference output dtype, since an explicit cast can make it lower than float64.
-- A descriptive accuracy label: `comparable_to_eager_against_fp64` for a compiled/eager RMSE
-  ratio in [0.5, 2], `candidate_closer_to_fp64` below that band, and
-  `candidate_farther_from_fp64` above it. Zero errors and unavailable comparisons have separate
-  labels. The factor-of-two band is a reporting convention, not a correctness threshold.
+- Reference RMS, a noise floor, and whether compiled RMSE exceeds twice that floor.
+- `comparable_to_eager_against_fp64` when compiled RMSE is at most twice the floor, including
+  results closer to fp64; `candidate_farther_from_fp64` above it. Missing or downcast references
+  are unavailable. Original ratios and the old [0.5, 2] label remain under
+  `candidate_to_eager_rmse` and `legacy_accuracy_label`.
+
+Version 0.11 declares the per-target floor as
+`max(eager_err, eager_control_err if available, 32 * 2^-24 * RMS(fp64_reference))`.
+The constant 32 was chosen before rerunning the models, as an engineering allowance for accumulated
+fp32 rounding. It is not fitted to the sweep, a statistical noise estimate, or a rigorous error bound.
+The formula deliberately uses fp32 unit roundoff, including when lower-precision execution is
+being examined. A tiny eager denominator alone can no longer produce contrary evidence.
+
+With `--numerics`, the repeated eager control is measured against the **same** fp64 output used
+for eager and compiled errors. Control-versus-eager RMSE is retained separately and never
+substituted for control-versus-fp64 RMSE. CPU oneDNN-off and input-ULP controls retain their names;
+they perturb different things. Absent, failed, or unstable controls are omitted from the maximum
+and recorded as unavailable. The same-input backward diagnostic uses the eager and reference-RMS
+terms; it has no alternate-control backward observation. None of these floors changes primary
+rtol/atol, statuses, signatures, reducer acceptance, or exit codes.
 
 Large ratios must be considered alongside absolute errors. Promoting arithmetic changes its
 rounding and can change control flow or activation derivatives near discontinuities. A result
@@ -119,31 +135,33 @@ Copied, accumulated, ambiguous, or otherwise unmapped gradients cannot satisfy d
 - `comparable_to_eager_against_fp64` and `eager_control_sensitive` apply to the whole finding only
   when all failing targets qualify. Per-target evidence remains available for mixed findings.
 
-Numerical context schema 3 records matched/total target counts under `label_coverage`, including
+Numerical context records matched/total target counts under `label_coverage`, including
 the exact eager control policy (`onednn_disabled` or `input_one_ulp_up`). The two controls are
 different experiments and are not pooled as equivalent evidence. Changed diagnostic execution or
 unstable masks cannot qualify for either discontinuity label. The explanation label expresses this
 evidence criterion, not a proof of compiler correctness or an adjudicated false-positive label.
 Schema 1's `discontinuity_sensitive` and any-target aggregate labels are historical 0.8 behavior.
 Schema 2 used the primary elementwise tolerance for same-input backward agreement.
+Schema 3 used a bare eager/fp64 RMSE denominator. Schema 4 adds the fixed noise floor and treats
+incomplete comparability or eager-control explanations as missing evidence rather than contrary evidence.
 
 The same-input backward check retains that elementwise result and adds `fp64_relative`. Both eager
 and compiled backward outputs are compared against repeated fp64 execution of the same backward
 graph on the **compiled run's saved inputs**. Floating storage is promoted while integer selectors,
 aliases, strides, and offsets are retained. Every floating backward output must have compiled RMSE
-at most twice eager RMSE. Both exact qualifies; an exact eager result and an inexact compiled result
-disagree. A missing, unstable, unsupported, or explicitly downcast reference is unknown. No primary
+at most twice its noise floor. Both exact qualifies; a small compiled error against exact eager
+can also qualify under the reference-RMS term. A missing, unstable, unsupported, or explicitly downcast reference is unknown. No primary
 tolerance changes. This compares errors under different arithmetic precision; it is not a
 correctness proof for the original-dtype backward implementation.
 
 Triage uses three advisory categories for stable findings:
 
-- `explained`: a complete whole-finding label qualifies and no verified contrary backward or
+- `explained`: a complete whole-finding label qualifies and no verified contrary accuracy, backward, or
   selector evidence overrides it. Optional diagnostic gaps remain recorded.
 - `unexplained_contrary_evidence`: a completed diagnostic contradicts an explanation. Reliable
-  same-input backward disagreement or fully covered flips not upstream of a mapped failing gradient
-  overrides otherwise reassuring labels. Without a complete explanation, failed fp64 comparability
-  or an insufficient completed eager control also supplies contrary evidence.
+  compiled/fp64 or same-input backward error beyond twice the floor, or fully covered flips not
+  upstream of a mapped failing gradient, overrides otherwise reassuring labels. An incomplete
+  comparability or eager-control explanation alone is not contrary evidence.
 - `unexplained_missing_evidence`: no complete explanation is available, but diagnostic errors,
   skips, unverified mappings, unsupported operations, or limits do not establish contrary evidence.
 
@@ -191,6 +209,30 @@ reference outputs below float64 do not qualify and remain in the denominator. In
 errors too: the ratio can rise because eager improved. The primary classification, reducer
 predicate, and exit code stay unchanged. A flagged pair is a candidate for investigation, not a
 confirmed compiler bug.
+
+Version 0.11 also reports `accuracy_shift`, over **all** output and gradient value targets rather
+than only those failing a tolerance. Gradient-presence flags, registered state, and post-call
+inputs are not value-error targets. For targets with fp64 evidence in both versions, it records
+the fraction whose compiled error grew, median log2 error growth, and an exact one-sided paired
+sign-test p-value. Equal errors count as ties for the fraction and median and are excluded only
+from the sign-test trials. Both-zero errors have zero growth; newly nonzero or newly exact errors
+use explicit extended-value statuses, never invalid JSON infinities. Missing evidence remains in
+the coverage denominator.
+
+The policy was motivated by GPT-2's 0.10 CPU result and fixed in [v011-policy.json](v011-policy.json):
+at least eight paired targets, at least 80% coverage, at least 75% worsening, median growth at least
+1.25×, and one-sided sign-test p at most 0.01. Targets share computations, so this p-value is
+descriptive; it is not a calibrated model-level probability. The original fraction rule remains
+unchanged alongside this advisory. The [40-pair 0.10 table](accuracy-shift-010.csv) is retrospective,
+not held-out validation. Applying an unchanged rule to newly held-out models is reported separately
+in [RESULTS](../RESULTS.md).
+
+Triage distinguishes missing explanations from positive contrary evidence. A comparability or
+eager-control explanation covering only some failing targets stays `unexplained_missing_evidence`,
+with matched/total counts. Contrary evidence requires compiled RMSE beyond twice the declared
+floor, a disagreeing same-input backward check beyond that floor, or a verified failing gradient
+that is not downstream of observed flips. These checks take precedence over reassuring labels;
+none establishes a compiler defect.
 
 ## Freezing internal graph values
 

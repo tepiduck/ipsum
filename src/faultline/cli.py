@@ -234,8 +234,13 @@ def main(argv=None):
     from .sweep import add_sweep_commands, sweep_command
 
     add_sweep_commands(commands, execution_options)
+    from .bisect import add_bisect_command, bisect_command
+
+    add_bisect_command(commands)
     args = parser.parse_args(argv)
     try:
+        if args.command == "bisect":
+            return bisect_command(args)
         if args.command == "sweep":
             return sweep_command(args, settings_from)
         if args.command == "benchmark":

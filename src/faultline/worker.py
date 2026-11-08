@@ -8,6 +8,7 @@ from pathlib import Path
 
 import psutil
 
+from .runner import parent_alive
 from .storage import atomic_json, read_json
 
 
@@ -15,12 +16,8 @@ def watch_parent(pid, created):
     """Do not leave compiler children running after an abruptly killed coordinator."""
     while True:
         time.sleep(1)
-        try:
-            parent = psutil.Process(pid)
-            if parent.create_time() == created and parent.is_running():
-                continue
-        except psutil.Error:
-            pass
+        if parent_alive(pid, created):
+            continue
         for child in psutil.Process().children(recursive=True):
             try:
                 child.kill()

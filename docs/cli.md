@@ -239,6 +239,16 @@ the HTML report. It can flag advisory accuracy degradation when both versions al
 primary tolerance. `sweep run` includes these counts and distinguishes contrary evidence from
 missing diagnostics. Primary gate statuses and exit codes are unchanged.
 
+With `--numerics` or `--fp64-advisory`, `model compare` also includes the distributional
+`accuracy_shift` record. It reports worsening fraction, median log2 growth, sign-test p-value,
+and paired-target coverage. `sweep run --set original|held-out|all` selects the pretrained catalog.
+
+`faultline bisect BUNDLE --baseline-python PYTHON --start YYYY-MM-DD --end YYYY-MM-DD --output DIR`
+installs isolated CPU nightlies and searches for an advisory accuracy boundary. It accepts a
+pinned `--requirements FILE` and `--resume`. See [bisection](bisect.md) for the fixed predicate,
+resource limits, evidence checks, and limitations. Its new exit codes are 0 for an independently
+confirmed boundary and 2 for an inconclusive search; existing command codes are unchanged.
+
 Native execution commands and `sweep run` accept `--deterministic`. It requires deterministic
 algorithms with a fixed BLAS workspace policy and is retained by replay, reduction, and exports.
 Unsupported deterministic operators remain errors. This option does not change tolerances or

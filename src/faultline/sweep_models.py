@@ -31,7 +31,28 @@ TEXT_MODELS = {
     "distilbert": "distilbert/distilbert-base-uncased",
     "smollm2": "HuggingFaceTB/SmolLM2-135M",
 }
-MODELS = (*VISION_MODELS, *TEXT_MODELS)
+ORIGINAL_MODELS = (*VISION_MODELS, *TEXT_MODELS)
+HELD_OUT_VISION = (
+    "regnet_y_400mf",
+    "densenet121",
+    "shufflenet_v2_x1_0",
+    "squeezenet1_1",
+    "mnasnet1_0",
+)
+HELD_OUT_TEXT = {
+    "t5_small_encoder": "google-t5/t5-small",
+    "roberta_base": "FacebookAI/roberta-base",
+    "opt_125m": "facebook/opt-125m",
+    "pythia_160m": "EleutherAI/pythia-160m",
+}
+TEXT_REVISIONS = {
+    # Existing SFconvertbot conversion, https://huggingface.co/facebook/opt-125m/discussions/51
+    "opt_125m": "1f9886ce095904096e22b0f4d9e7ba932fa7df2a",
+}
+HELD_OUT_MODELS = (*HELD_OUT_VISION, *HELD_OUT_TEXT)
+VISION_MODELS = (*VISION_MODELS, *HELD_OUT_VISION)
+TEXT_MODELS = {**TEXT_MODELS, **HELD_OUT_TEXT}
+MODELS = (*ORIGINAL_MODELS, *HELD_OUT_MODELS)
 IMAGE_URLS = (
     "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg",
     "https://raw.githubusercontent.com/pytorch/vision/main/gallery/assets/dog2.jpg",
@@ -64,7 +85,18 @@ def factory():
         kind = configuration.pop("model_type")
         config = AutoConfig.for_model(kind, **configuration)
         config.use_cache = False
-        model = TextEncoder(AutoModel.from_config(config, attn_implementation="sdpa"))
+        if spec.get("loader") == "T5EncoderModel":
+            from transformers import T5EncoderModel
+
+            config._attn_implementation = spec["attention"]
+            inner = T5EncoderModel(config)
+        else:
+            inner = AutoModel.from_config(
+                config,
+                attn_implementation=spec.get("attention", "sdpa"),
+                **spec.get("model_options", {}),
+            )
+        model = TextEncoder(inner)
     model.load_state_dict(torch.load(root / "weights.pt", map_location="cpu", weights_only=True))
     return model.eval(), torch.load(root / "inputs.pt", map_location="cpu", weights_only=True)
 
@@ -144,8 +176,13 @@ def prepare_model(name, directory, inputs_directory):
         from transformers import AutoModel, AutoTokenizer
 
         repository = TEXT_MODELS[name]
-        info = model_info(repository)
+        info = model_info(repository, revision=TEXT_REVISIONS.get(name))
         revision = info.sha
+        files = {entry.rfilename for entry in info.siblings}
+        if not files & {"model.safetensors", "model.safetensors.index.json"}:
+            raise ValueError(
+                "Pinned checkpoint has no safetensors weights; automatic conversion is disabled"
+            )
         tokenizer = AutoTokenizer.from_pretrained(
             repository, revision=revision, trust_remote_code=False
         )
@@ -160,17 +197,33 @@ def prepare_model(name, directory, inputs_directory):
                 return_tensors="pt",
             )
         )
-        inner, loading = AutoModel.from_pretrained(
+        loader = AutoModel
+        if name == "t5_small_encoder":
+            from transformers import T5EncoderModel
+
+            loader = T5EncoderModel
+        elif name == "opt_125m":
+            from transformers import AutoModelForCausalLM
+
+            # The converted checkpoint stores the tied embedding as lm_head.weight.
+            # Resolve the declared tie before extracting the pretrained base model.
+            loader = AutoModelForCausalLM
+        attention = "sdpa"
+        model_options = {"add_pooling_layer": False} if name == "roberta_base" else {}
+        inner, loading = loader.from_pretrained(
             repository,
             revision=revision,
             trust_remote_code=False,
             use_safetensors=True,
             dtype=torch.float32,
-            attn_implementation="sdpa",
+            attn_implementation=attention,
             output_loading_info=True,
+            **model_options,
         )
         if any(loading.get(key) for key in ("missing_keys", "mismatched_keys", "error_msgs")):
             raise ValueError(f"Pretrained checkpoint did not fully initialize the model: {loading}")
+        if name == "opt_125m":
+            inner = inner.base_model
         inner.config.use_cache = False
         model = TextEncoder(inner).eval()
         spec = {
@@ -178,10 +231,20 @@ def prepare_model(name, directory, inputs_directory):
             "architecture": name,
             "repository": repository,
             "revision": revision,
+            "revision_source": "pinned_existing_conversion"
+            if name in TEXT_REVISIONS
+            else "resolved_main",
             "config": inner.config.to_dict(),
             "sequence_length": 64,
             "output": "last_hidden_state",
-            "attention": "sdpa",
+            "attention": attention,
+            "loader": "T5EncoderModel" if name == "t5_small_encoder" else "AutoModel",
+            "checkpoint_loader": "AutoModelForCausalLM"
+            if name == "opt_125m"
+            else "T5EncoderModel"
+            if name == "t5_small_encoder"
+            else "AutoModel",
+            "model_options": model_options,
             "use_cache": False,
             "provider_version": importlib.metadata.version("transformers"),
             "unused_checkpoint_keys": sorted(loading.get("unexpected_keys", [])),
@@ -193,6 +256,7 @@ def prepare_model(name, directory, inputs_directory):
         storage_dtype="float32",
         batch_size=2,
         input_sources=input_meta["sources"],
+        catalog_set="held-out" if name in HELD_OUT_MODELS else "original",
         parameter_count=sum(p.numel() for p in model.parameters()),
     )
     torch.save(model.state_dict(), directory / "weights.pt")

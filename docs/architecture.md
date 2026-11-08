@@ -286,3 +286,15 @@ Each attempt commits hashes of its result documents only after the comparison is
 verifies completed documents and starts a new attempt for interrupted work, retaining earlier
 artifacts. Numerical labels are advisory; counts distinguish pair agreement, stable findings,
 inconclusive execution, and findings without sufficient diagnostic evidence. See [sweeps](sweeps.md).
+
+## Accuracy bisection
+
+`bisect_env.py` discovers compatible CPU nightly wheels and supervises isolated venv installation,
+package probes, and wheel verification. `bisect.py` freezes a reference error vector, searches
+nightly dates using repeated observations, and independently confirms neighboring builds.
+It uses the existing native worker and preserves primary results. The new predicate and its
+reports are advisory and never feed the reducer or the primary oracle. See [bisection](bisect.md).
+
+`accuracy.py` owns the cross-version fraction and distributional advisories. `native_precision.py`
+retains absolute errors, legacy ratios, and the declared noise floor. `native_numerics.py` combines
+this evidence with mask reachability and same-input backward checks for advisory triage.

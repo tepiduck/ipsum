@@ -69,7 +69,9 @@ def mismatch_targets(comparison):
     return [(x["target"], x["kind"]) for x in comparison["outputs"] if not x["matches"]]
 
 
-def assess_control(execution_factory, eager, candidate, settings, compare, policy, stats):
+def assess_control(
+    execution_factory, eager, candidate, settings, compare, policy, stats, *, observation_sink=None
+):
     name = control_policy(settings)
     base = {
         "control": name,
@@ -123,6 +125,19 @@ def assess_control(execution_factory, eager, candidate, settings, compare, polic
                     else None,
                     "exceeds_primary_tolerance": not row["matches"],
                 }
+            )
+        if observation_sink is not None:
+            # Only these values are compared with fp64. Keeping the model-state
+            # snapshot here needlessly adds another full parameter copy at peak RSS.
+            observation_sink["observation"] = (
+                {
+                    target: value
+                    for target, value in first[0].items()
+                    if value.is_floating_point()
+                    and not target.startswith("state:")
+                    and ":input_after:" not in target
+                },
+                first[1],
             )
         return {**base, "status": "complete", "comparison": comparison, "outputs": records}
     except Exception as exc:  # noqa: BLE001 -- optional arbitrary-model control
@@ -246,7 +261,7 @@ def annotate(primary, fp64, control, masks):
         },
     }
     context = {
-        "schema_version": 3,
+        "schema_version": 4,
         "labels": labels,
         "label_coverage": coverage,
         "failing_targets": sorted(failed),
@@ -298,6 +313,8 @@ def triage_evidence(primary, fp64, control, masks, context, mapped):
     )
     if not failed <= set(fp_rows):
         missing.append("fp64_targets_incomplete")
+    if any(fp_rows[t].get("farther_than_noise_floor") is True for t in failed & set(fp_rows)):
+        contrary.append("compiled_farther_than_fp64_noise_floor")
     control_rows = (
         {
             row["target"]: row
@@ -320,19 +337,12 @@ def triage_evidence(primary, fp64, control, masks, context, mapped):
     }:
         classification = "explained"
     else:
-        # A completed check can rule out its own proposed explanation without establishing a bug.
-        if any(
-            fp_rows[t].get("accuracy_label")
-            in {"candidate_farther_from_fp64", "eager_exact_candidate_differs"}
-            for t in failed & set(fp_rows)
-        ):
-            contrary.append("fp64_comparability_does_not_explain_all_targets")
-        if any(t not in context["eager_sensitive_targets"] for t in failed & set(control_rows)):
-            contrary.append("eager_control_does_not_explain_all_targets")
-        classification = (
-            "unexplained_contrary_evidence" if contrary else "unexplained_missing_evidence"
-        )
-        if not contrary and not missing:
+        if set(context["fp64_comparable_targets"]) != failed:
+            missing.append("fp64_comparability_does_not_explain_all_targets")
+        if set(context["eager_sensitive_targets"]) != failed:
+            missing.append("eager_control_does_not_explain_all_targets")
+        classification = "unexplained_missing_evidence"
+        if not missing:
             missing.append("no_complete_supported_explanation")
     return {
         "classification": classification,

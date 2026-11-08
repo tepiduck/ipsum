@@ -4,6 +4,36 @@ import math
 
 import torch
 
+NOISE_FLOOR_C = 32.0
+FP32_UNIT_ROUNDOFF = 2.0**-24
+
+
+def reference_rms(value):
+    value = value.double().abs()
+    maximum = float(value.max()) if value.numel() else 0.0
+    return maximum * float((value / maximum).square().mean().sqrt()) if maximum else 0.0
+
+
+def noise_floor(eager_error, control_error, rms):
+    """A declared engineering floor, not a fitted error bound or primary tolerance."""
+    eager = eager_error.get("rmse")
+    control = (control_error or {}).get("rmse")
+    if any(not isinstance(x, (int, float)) or not math.isfinite(x) or x < 0 for x in (eager, rms)):
+        return {"status": "unavailable"}
+    control_valid = isinstance(control, (int, float)) and math.isfinite(control) and control >= 0
+    rounding = NOISE_FLOOR_C * FP32_UNIT_ROUNDOFF * rms
+    return {
+        "status": "complete",
+        "value": max(eager, control if control_valid else 0.0, rounding),
+        "eager_rmse": eager,
+        "eager_control_rmse": control if control_valid else None,
+        "reference_rms": rms,
+        "rounding_term": rounding,
+        "c": NOISE_FLOOR_C,
+        "unit_roundoff": FP32_UNIT_ROUNDOFF,
+        "control_available": control_valid,
+    }
+
 
 def promote_tree(value):
     """Promote floating storage once, retaining aliases, offsets, strides and integer inputs."""
@@ -111,7 +141,16 @@ def accuracy_label(eager_error, candidate_error):
 
 
 def assess_fp64(
-    reference, eager, candidate, compare, policy, repeats, *, reference_is_factory=False
+    reference,
+    eager,
+    candidate,
+    compare,
+    policy,
+    repeats,
+    *,
+    reference_is_factory=False,
+    control=None,
+    control_name=None,
 ):
     """Report errors without changing the eager-versus-compiled verdict."""
     note = (
@@ -148,6 +187,19 @@ def assess_fp64(
                 records.append({"target": name, "status": "structure_mismatch"})
                 continue
             a, b = error_stats(left, expected), error_stats(right, expected)
+            alternate = control[0].get(name) if control is not None else None
+            control_error = (
+                error_stats(alternate, expected)
+                if alternate is not None and alternate.shape == expected.shape
+                else None
+            )
+            floor = noise_floor(a, control_error, reference_rms(expected))
+            farther = None
+            if expected.dtype == torch.float64 and floor.get("status") == "complete":
+                if b.get("rmse") is not None:
+                    farther = b["rmse"] > 2.0 * floor["value"]
+                elif b.get("nonfinite_error"):
+                    farther = True
             ratio = b["rmse"] / a["rmse"] if a.get("rmse", 0) and "rmse" in b else None
             records.append(
                 {
@@ -160,13 +212,32 @@ def assess_fp64(
                     else None,
                     "eager_exact": a.get("rmse") == 0,
                     "candidate_exact": b.get("rmse") == 0,
-                    "accuracy_label": accuracy_label(a, b),
+                    "legacy_accuracy_label": accuracy_label(a, b),
+                    "eager_control": control_error,
+                    "eager_control_policy": control_name,
+                    "noise_floor": floor,
+                    "farther_than_noise_floor": farther,
+                    "accuracy_label": (
+                        "unavailable"
+                        if farther is None
+                        else "candidate_farther_from_fp64"
+                        if farther
+                        else "comparable_to_eager_against_fp64"
+                    ),
                 }
             )
         return {
             "status": "complete",
             "outputs": records,
             "ratio_band": [0.5, 2.0],
+            "ratio_band_scope": "legacy labels only; comparability now uses compiled_rmse <= 2 * noise_floor",
+            "noise_floor_policy": {
+                "c": NOISE_FLOOR_C,
+                "unit_roundoff": FP32_UNIT_ROUNDOFF,
+                "criterion": "compiled_err > 2 * max(eager_err, eager_control_err, c*u*RMS(reference))",
+                "eager_control": control_name,
+                "control_status": "available" if control is not None else "unavailable",
+            },
             "note": note,
         }
     except Exception as exc:  # noqa: BLE001 -- arbitrary user model's optional fp64 execution
@@ -181,11 +252,8 @@ def assess_backward_fp64(reference, eager, candidate, compare, policy, repeats):
         for row in evidence["outputs"]:
             agrees = None
             if row.get("reference_dtype") == "torch.float64":
-                a, b = row.get("eager", {}).get("rmse"), row.get("candidate", {}).get("rmse")
-                if a is not None and b is not None:
-                    agrees = b <= 2.0 * a
-                elif a is not None and row.get("candidate", {}).get("nonfinite_error"):
-                    agrees = False
+                farther = row.get("farther_than_noise_floor")
+                agrees = not farther if farther is not None else None
             judgments.append({"target": row["target"], "agrees": agrees})
     total = sum(value.is_floating_point() for value in eager[0].values())
     available = sum(row["agrees"] is not None for row in judgments)
@@ -204,8 +272,9 @@ def assess_backward_fp64(reference, eager, candidate, compare, policy, repeats):
         "total": total,
         "outputs": judgments,
         "fp64": evidence,
-        "criterion": "Every floating backward output has compiled RMSE <= 2 * eager RMSE "
+        "criterion": "Every floating backward output has compiled RMSE <= 2 * noise floor "
         "against repeated fp64 backward on identical compiled saved inputs. "
-        "Both exact qualifies; eager exact/compiled inexact disagrees. Missing, unstable, "
+        "The floor uses max(eager RMSE, 32 * 2^-24 * RMS(reference)); an alternate-control "
+        "backward is unavailable here. Old eager ratios are retained. Missing, unstable, "
         "unsupported, or explicitly downcast references are unknown, never agreement.",
     }

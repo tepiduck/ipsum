@@ -472,18 +472,9 @@ def evaluate_native(job, settings, directory):
         from .native_runtime import compare_native
 
         atomic_json(directory / "primary-result.json", {"case_hash": job.digest(), **primary})
-        fp64 = native_precision.assess_fp64(
-            lambda: make_execution(precision=native_precision),
-            eager,
-            candidate,
-            compare_native,
-            portable,
-            settings.repeats,
-            reference_is_factory=True,
-        )
+        control, control_observation = {}, {}
         if settings.numerics:
-            from . import native_aot, native_compile, native_numerics
-            from .native_masks import MaskProbe
+            from . import native_numerics
 
             control = native_numerics.assess_control(
                 lambda transform: make_execution(request_transform=transform),
@@ -493,7 +484,23 @@ def evaluate_native(job, settings, directory):
                 compare_native,
                 portable,
                 native_precision.error_stats,
+                observation_sink=control_observation,
             )
+        fp64 = native_precision.assess_fp64(
+            lambda: make_execution(precision=native_precision),
+            eager,
+            candidate,
+            compare_native,
+            portable,
+            settings.repeats,
+            reference_is_factory=True,
+            control=control_observation.pop("observation", None),
+            control_name=control.get("control"),
+        )
+        if settings.numerics:
+            from . import native_aot, native_compile, native_numerics
+            from .native_masks import MaskProbe
+
             masks = {
                 "status": "unavailable",
                 "reason": "Requires a whole-model --aot --gradients run",

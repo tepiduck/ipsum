@@ -106,6 +106,18 @@ def main():
         )
 
     def advisory(eager, candidate, primary):
+        control, control_observation = {}, {}
+        if settings.get("numerics"):
+            control = native_numerics.assess_control(
+                lambda transform: execution(request_transform=transform),
+                eager,
+                candidate,
+                settings,
+                native_runtime.compare_native,
+                portable,
+                native_precision.error_stats,
+                observation_sink=control_observation,
+            )
         fp64 = native_precision.assess_fp64(
             lambda: execution(precision=native_precision),
             eager,
@@ -114,18 +126,11 @@ def main():
             portable,
             settings["repeats"],
             reference_is_factory=True,
+            control=control_observation.pop("observation", None),
+            control_name=control.get("control"),
         )
         if settings.get("numerics"):
             compare = native_runtime.compare_native
-            control = native_numerics.assess_control(
-                lambda transform: execution(request_transform=transform),
-                eager,
-                candidate,
-                settings,
-                compare,
-                portable,
-                native_precision.error_stats,
-            )
             masks = {
                 "status": "unavailable",
                 "reason": "Requires a whole-model --aot --gradients run",
