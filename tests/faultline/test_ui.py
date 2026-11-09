@@ -69,7 +69,7 @@ def test_version_and_ui_are_discoverable(capsys):
     with pytest.raises(SystemExit) as exc:
         main(["--version"])
     assert exc.value.code == 0
-    assert "Faultline 0.13.0" in capsys.readouterr().out
+    assert "Faultline 0.14.0" in capsys.readouterr().out
     with pytest.raises(SystemExit):
         main(["--help"])
     text = capsys.readouterr().out

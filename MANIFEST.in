@@ -29,6 +29,9 @@ include docs/attribution-013.csv docs/attention-capture-013.json
 include docs/attention-kernel-013.csv docs/attention-heads-013.csv docs/attention-rows-013.csv
 include docs/attention-association-013.csv docs/attention-consistency-013.csv
 include docs/exp-accuracy-013.csv docs/exp-timing-013.csv
+include docs/upstream-report-draft-013.md docs/gelu-investigation.md docs/v014-policy.json
+include docs/gelu-code-014.json docs/gelu-capture-014.json docs/gelu-ranges-014.csv
+include docs/gelu-exp-grid-014.csv docs/gelu-block12-014.csv examples/gelu_ranges.py
 global-exclude __pycache__ *.py[cod] AGENTS.md CLAUDE.md
 exclude tests/test_*.py
 prune reports

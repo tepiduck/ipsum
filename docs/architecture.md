@@ -4,6 +4,8 @@ The standalone attention/exponential examples are advisory investigation utiliti
 saved CPU operator records or call an explicitly built AVX512 measurement adapter; they do not
 participate in primary comparison, failure signatures, or reducer acceptance. See the
 [attention investigation](attention-investigation.md) for the fixed protocols and their limits.
+The separate [GELU range example](gelu-investigation.md) distinguishes captured inputs,
+reconstructed intermediates and hypothetical exponential evaluations; it also remains advisory.
 
 ## Native workloads
 

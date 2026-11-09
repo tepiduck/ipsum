@@ -1253,3 +1253,117 @@ entries, earlier results text and evidence remain intact, and the original 0.12 
 archived byte-for-byte. The Git-normalized packaged source hash is
 `98599a6cbd96b9cc1e23269cfb960ab37146981683bcd31e90766ee4f553691c`.
 Raw captures, compiler caches, adapters, environments and supervision logs remain local.
+
+## Version 0.14 GELU investigation
+
+The existing parent `eb48c7e2` and child `2450619a` source installations and original full
+frozen GPT-2 workload are unchanged. The [policy](docs/v014-policy.json) fixes the original
+1.4× median-log2-growth predicate, locked reference vector, three fresh workers and two internal
+repeats before any conditional intervention. All new results are advisory; primary statuses,
+tolerances, signatures, reducer predicates and existing exit codes are unchanged.
+
+### Generated GELU does not call exp_u20
+
+The complete search covers twelve source-build generated Python modules, 144 cached C++ files
+and all 24 original boundary-nightly debug dumps. Each full-model forward defines eleven
+generated C++ kernels and backward defines seven. The only workload math matches are:
+
+| Stage | Generated kernel | Exact module source line |
+|---|---|---|
+| Forward | `cpp_fused_add_mul_pow_tanh_view_3` | 487: `auto tmp13 = tmp12.tanh();` |
+| Backward | `cpp_fused_add_mul_pow_sum_tanh_tanh_backward_view_1` | 171: `auto tmp10 = tmp9.tanh();` |
+
+Both builds emit those same calls. All twelve corresponding saved shared libraries import
+`Sleef_tanhf16_u10`. The installed AVX512 header resolves vector tanh to SLEEF, whose own
+exponential helper does not call ATen's `exp_u20`. No generated GELU sigmoid/erf/exponential
+decomposition was found. The [inventory](docs/gelu-code-014.json) includes every module/kernel,
+hash, exact match, native attention call site and source/link resolution.
+
+Three `.exp()` matches per worker belong to ISA capability probes, not model kernels. Native
+CPU flash forward separately reaches `exp_u20`; backward recomputation uses regular exp.
+`cpp.use_decompose_tanh` is false. Enabling that option would emit regular vector `.exp()`
+already, changing the tanh formula rather than replacing an existing `exp_u20` call.
+
+The frozen model's eager `gelu_new` uses Python arithmetic and `aten.tanh`, also reaching
+SLEEF. Its tanh backward is `grad*(1-output*output)`, without an exponential. The native fused
+GELU-tanh forward/backward implementations were inspected separately and likewise use vector
+tanh; the frozen model does not use that fused eager GELU entry point.
+
+Consequently the requested generated-GELU replacement and reverse replacement are
+**not applicable**. No three-worker replacement runs were made, no disappearance of the
+1.710× full-model shift is claimed, and no minimal GELU reproducer is promoted. This is a
+negative call-path result, not a passing numerical intervention. No PyTorch rebuild was needed.
+
+### Full-model GELU distributions
+
+Four fresh workers capture parent/child × eager/compiled execution of the full model.
+Each performs two observed replays after an uninstrumented forward/backward control. All
+eight replays exactly match all 149 output/gradient control tensors. Twelve actual expansion
+addmm outputs per replay retain their original `[128,3072]` fp32 storage. The
+[capture inventory](docs/gelu-capture-014.json) records counts, layouts, hashes and controls.
+
+Eager tanh operands are directly captured. For comparable distributions in both paths,
+`z = sqrt(2/pi)*(x+0.044715*x^3)` is reconstructed in fp64 from the saved fp32 inputs;
+the compiled fused intermediate is not directly observed. The
+[168-row table](docs/gelu-ranges-014.csv) includes all twelve blocks, both builds and paths,
+all histogram bins, extrema, absolute p95/p99, and observed/reconstructed distinctions.
+
+The existing 0.13 adapters regenerate all three fixed grids with exactly the same sampled
+accuracy statistics. The [per-bin comparison](docs/gelu-exp-grid-014.csv) reports 26 occupied
+sample/bin combinations; it does not infer exact behavior for untested floats in a bin.
+Both adapters are also evaluated directly on identical saved inputs and reconstructed
+arguments, plus hypothetical `-2*z` coordinates. Regular exp results are identical throughout.
+These are hypothetical exponential evaluations; generated GELU does not call exp_u20.
+
+For child-compiled captures:
+
+| Quantity | Block 11 | Block 12 | Blocks 1–11 comparison |
+|---|---:|---:|---:|
+| Input absolute p99 | 3.143544 | 3.090838 | Median 3.143544 |
+| Reconstructed z absolute p99 | 3.616472 | 3.519601 | Median 3.616472 |
+| Hypothetical exp_u20(x) parent/child disagreement | 1.746% | 1.661% | Pooled 1.836% |
+| Hypothetical exp_u20(z) parent/child disagreement | 1.590% | 1.502% | Pooled 1.708% |
+| Hypothetical exp_u20(-2*z) parent/child disagreement | 4.960% | 4.688% | Pooled 5.252% |
+
+Block 12's absolute p99 rank is seventh in every condition. None of the fourteen
+quantity/condition checks meets either fixed criterion: p99 above twice the earlier-block
+median, or disagreement at least ten percentage points above the earlier-block pooled fraction.
+The [comparison table](docs/gelu-block12-014.csv) retains all scores and ranks, including nulls.
+
+Block-12 reconstructed z reaches approximately -144.504 to 34.958, with three values below
+-87.3 and two below -103.97. Earlier blocks also have tails: block 11 reaches -124.316;
+block 3 spans roughly -1048.376 to 8912.077. These tanh operands are not attention scores
+or actual exp_u20 inputs, so the threshold counts do not show exponential underflow in GELU.
+Nonfinite outputs of the hypothetical exponential evaluations are counted separately.
+
+The [investigation guide](docs/gelu-investigation.md) includes the complete per-block summary
+and call-path details. The PyTorch-only [range example](examples/gelu_ranges.py) reproduces
+the recorded block-12 distributions through its CLI. It is not a reproducer of the accuracy
+shift. The full GPT-2 script remains the lead of the [report draft](docs/upstream-report-draft.md),
+whose [0.13 version](docs/upstream-report-draft-013.md) is preserved verbatim. Nothing was filed
+upstream. The source-commit attribution stands; the full-model amplification remains unresolved.
+
+### Executed checks
+
+| Check | Result |
+|---|---|
+| Windows portable suite | 298 passed, 1 skipped; 12 compiler tests deselected |
+| Linux CPU Inductor suite | 12 passed; 299 tests deselected |
+| Compiler validation campaign | All 14 checks passed; 17 passes and 1 unconfirmed numerical discrepancy |
+| Legacy tests | 31 passed with asyncio auto mode |
+| Ruff lint and formatting | Passed; 90 files in the requested format scope, 95 with all scripts |
+| Standalone range CLI | Exactly reproduces the recorded child-compiled block-12 distributions |
+| Publication audit | 146 allowed Git-index files; 57 wheel and 149 source-archive members |
+| Independent installed-wheel checks | Package location, version, source hash, eager corpus and code comparator passed |
+
+Three new behavior tests cover histogram boundaries/nonfinite inputs, exponential disagreements
+with nonfinite outputs, and positive/null block-12 comparisons with a complete denominator.
+All 51 earlier runtime implementation files other than the version file are unchanged.
+All 21 prior validation entries, earlier results and evidence remain intact; the 0.13 report
+is archived byte-for-byte. Large captures, adapters, caches, environments and logs remain local.
+License files and license metadata remain absent from the distributions.
+
+The Git-normalized packaged source hash is
+`3f3fc9b7f303cbbdb06a042d106897ab881a3a027704f37e3f38823dfd4424cc`.
+This release changes the version and adds a separate diagnostic example and evidence; no
+numerical tolerance, primary verdict or reducer behavior changes.

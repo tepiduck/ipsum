@@ -1,0 +1,34 @@
+{
+  "version": "0.14.0",
+  "advisory_only": true,
+  "upstream_submission": false,
+  "source_commits": {"parent": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42", "child": "2450619a4c8a11b6f652154d12173794ebe181d5"},
+  "workload": "Original full frozen GPT-2 workload and original locked 0.11 per-target reference vector; no model, input, cotangent, or layout changes.",
+  "predicate": {
+    "source": "Unchanged frozen faultline.bisect from 0.11, as used in 0.12/0.13",
+    "growth_threshold": 1.4,
+    "fresh_workers": 3,
+    "internal_repeats": 2,
+    "threads": 1,
+    "timeout_s": 900,
+    "max_rss_mb": 12288,
+    "score": "Median log2 compiled RMSE growth against the locked stable fp64-error vector, over the same 147 positive finite gradient targets. All three workers must agree; missing targets or mixed results are inconclusive.",
+    "disappears": "The intervention is not_shifted in all three fresh workers under the unchanged 1.4x threshold. Also report absolute errors, the score, and whether it returns exactly to the parent evidence. Do not call below-threshold growth exact recovery."
+  },
+  "intervention_gate": "Only replace exp_u20 in generated C++ kernels if the complete saved forward/backward code and its linked call paths establish that those kernels reach it. Distinguish native flash-attention calls from generated GELU kernels. If generated GELU uses SLEEF tanh without exp_u20, record the replacement as not applicable; do not enable a different tanh formula and call that an exp_u20 replacement.",
+  "capture": {
+    "environments": ["parent", "child"],
+    "paths": ["eager", "compiled"],
+    "blocks": "All twelve blocks",
+    "repeats": 2,
+    "control": "Warm compiled forward and backward before observation. Capture actual MLP expansion addmm outputs and eager tanh operands; require exact equality of all 149 output/gradient control tensors in both replays. Preserve tensor storage/layouts and retain raw captures locally.",
+    "compiled_tanh_argument": "Report the mathematical GELU tanh argument sqrt(2/pi)*(x+0.044715*x^3), evaluated in fp64 from the captured fp32 inputs, explicitly labeled reconstructed. It is not a claim of direct capture of a fused C++ intermediate. Eager actual tanh operands are recorded separately."
+  },
+  "histograms": {
+    "finite_edges": [-104, -103.97, -90, -87.3, -80, -40, -20, -10, -5, -3, -1, 0, 1, 3, 5, 10, 20, 40, 80, 89, 104],
+    "semantics": "Half-open bins include the lower edge; separate tails below the first edge and at/above the last edge. Report all blocks, counts, extrema and absolute p95/p99.",
+    "exp_comparison": "Reuse the 0.13 adapters and its fixed grids. Verify the regenerated sampled accuracy equals 0.13 before deriving per-bin parent/child exp_u20 disagreement. For every identical captured input, reconstructed tanh argument, and hypothetical decomposed-tanh exponent -2*argument (rounded to fp32), additionally compare both adapters directly. These are counterfactual exp evaluations, not actual GELU call-path exposure. Report nonfinite results separately.",
+    "block12_unusual": "Predeclare two descriptive criteria, separately per build/path: block 12 absolute p99 input or tanh argument exceeds twice the median of blocks 1-11; or its counterfactual exp_u20 disagreement fraction exceeds the pooled blocks 1-11 fraction by at least 0.10. Report every block and ranks, including ties. No population-level or causal inference."
+  },
+  "bounded_scope": "No PyTorch rebuild, no new model families or broad compiler bisection. Preserve prior evidence. A standalone GELU reproducer is promoted only if the conditional full-model intervention isolates this path and the standalone case independently reproduces the accuracy shift; otherwise retain the full-model report lead."
+}

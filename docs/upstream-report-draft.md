@@ -4,11 +4,21 @@ Status: repository draft; not submitted upstream. This reports a measured accura
 whether it is an expected numerical trade-off. It does not claim a compiler defect or a change
 in model quality.
 
-Updated with the 0.13 investigation. The [0.12 draft](upstream-report-draft-012.md) is retained
-verbatim. The full GPT-2 workload remains the reproducer: fixed-tensor attention tests did not
-reproduce the full-model shift, so no minimal kernel reproducer is claimed.
+Updated with the 0.14 investigation. The [0.12 draft](upstream-report-draft-012.md) and
+[0.13 draft](upstream-report-draft-013.md) are retained verbatim. The full GPT-2 workload remains
+the reproducer: fixed-tensor attention tests did not reproduce the full-model shift, and the
+generated GELU kernels do not call exp_u20. No minimal kernel reproducer is claimed.
 
 ## Observation and source boundary
+
+The [0.14 GELU investigation](gelu-investigation.md) searches every retained full-model
+forward/backward module from both source builds and resolves the linked tanh calls. Generated
+GELU forward/backward and eager `gelu_new` use SLEEF tanh, not exp_u20. Consequently the proposed
+generated-GELU exp replacement is not applicable and no recovery is claimed. All twelve blocks
+were captured with exact 149-target output/gradient controls. Block 12 is not unusual under
+the fixed input/argument range criteria. Its counterfactual exp_u20 disagreement fraction is
+below the pooled earlier blocks; those hypothetical evaluations are not actual GELU exposure.
+The full-model propagation mechanism remains unresolved.
 
 On a frozen pretrained GPT-2 workload, compiled fp32 gradient RMSE against eager fp64 grows by
 a median 1.710× after

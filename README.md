@@ -153,6 +153,8 @@ The [CPU accuracy investigation](docs/accuracy-investigation.md) describes gener
 comparison and a standalone GPT-2 measurement for following up a localized shift.
 The [attention follow-up](docs/attention-investigation.md) includes saved-kernel comparisons,
 layout controls, and CPU exponential measurements, including null results.
+The [GELU investigation](docs/gelu-investigation.md) traces generated math calls and compares
+activation ranges across all twelve GPT-2 blocks.
 The [recorded CPU and AMD sweep](RESULTS.md#version-09-pretrained-environment-sweep) includes
 gradient findings, unstable references, and diagnostic memory limits; it is not a model-correctness claim.
 

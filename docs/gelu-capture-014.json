@@ -1,0 +1,2974 @@
+{
+  "parent-eager": {
+    "compiled_graphs": 0,
+    "instrumentation_control": "exact",
+    "path": "eager",
+    "policy_sha256": "25c85be42bc92595b9ba4aba4eac231ed63f90c7b3080928028334c8d04ea747",
+    "records": [
+      {
+        "captures": {
+          "input-block-1": {
+            "file": "input-block-1.pt",
+            "sha256": "62c906892eff38186e7cbc43f81d3e7882ec4c8d1cf68e353dbb56eafabd7fe9",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "f1c1c993bcd298add7e8e4abca5af68c442dee821bb25523843b36e30e519beb",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-10": {
+            "file": "input-block-10.pt",
+            "sha256": "668830342467995ddeef1fb5a97c0c8cddb85ce0a5660135a71de41810a8a1a7",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "b4e4ba038f6e09b84d2824c2727b7d5db68c86ed98c8ba5cd9f52eba025ebf13",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-11": {
+            "file": "input-block-11.pt",
+            "sha256": "d2024bf0a07fcdfa93f6d1a562b4c12398ace28873f45f3a45ca55d8d9f5ac7f",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "a1de4db2b729aa64c20208a78f767b801252c3161da8dc46d8c7ddb88061bdf5",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-12": {
+            "file": "input-block-12.pt",
+            "sha256": "83efbe664add886e309f38a3ad9bbcda8cfe3b4a7930523c3a95c48036e6a659",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "fa43f2b7bae9638a237fb8a0844970125da812d8043ad7d86bfcddea085b486c",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-2": {
+            "file": "input-block-2.pt",
+            "sha256": "3f7ad99f89f12411d9911ffa0d381e136dfba9558d0be4d4d653166db29fb8de",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "3c16d71b68a37c3c20dfa89b67441a15f99ddf66eb111e3fc704f80ff5090a4e",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-3": {
+            "file": "input-block-3.pt",
+            "sha256": "f61b3149b3ca278152d29a3c5b13c2f5a31f6529724bd4ed476faa1caf273754",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "4481ff0212cb7b4f5069591954a6628188fc5bcb8b400910b32bb28b8027bdca",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-4": {
+            "file": "input-block-4.pt",
+            "sha256": "5ece5c040fe282717e2d1af6182cc547f08c8a7b83627318375b19e1fa18de0f",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "b4cb12e182263c5793c7ff6d92882b722897f83d6b06391a56da1aaeb2449d7d",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-5": {
+            "file": "input-block-5.pt",
+            "sha256": "cc5292baf478444b41d8cf94f9cd3971ca29e8d9ed513d0d5ee6f8cedc7b0338",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "7386863a28be750b61a7678445cb16c618484c3906569369cad8b8cc52c367b7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-6": {
+            "file": "input-block-6.pt",
+            "sha256": "35002f6037ad63433e51a638fcce6fb2098600c9cf5e2b44f4bf9409cee445cc",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "12b23c119a2b4bcb057b9b13c1a4f8afcc7cafa6dc45e9db95da102ff3980fa6",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-7": {
+            "file": "input-block-7.pt",
+            "sha256": "020f62013a5dd86dbaedd50ff9abfc873236d1de1207adfc51f4871655e21af0",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ec52a259817a1e58b8d0750dae9e1f9f088c234f5e556c1f805deec475482ab3",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-8": {
+            "file": "input-block-8.pt",
+            "sha256": "0c6509c690c674f8265969a1d1d030784ee122bb1331dfd6f372b8ec5bec6051",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "2df3f301a05278b586f3803fa105ac636b6b86ead0f8f8f3f59df226faddb989",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-9": {
+            "file": "input-block-9.pt",
+            "sha256": "822fb1e5a5fc7d28387e9412c395a8f6ef83a70193756215ce09bd454b34b683",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "b992248cc417c302296e0d428ce6e4ac3d6f78ae678bef52b21058d136b67c63",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-1": {
+            "file": "tanh_argument-block-1.pt",
+            "sha256": "d909a0a113c4dabc240e429c14ff7bae1e5bd7449249b8796181590563dd86e6",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "c4c6d6bf033b9235defe24592fc4a3079eaca1d19a4596a993551863064516c9",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-10": {
+            "file": "tanh_argument-block-10.pt",
+            "sha256": "a8b1944dd69e6c99bca96b69d453a0dd46c5913f37b8f3cb85a7cad0f7972765",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "5463b09375c6d323e900053496d427e7b3436c11b83de6a29b27b6679bc616a0",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-11": {
+            "file": "tanh_argument-block-11.pt",
+            "sha256": "24c9aa3431e792f420d4631cdd5828dfaaa87cf15d60644bde5ab5bdb41dd7bd",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "73139bf68a26f4759c611d988debd65d12f1f7d26b2143f44cde00a024105306",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-12": {
+            "file": "tanh_argument-block-12.pt",
+            "sha256": "6e96a9d62fb03a2560d2428873b84458038771165d749acbbb96b745a8784f8c",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "fb91a9eac58e983a7b10af07fb5a88ac0f02e740d4b0fb52f3650c7cc4db4b30",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-2": {
+            "file": "tanh_argument-block-2.pt",
+            "sha256": "50ed8ca08288cc40fb08857a0df547bc2fb29d4b8faf52c3d40b769e72498bdd",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "1a42d4c62c496d5794b186aeb4f3e3377cdfa7e3e06509af86fff52610f34fcd",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-3": {
+            "file": "tanh_argument-block-3.pt",
+            "sha256": "a250e1c8d989933009ae1921faad469913820668be84fec50a771d4137594da3",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ddfe28b018bac46dd180428ef50235019321200fad3be915d9d148f5892d90c2",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-4": {
+            "file": "tanh_argument-block-4.pt",
+            "sha256": "7b6cb2952fcd714888d676bb0e53a973df19ee1e7a9c0dee6510915a501bac41",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "c367bcb9653434508df16d9978eb561ccfcec232ef4b38aee2a636bd2ffa0874",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-5": {
+            "file": "tanh_argument-block-5.pt",
+            "sha256": "1265fb73745d86e936fce208cf766922c97be01e8983cb62a7780ba2a7587a74",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "621d4ad99dbb497eb2577fea8e0bcf2b98d6972c16e491f5a82c0d58c03d9d80",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-6": {
+            "file": "tanh_argument-block-6.pt",
+            "sha256": "1480a20446b7703161dc0ab52c0052a2fa0add5fc34728eebbb49a0e61952148",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "c0fe5f36d4d55d5af3a0fc07be33c072a3e838acd6d835256f38a8168d56417d",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-7": {
+            "file": "tanh_argument-block-7.pt",
+            "sha256": "49264049e48f5411a94c9c49d6642a02e1a8bd5b097c5404454cb3f292babb70",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "094dc95cda8f8f71c9b49974250918e8980987c770581deb942abb85ecd6f04e",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-8": {
+            "file": "tanh_argument-block-8.pt",
+            "sha256": "0418d813147c4bc384c43e24a266fbb7d544feb8b986edf4da9f62264cb79d35",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "f4b37f693e4c8edbdb4530245ce831198de015106a38c3d886f7b9d91cdca3ac",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-9": {
+            "file": "tanh_argument-block-9.pt",
+            "sha256": "cbbf3929efbc29853246fe27991dce9f0f4d0dcf9d74a4b52ad2f934a1ec4c44",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "bb28af01b9f85a0d007ac4ac72d00418e3a7266ccb955f90e3ab6ddfea1cbd38",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          }
+        },
+        "control_targets": 149,
+        "counts": {
+          "input": 12,
+          "tanh_argument": 12
+        },
+        "exact_control_matches": 149,
+        "operators": {
+          "aten._local_scalar_dense.default": 1,
+          "aten._scaled_dot_product_flash_attention_for_cpu.default": 12,
+          "aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12,
+          "aten._to_copy.default": 1,
+          "aten.add.Tensor": 98,
+          "aten.addmm.default": 48,
+          "aten.arange.default": 1,
+          "aten.cat.default": 12,
+          "aten.clone.default": 149,
+          "aten.detach.default": 197,
+          "aten.embedding.default": 2,
+          "aten.embedding_dense_backward.default": 2,
+          "aten.eq.Scalar": 1,
+          "aten.mm.default": 96,
+          "aten.mul.Scalar": 12,
+          "aten.mul.Tensor": 120,
+          "aten.native_layer_norm.default": 25,
+          "aten.native_layer_norm_backward.default": 25,
+          "aten.pow.Tensor_Scalar": 24,
+          "aten.split.Tensor": 12,
+          "aten.sum.default": 1,
+          "aten.sum.dim_IntList": 49,
+          "aten.t.default": 96,
+          "aten.tanh.default": 12,
+          "aten.tanh_backward.default": 12,
+          "aten.transpose.int": 96,
+          "aten.unsqueeze.default": 1,
+          "aten.view.default": 340
+        }
+      },
+      {
+        "captures": {
+          "input-block-1": {
+            "file": "input-block-1.pt",
+            "sha256": "62c906892eff38186e7cbc43f81d3e7882ec4c8d1cf68e353dbb56eafabd7fe9",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "f1c1c993bcd298add7e8e4abca5af68c442dee821bb25523843b36e30e519beb",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-10": {
+            "file": "input-block-10.pt",
+            "sha256": "668830342467995ddeef1fb5a97c0c8cddb85ce0a5660135a71de41810a8a1a7",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "b4e4ba038f6e09b84d2824c2727b7d5db68c86ed98c8ba5cd9f52eba025ebf13",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-11": {
+            "file": "input-block-11.pt",
+            "sha256": "d2024bf0a07fcdfa93f6d1a562b4c12398ace28873f45f3a45ca55d8d9f5ac7f",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "a1de4db2b729aa64c20208a78f767b801252c3161da8dc46d8c7ddb88061bdf5",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-12": {
+            "file": "input-block-12.pt",
+            "sha256": "83efbe664add886e309f38a3ad9bbcda8cfe3b4a7930523c3a95c48036e6a659",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "fa43f2b7bae9638a237fb8a0844970125da812d8043ad7d86bfcddea085b486c",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-2": {
+            "file": "input-block-2.pt",
+            "sha256": "3f7ad99f89f12411d9911ffa0d381e136dfba9558d0be4d4d653166db29fb8de",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "3c16d71b68a37c3c20dfa89b67441a15f99ddf66eb111e3fc704f80ff5090a4e",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-3": {
+            "file": "input-block-3.pt",
+            "sha256": "f61b3149b3ca278152d29a3c5b13c2f5a31f6529724bd4ed476faa1caf273754",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "4481ff0212cb7b4f5069591954a6628188fc5bcb8b400910b32bb28b8027bdca",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-4": {
+            "file": "input-block-4.pt",
+            "sha256": "5ece5c040fe282717e2d1af6182cc547f08c8a7b83627318375b19e1fa18de0f",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "b4cb12e182263c5793c7ff6d92882b722897f83d6b06391a56da1aaeb2449d7d",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-5": {
+            "file": "input-block-5.pt",
+            "sha256": "cc5292baf478444b41d8cf94f9cd3971ca29e8d9ed513d0d5ee6f8cedc7b0338",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "7386863a28be750b61a7678445cb16c618484c3906569369cad8b8cc52c367b7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-6": {
+            "file": "input-block-6.pt",
+            "sha256": "35002f6037ad63433e51a638fcce6fb2098600c9cf5e2b44f4bf9409cee445cc",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "12b23c119a2b4bcb057b9b13c1a4f8afcc7cafa6dc45e9db95da102ff3980fa6",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-7": {
+            "file": "input-block-7.pt",
+            "sha256": "020f62013a5dd86dbaedd50ff9abfc873236d1de1207adfc51f4871655e21af0",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ec52a259817a1e58b8d0750dae9e1f9f088c234f5e556c1f805deec475482ab3",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-8": {
+            "file": "input-block-8.pt",
+            "sha256": "0c6509c690c674f8265969a1d1d030784ee122bb1331dfd6f372b8ec5bec6051",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "2df3f301a05278b586f3803fa105ac636b6b86ead0f8f8f3f59df226faddb989",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-9": {
+            "file": "input-block-9.pt",
+            "sha256": "822fb1e5a5fc7d28387e9412c395a8f6ef83a70193756215ce09bd454b34b683",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "b992248cc417c302296e0d428ce6e4ac3d6f78ae678bef52b21058d136b67c63",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-1": {
+            "file": "tanh_argument-block-1.pt",
+            "sha256": "d909a0a113c4dabc240e429c14ff7bae1e5bd7449249b8796181590563dd86e6",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "c4c6d6bf033b9235defe24592fc4a3079eaca1d19a4596a993551863064516c9",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-10": {
+            "file": "tanh_argument-block-10.pt",
+            "sha256": "a8b1944dd69e6c99bca96b69d453a0dd46c5913f37b8f3cb85a7cad0f7972765",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "5463b09375c6d323e900053496d427e7b3436c11b83de6a29b27b6679bc616a0",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-11": {
+            "file": "tanh_argument-block-11.pt",
+            "sha256": "24c9aa3431e792f420d4631cdd5828dfaaa87cf15d60644bde5ab5bdb41dd7bd",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "73139bf68a26f4759c611d988debd65d12f1f7d26b2143f44cde00a024105306",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-12": {
+            "file": "tanh_argument-block-12.pt",
+            "sha256": "6e96a9d62fb03a2560d2428873b84458038771165d749acbbb96b745a8784f8c",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "fb91a9eac58e983a7b10af07fb5a88ac0f02e740d4b0fb52f3650c7cc4db4b30",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-2": {
+            "file": "tanh_argument-block-2.pt",
+            "sha256": "50ed8ca08288cc40fb08857a0df547bc2fb29d4b8faf52c3d40b769e72498bdd",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "1a42d4c62c496d5794b186aeb4f3e3377cdfa7e3e06509af86fff52610f34fcd",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-3": {
+            "file": "tanh_argument-block-3.pt",
+            "sha256": "a250e1c8d989933009ae1921faad469913820668be84fec50a771d4137594da3",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ddfe28b018bac46dd180428ef50235019321200fad3be915d9d148f5892d90c2",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-4": {
+            "file": "tanh_argument-block-4.pt",
+            "sha256": "7b6cb2952fcd714888d676bb0e53a973df19ee1e7a9c0dee6510915a501bac41",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "c367bcb9653434508df16d9978eb561ccfcec232ef4b38aee2a636bd2ffa0874",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-5": {
+            "file": "tanh_argument-block-5.pt",
+            "sha256": "1265fb73745d86e936fce208cf766922c97be01e8983cb62a7780ba2a7587a74",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "621d4ad99dbb497eb2577fea8e0bcf2b98d6972c16e491f5a82c0d58c03d9d80",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-6": {
+            "file": "tanh_argument-block-6.pt",
+            "sha256": "1480a20446b7703161dc0ab52c0052a2fa0add5fc34728eebbb49a0e61952148",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "c0fe5f36d4d55d5af3a0fc07be33c072a3e838acd6d835256f38a8168d56417d",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-7": {
+            "file": "tanh_argument-block-7.pt",
+            "sha256": "49264049e48f5411a94c9c49d6642a02e1a8bd5b097c5404454cb3f292babb70",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "094dc95cda8f8f71c9b49974250918e8980987c770581deb942abb85ecd6f04e",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-8": {
+            "file": "tanh_argument-block-8.pt",
+            "sha256": "0418d813147c4bc384c43e24a266fbb7d544feb8b986edf4da9f62264cb79d35",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "f4b37f693e4c8edbdb4530245ce831198de015106a38c3d886f7b9d91cdca3ac",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-9": {
+            "file": "tanh_argument-block-9.pt",
+            "sha256": "cbbf3929efbc29853246fe27991dce9f0f4d0dcf9d74a4b52ad2f934a1ec4c44",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "bb28af01b9f85a0d007ac4ac72d00418e3a7266ccb955f90e3ab6ddfea1cbd38",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          }
+        },
+        "control_targets": 149,
+        "counts": {
+          "input": 12,
+          "tanh_argument": 12
+        },
+        "exact_control_matches": 149,
+        "operators": {
+          "aten._local_scalar_dense.default": 1,
+          "aten._scaled_dot_product_flash_attention_for_cpu.default": 12,
+          "aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12,
+          "aten._to_copy.default": 1,
+          "aten.add.Tensor": 98,
+          "aten.addmm.default": 48,
+          "aten.arange.default": 1,
+          "aten.cat.default": 12,
+          "aten.clone.default": 149,
+          "aten.detach.default": 197,
+          "aten.embedding.default": 2,
+          "aten.embedding_dense_backward.default": 2,
+          "aten.eq.Scalar": 1,
+          "aten.mm.default": 96,
+          "aten.mul.Scalar": 12,
+          "aten.mul.Tensor": 120,
+          "aten.native_layer_norm.default": 25,
+          "aten.native_layer_norm_backward.default": 25,
+          "aten.pow.Tensor_Scalar": 24,
+          "aten.split.Tensor": 12,
+          "aten.sum.default": 1,
+          "aten.sum.dim_IntList": 49,
+          "aten.t.default": 96,
+          "aten.tanh.default": 12,
+          "aten.tanh_backward.default": 12,
+          "aten.transpose.int": 96,
+          "aten.unsqueeze.default": 1,
+          "aten.view.default": 340
+        }
+      }
+    ],
+    "torch": "2.16.0a0+giteb48c7e",
+    "torch_git_version": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42",
+    "use_decompose_tanh": false,
+    "worker_sha256": "92f12290aaed6c464cde62e95d04f9a397f2ac04eb1127356430a58a6f8c4960",
+    "workload_sha256": "0a6fc47ab5b72fc35e7b683953feace042fe19d5cbb3e7f96f4fbe6255b15d62"
+  },
+  "parent-compiled": {
+    "compiled_graphs": 1,
+    "instrumentation_control": "exact",
+    "path": "compiled",
+    "policy_sha256": "25c85be42bc92595b9ba4aba4eac231ed63f90c7b3080928028334c8d04ea747",
+    "records": [
+      {
+        "captures": {
+          "input-block-1": {
+            "file": "input-block-1.pt",
+            "sha256": "c09cc8fd5246f0b0ee2985b53a669fff4ca943c720ebbf6a771b079b256810db",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "485fd029e620f7f8653984c68d67fad73fba4c3ef2419b02ad80a165dbfb3bb6",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-10": {
+            "file": "input-block-10.pt",
+            "sha256": "eddba32a2b9a86492ec9081d5f2e46d72b9aa0f4b71447f9e2fcb7f1f566e278",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "bc7aa9df3b52c011584c9732f1a8c69355ebc12632e108eb315d3530398c090a",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-11": {
+            "file": "input-block-11.pt",
+            "sha256": "b2425361242d0e696937c7c77ed908635e8bb38895991101a1147b4f0b98568d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "9a9015a2f9f764e64a5a6a842da9166142839777a28ba51b9295900d46fab586",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-12": {
+            "file": "input-block-12.pt",
+            "sha256": "a9b3fb4825bf3c11bd6f4ad7fd1f9e87336cafe4adea1b65f93695b84b75cf8b",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "1d86229b42eaead0e1d594c0966949d5eff82784b92c94c093687fa0601475a3",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-2": {
+            "file": "input-block-2.pt",
+            "sha256": "48f9b66b8e3ba992bff5fafdf785a110ebcfd51bedae47c964db5397bc484c13",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ee479617d029fbbdec3e722ecf242f1c9ede1fb9a3da13cb0a25124a944c63a6",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-3": {
+            "file": "input-block-3.pt",
+            "sha256": "c30ebcf8e2bd2c56be60b8d2bbe14786a91b1e478d368d2638e641fac1f34add",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "d2a872d5d363a2e61419eb29730f117fc5460057076bb9647770bff4dc35e468",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-4": {
+            "file": "input-block-4.pt",
+            "sha256": "50a5ef5ce6e925dd0dae8ae9a2d6ccfd8f2b5041db3c5cda03b7e1cffc08d82c",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "344b405590ace3c35e6ac83955449ece6bf6c4cc7601b7db35350d4297f4825b",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-5": {
+            "file": "input-block-5.pt",
+            "sha256": "d4c22b9c092e0756fc099226422679d9c378badae34037f7ed96c7dce82d15fe",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "4141b27044210ccbfc2ee6cc887876ae99ea17a6b84865a2d2a2b71a015270a9",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-6": {
+            "file": "input-block-6.pt",
+            "sha256": "c7ed1a161758f4a81887a51b84a9ae0b0acdde9979c4b56b38b614e2427e2258",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "89754e2a32f7184be1c460f3c21e3dc04d7547e8dcee5b34adf1a4a57dba39c8",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-7": {
+            "file": "input-block-7.pt",
+            "sha256": "0a443521762ddf919df2a0b88979ccfef7cfa80e44458feed5f1fab3dfceceba",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "bec56be4f3f3b48b7aed793f23e645567d8157b8e4eb85bbc44bedff63bc92fe",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-8": {
+            "file": "input-block-8.pt",
+            "sha256": "f7f1b52eac6bad3fd1a98e05d55bd8176defacc905d0a325fbd7c97bc1e54151",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "655a497c23de1b1311bbcf5ddd655241907d7f29a05d8e43cac06cdfda74bc29",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-9": {
+            "file": "input-block-9.pt",
+            "sha256": "f801d7c32edc64e595fc3e3fc950e24d4e948c4b4bd5106c4ecce9d126072459",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "6177124e7c310f80e00c4186eecad0f0337ee15e07ae51d18923a6b14ca09305",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          }
+        },
+        "control_targets": 149,
+        "counts": {
+          "input": 12
+        },
+        "exact_control_matches": 149,
+        "operators": {
+          "aten._scaled_dot_product_flash_attention_for_cpu.default": 12,
+          "aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12,
+          "aten._unsafe_view.default": 1,
+          "aten.addmm.out": 48,
+          "aten.clone.default": 149,
+          "aten.detach.default": 149,
+          "aten.mm.out": 96
+        }
+      },
+      {
+        "captures": {
+          "input-block-1": {
+            "file": "input-block-1.pt",
+            "sha256": "c09cc8fd5246f0b0ee2985b53a669fff4ca943c720ebbf6a771b079b256810db",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "485fd029e620f7f8653984c68d67fad73fba4c3ef2419b02ad80a165dbfb3bb6",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-10": {
+            "file": "input-block-10.pt",
+            "sha256": "eddba32a2b9a86492ec9081d5f2e46d72b9aa0f4b71447f9e2fcb7f1f566e278",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "bc7aa9df3b52c011584c9732f1a8c69355ebc12632e108eb315d3530398c090a",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-11": {
+            "file": "input-block-11.pt",
+            "sha256": "b2425361242d0e696937c7c77ed908635e8bb38895991101a1147b4f0b98568d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "9a9015a2f9f764e64a5a6a842da9166142839777a28ba51b9295900d46fab586",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-12": {
+            "file": "input-block-12.pt",
+            "sha256": "a9b3fb4825bf3c11bd6f4ad7fd1f9e87336cafe4adea1b65f93695b84b75cf8b",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "1d86229b42eaead0e1d594c0966949d5eff82784b92c94c093687fa0601475a3",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-2": {
+            "file": "input-block-2.pt",
+            "sha256": "48f9b66b8e3ba992bff5fafdf785a110ebcfd51bedae47c964db5397bc484c13",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ee479617d029fbbdec3e722ecf242f1c9ede1fb9a3da13cb0a25124a944c63a6",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-3": {
+            "file": "input-block-3.pt",
+            "sha256": "c30ebcf8e2bd2c56be60b8d2bbe14786a91b1e478d368d2638e641fac1f34add",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "d2a872d5d363a2e61419eb29730f117fc5460057076bb9647770bff4dc35e468",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-4": {
+            "file": "input-block-4.pt",
+            "sha256": "50a5ef5ce6e925dd0dae8ae9a2d6ccfd8f2b5041db3c5cda03b7e1cffc08d82c",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "344b405590ace3c35e6ac83955449ece6bf6c4cc7601b7db35350d4297f4825b",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-5": {
+            "file": "input-block-5.pt",
+            "sha256": "d4c22b9c092e0756fc099226422679d9c378badae34037f7ed96c7dce82d15fe",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "4141b27044210ccbfc2ee6cc887876ae99ea17a6b84865a2d2a2b71a015270a9",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-6": {
+            "file": "input-block-6.pt",
+            "sha256": "c7ed1a161758f4a81887a51b84a9ae0b0acdde9979c4b56b38b614e2427e2258",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "89754e2a32f7184be1c460f3c21e3dc04d7547e8dcee5b34adf1a4a57dba39c8",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-7": {
+            "file": "input-block-7.pt",
+            "sha256": "0a443521762ddf919df2a0b88979ccfef7cfa80e44458feed5f1fab3dfceceba",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "bec56be4f3f3b48b7aed793f23e645567d8157b8e4eb85bbc44bedff63bc92fe",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-8": {
+            "file": "input-block-8.pt",
+            "sha256": "f7f1b52eac6bad3fd1a98e05d55bd8176defacc905d0a325fbd7c97bc1e54151",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "655a497c23de1b1311bbcf5ddd655241907d7f29a05d8e43cac06cdfda74bc29",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-9": {
+            "file": "input-block-9.pt",
+            "sha256": "f801d7c32edc64e595fc3e3fc950e24d4e948c4b4bd5106c4ecce9d126072459",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "6177124e7c310f80e00c4186eecad0f0337ee15e07ae51d18923a6b14ca09305",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          }
+        },
+        "control_targets": 149,
+        "counts": {
+          "input": 12
+        },
+        "exact_control_matches": 149,
+        "operators": {
+          "aten._scaled_dot_product_flash_attention_for_cpu.default": 12,
+          "aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12,
+          "aten._unsafe_view.default": 1,
+          "aten.addmm.out": 48,
+          "aten.clone.default": 149,
+          "aten.detach.default": 149,
+          "aten.mm.out": 96
+        }
+      }
+    ],
+    "torch": "2.16.0a0+giteb48c7e",
+    "torch_git_version": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42",
+    "use_decompose_tanh": false,
+    "worker_sha256": "92f12290aaed6c464cde62e95d04f9a397f2ac04eb1127356430a58a6f8c4960",
+    "workload_sha256": "0a6fc47ab5b72fc35e7b683953feace042fe19d5cbb3e7f96f4fbe6255b15d62"
+  },
+  "child-eager": {
+    "compiled_graphs": 0,
+    "instrumentation_control": "exact",
+    "path": "eager",
+    "policy_sha256": "25c85be42bc92595b9ba4aba4eac231ed63f90c7b3080928028334c8d04ea747",
+    "records": [
+      {
+        "captures": {
+          "input-block-1": {
+            "file": "input-block-1.pt",
+            "sha256": "250cb6371e8a114f2a224640003af0ece09ca7d25bedadf02aea2afa15e86f06",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "99be68ca58af7cb5b9aecd86826d34d8aa79d6a0c67f1c1b7c3030a8b71a351f",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-10": {
+            "file": "input-block-10.pt",
+            "sha256": "747ba15f446a11cc0f23357c6029d53b0d69ec3f5c90ff0029f80f433fda00a1",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "76f62f6e89842a904619be1be6b3fa200bba5d2f8f45d9347df71768fab8ba12",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-11": {
+            "file": "input-block-11.pt",
+            "sha256": "9425213a89b705f58087a3c2ad1163ed90deab7daf9b9da79e5e4f7e02269366",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "c6e10480a2b4be61b0189c038561bb282ac190c0f603e9a22410e141c96d1bfa",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-12": {
+            "file": "input-block-12.pt",
+            "sha256": "5bfba2116edeac7d919f42030dd7d7259fd8b99c02b2999f4170162d564b133d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "1efc69c1177afa868600c8b53d7f9ecc950f59257a9d6eccff04250dba35f0e6",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-2": {
+            "file": "input-block-2.pt",
+            "sha256": "08365bedb7c374cdda8c1e6ea0b8dfc9c0b7ace84589383fbfb3e93154578aa5",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "05377a45aa83f2cb82af0cb7fbcdc099ed635c710b910a458729c078ffc2b8d7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-3": {
+            "file": "input-block-3.pt",
+            "sha256": "0a41b5bb25290beceec4d6a74d3077a9c59c63969cf8f38a895dfd8c2e0ff503",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "84cfe0951e9815b422b6303fa365d869c99c2a4d4727c8ae5a1fcb12071cf763",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-4": {
+            "file": "input-block-4.pt",
+            "sha256": "e88b1484e7f22a71b17348978fb74d7a0ec6442fbfd9984f0bbbec4e3374485d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "e0358605237160eb732a5a6a0cea1c85375ce40fcd394497a381f84380928f27",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-5": {
+            "file": "input-block-5.pt",
+            "sha256": "109206f94aed746cc64d254cae7536f6dcb99d6572209edcb02402ffcd5de88d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "d630904cf96638271e27196413d2e22ef49736906535e65c7f9f3a201ef9fdfb",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-6": {
+            "file": "input-block-6.pt",
+            "sha256": "1a2d7880879f17d42a66d0e78fc52cd44bc0be29527dc66d6fa308b62abb6da9",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "06963d51ea6acdd6bda55f67d48520f7b9c5a907c14a5d0ccb2e85324eff8702",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-7": {
+            "file": "input-block-7.pt",
+            "sha256": "67c54af775fe839d37955c0420a023fa757701da45dbbe9b63328f76883cc7e2",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "94a4a2cc35c53e4125f1a8763de884b241801be5867806cd00c22e333b7946d7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-8": {
+            "file": "input-block-8.pt",
+            "sha256": "18d40a385e39fb850e52d17da578946abe8d2c1685302ca005dfa69b8baccb75",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "6796f3e9775f8f945085ff910e5fa9bca688e9a0cbb2bd2f3bd7c82be702151e",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-9": {
+            "file": "input-block-9.pt",
+            "sha256": "cdee48daa12a49a4df75cff77d702c992aa48767e737718fa225e2a06b687e2e",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "7807dd6dac47b517c0a59dc7022175ad9cec473b8aecf33f8fda29d8c0dae5ef",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-1": {
+            "file": "tanh_argument-block-1.pt",
+            "sha256": "7edc104ec35b29e2e1de56faa5c0e943c27dc2b1d78ea22575dd843713ceee2c",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "6b76c7d91c84bfcb1afa1a27c97e0d3b7587078f80602c6268e65761e581e90b",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-10": {
+            "file": "tanh_argument-block-10.pt",
+            "sha256": "9c1e78370ea2f634a84a8e91a3551e1c206e6f5817643ef26c49522825ba711f",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "1bcb37413093c2b7448e5d2c6861dc45f8b1428961d26f9dbc1e6b501a0345ec",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-11": {
+            "file": "tanh_argument-block-11.pt",
+            "sha256": "5255235fcaed266b78fe6ccdbe3ec31e2edbebdbc609dc100d9c0566c857c52d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "3f203e9d2bf023bdd90298c7e47732267ed7ef3cfacc63cf4372fe55d485d8df",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-12": {
+            "file": "tanh_argument-block-12.pt",
+            "sha256": "0efb96a71d21333ea73c09ae5e887d4f1a1b1c3376f6c2629f6f9afe18e9db40",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "0333936f6f96310d17e438adb314a705f7073d69aa0a8c4690d6fe54fa0485d8",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-2": {
+            "file": "tanh_argument-block-2.pt",
+            "sha256": "9ee84a6f1909719851fecec6ddea42f07c488a3a537368f277d527bdf2bd8748",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "65e6b44510286b72bf1e722a54e3f27274473905b2f7e4102b2dbd2d6bd0584a",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-3": {
+            "file": "tanh_argument-block-3.pt",
+            "sha256": "d20825e83d2080657c7fffab5d5524c535601f577ef2a439c4a15ca1d8ee3e62",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ecdcd02b5179431f32109090084cdf15238bf2f22eaecfc787cbed42b30687f0",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-4": {
+            "file": "tanh_argument-block-4.pt",
+            "sha256": "8f48bc49ecd03ffd7ac11d52e5160333fdb468027a6d33f96fb7a8dbcc4154a9",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "286a69f9cd88cc8cbd826aaec93f1e9db5d94a76daea496bd5d78985de5224be",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-5": {
+            "file": "tanh_argument-block-5.pt",
+            "sha256": "e5722eee58343bbc199e34094a3342180a2d26a0bda08849ca4eda39c7ca513d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "48276cabde1daed7e55137e69dbbb6fcf90bb923ce3431bd2e6a78231672b101",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-6": {
+            "file": "tanh_argument-block-6.pt",
+            "sha256": "58d407722149225e3b00383e920bf8f279548027fddbbfa920805d4303597b46",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "39b2b9600af14f2ad305680a0edfc844afa0326c1cfe3734761d41b63f4f4f98",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-7": {
+            "file": "tanh_argument-block-7.pt",
+            "sha256": "94d4c2ae1ac5471e83c61a2aea8efd630842b852e12fb19babdb51f56741f373",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "51f96941134bdc3b97a8512247606eeb68789ca1da99fa2623b7514883419102",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-8": {
+            "file": "tanh_argument-block-8.pt",
+            "sha256": "ece03eb65909d7df65f868bda3437047f50943a3331fbe72ce851a33a2c38f78",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "481e99e68d967e273ecc40950f3321e49504d1ff66d11ceda7e8e2dff7cc2d14",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-9": {
+            "file": "tanh_argument-block-9.pt",
+            "sha256": "492878876e059f0148590bea732be1f9b0a9204c42b8c4aeea86a6784c252a09",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "9f6057f6d2022ed72d49134131653a68fa300e82eda35fd28ecdf580a9a21e65",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          }
+        },
+        "control_targets": 149,
+        "counts": {
+          "input": 12,
+          "tanh_argument": 12
+        },
+        "exact_control_matches": 149,
+        "operators": {
+          "aten._local_scalar_dense.default": 1,
+          "aten._scaled_dot_product_flash_attention_for_cpu.default": 12,
+          "aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12,
+          "aten._to_copy.default": 1,
+          "aten.add.Tensor": 98,
+          "aten.addmm.default": 48,
+          "aten.arange.default": 1,
+          "aten.cat.default": 12,
+          "aten.clone.default": 149,
+          "aten.detach.default": 197,
+          "aten.embedding.default": 2,
+          "aten.embedding_dense_backward.default": 2,
+          "aten.eq.Scalar": 1,
+          "aten.mm.default": 96,
+          "aten.mul.Scalar": 12,
+          "aten.mul.Tensor": 120,
+          "aten.native_layer_norm.default": 25,
+          "aten.native_layer_norm_backward.default": 25,
+          "aten.pow.Tensor_Scalar": 24,
+          "aten.split.Tensor": 12,
+          "aten.sum.default": 1,
+          "aten.sum.dim_IntList": 49,
+          "aten.t.default": 96,
+          "aten.tanh.default": 12,
+          "aten.tanh_backward.default": 12,
+          "aten.transpose.int": 96,
+          "aten.unsqueeze.default": 1,
+          "aten.view.default": 340
+        }
+      },
+      {
+        "captures": {
+          "input-block-1": {
+            "file": "input-block-1.pt",
+            "sha256": "250cb6371e8a114f2a224640003af0ece09ca7d25bedadf02aea2afa15e86f06",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "99be68ca58af7cb5b9aecd86826d34d8aa79d6a0c67f1c1b7c3030a8b71a351f",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-10": {
+            "file": "input-block-10.pt",
+            "sha256": "747ba15f446a11cc0f23357c6029d53b0d69ec3f5c90ff0029f80f433fda00a1",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "76f62f6e89842a904619be1be6b3fa200bba5d2f8f45d9347df71768fab8ba12",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-11": {
+            "file": "input-block-11.pt",
+            "sha256": "9425213a89b705f58087a3c2ad1163ed90deab7daf9b9da79e5e4f7e02269366",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "c6e10480a2b4be61b0189c038561bb282ac190c0f603e9a22410e141c96d1bfa",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-12": {
+            "file": "input-block-12.pt",
+            "sha256": "5bfba2116edeac7d919f42030dd7d7259fd8b99c02b2999f4170162d564b133d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "1efc69c1177afa868600c8b53d7f9ecc950f59257a9d6eccff04250dba35f0e6",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-2": {
+            "file": "input-block-2.pt",
+            "sha256": "08365bedb7c374cdda8c1e6ea0b8dfc9c0b7ace84589383fbfb3e93154578aa5",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "05377a45aa83f2cb82af0cb7fbcdc099ed635c710b910a458729c078ffc2b8d7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-3": {
+            "file": "input-block-3.pt",
+            "sha256": "0a41b5bb25290beceec4d6a74d3077a9c59c63969cf8f38a895dfd8c2e0ff503",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "84cfe0951e9815b422b6303fa365d869c99c2a4d4727c8ae5a1fcb12071cf763",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-4": {
+            "file": "input-block-4.pt",
+            "sha256": "e88b1484e7f22a71b17348978fb74d7a0ec6442fbfd9984f0bbbec4e3374485d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "e0358605237160eb732a5a6a0cea1c85375ce40fcd394497a381f84380928f27",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-5": {
+            "file": "input-block-5.pt",
+            "sha256": "109206f94aed746cc64d254cae7536f6dcb99d6572209edcb02402ffcd5de88d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "d630904cf96638271e27196413d2e22ef49736906535e65c7f9f3a201ef9fdfb",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-6": {
+            "file": "input-block-6.pt",
+            "sha256": "1a2d7880879f17d42a66d0e78fc52cd44bc0be29527dc66d6fa308b62abb6da9",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "06963d51ea6acdd6bda55f67d48520f7b9c5a907c14a5d0ccb2e85324eff8702",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-7": {
+            "file": "input-block-7.pt",
+            "sha256": "67c54af775fe839d37955c0420a023fa757701da45dbbe9b63328f76883cc7e2",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "94a4a2cc35c53e4125f1a8763de884b241801be5867806cd00c22e333b7946d7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-8": {
+            "file": "input-block-8.pt",
+            "sha256": "18d40a385e39fb850e52d17da578946abe8d2c1685302ca005dfa69b8baccb75",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "6796f3e9775f8f945085ff910e5fa9bca688e9a0cbb2bd2f3bd7c82be702151e",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-9": {
+            "file": "input-block-9.pt",
+            "sha256": "cdee48daa12a49a4df75cff77d702c992aa48767e737718fa225e2a06b687e2e",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "7807dd6dac47b517c0a59dc7022175ad9cec473b8aecf33f8fda29d8c0dae5ef",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-1": {
+            "file": "tanh_argument-block-1.pt",
+            "sha256": "7edc104ec35b29e2e1de56faa5c0e943c27dc2b1d78ea22575dd843713ceee2c",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "6b76c7d91c84bfcb1afa1a27c97e0d3b7587078f80602c6268e65761e581e90b",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-10": {
+            "file": "tanh_argument-block-10.pt",
+            "sha256": "9c1e78370ea2f634a84a8e91a3551e1c206e6f5817643ef26c49522825ba711f",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "1bcb37413093c2b7448e5d2c6861dc45f8b1428961d26f9dbc1e6b501a0345ec",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-11": {
+            "file": "tanh_argument-block-11.pt",
+            "sha256": "5255235fcaed266b78fe6ccdbe3ec31e2edbebdbc609dc100d9c0566c857c52d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "3f203e9d2bf023bdd90298c7e47732267ed7ef3cfacc63cf4372fe55d485d8df",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-12": {
+            "file": "tanh_argument-block-12.pt",
+            "sha256": "0efb96a71d21333ea73c09ae5e887d4f1a1b1c3376f6c2629f6f9afe18e9db40",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "0333936f6f96310d17e438adb314a705f7073d69aa0a8c4690d6fe54fa0485d8",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-2": {
+            "file": "tanh_argument-block-2.pt",
+            "sha256": "9ee84a6f1909719851fecec6ddea42f07c488a3a537368f277d527bdf2bd8748",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "65e6b44510286b72bf1e722a54e3f27274473905b2f7e4102b2dbd2d6bd0584a",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-3": {
+            "file": "tanh_argument-block-3.pt",
+            "sha256": "d20825e83d2080657c7fffab5d5524c535601f577ef2a439c4a15ca1d8ee3e62",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ecdcd02b5179431f32109090084cdf15238bf2f22eaecfc787cbed42b30687f0",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-4": {
+            "file": "tanh_argument-block-4.pt",
+            "sha256": "8f48bc49ecd03ffd7ac11d52e5160333fdb468027a6d33f96fb7a8dbcc4154a9",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "286a69f9cd88cc8cbd826aaec93f1e9db5d94a76daea496bd5d78985de5224be",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-5": {
+            "file": "tanh_argument-block-5.pt",
+            "sha256": "e5722eee58343bbc199e34094a3342180a2d26a0bda08849ca4eda39c7ca513d",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "48276cabde1daed7e55137e69dbbb6fcf90bb923ce3431bd2e6a78231672b101",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-6": {
+            "file": "tanh_argument-block-6.pt",
+            "sha256": "58d407722149225e3b00383e920bf8f279548027fddbbfa920805d4303597b46",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "39b2b9600af14f2ad305680a0edfc844afa0326c1cfe3734761d41b63f4f4f98",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-7": {
+            "file": "tanh_argument-block-7.pt",
+            "sha256": "94d4c2ae1ac5471e83c61a2aea8efd630842b852e12fb19babdb51f56741f373",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "51f96941134bdc3b97a8512247606eeb68789ca1da99fa2623b7514883419102",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-8": {
+            "file": "tanh_argument-block-8.pt",
+            "sha256": "ece03eb65909d7df65f868bda3437047f50943a3331fbe72ce851a33a2c38f78",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "481e99e68d967e273ecc40950f3321e49504d1ff66d11ceda7e8e2dff7cc2d14",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          },
+          "tanh_argument-block-9": {
+            "file": "tanh_argument-block-9.pt",
+            "sha256": "492878876e059f0148590bea732be1f9b0a9204c42b8c4aeea86a6784c252a09",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "9f6057f6d2022ed72d49134131653a68fa300e82eda35fd28ecdf580a9a21e65",
+              "shape": [
+                2,
+                64,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                196608,
+                3072,
+                1
+              ]
+            }
+          }
+        },
+        "control_targets": 149,
+        "counts": {
+          "input": 12,
+          "tanh_argument": 12
+        },
+        "exact_control_matches": 149,
+        "operators": {
+          "aten._local_scalar_dense.default": 1,
+          "aten._scaled_dot_product_flash_attention_for_cpu.default": 12,
+          "aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12,
+          "aten._to_copy.default": 1,
+          "aten.add.Tensor": 98,
+          "aten.addmm.default": 48,
+          "aten.arange.default": 1,
+          "aten.cat.default": 12,
+          "aten.clone.default": 149,
+          "aten.detach.default": 197,
+          "aten.embedding.default": 2,
+          "aten.embedding_dense_backward.default": 2,
+          "aten.eq.Scalar": 1,
+          "aten.mm.default": 96,
+          "aten.mul.Scalar": 12,
+          "aten.mul.Tensor": 120,
+          "aten.native_layer_norm.default": 25,
+          "aten.native_layer_norm_backward.default": 25,
+          "aten.pow.Tensor_Scalar": 24,
+          "aten.split.Tensor": 12,
+          "aten.sum.default": 1,
+          "aten.sum.dim_IntList": 49,
+          "aten.t.default": 96,
+          "aten.tanh.default": 12,
+          "aten.tanh_backward.default": 12,
+          "aten.transpose.int": 96,
+          "aten.unsqueeze.default": 1,
+          "aten.view.default": 340
+        }
+      }
+    ],
+    "torch": "2.16.0a0+git2450619",
+    "torch_git_version": "2450619a4c8a11b6f652154d12173794ebe181d5",
+    "use_decompose_tanh": false,
+    "worker_sha256": "92f12290aaed6c464cde62e95d04f9a397f2ac04eb1127356430a58a6f8c4960",
+    "workload_sha256": "0a6fc47ab5b72fc35e7b683953feace042fe19d5cbb3e7f96f4fbe6255b15d62"
+  },
+  "child-compiled": {
+    "compiled_graphs": 1,
+    "instrumentation_control": "exact",
+    "path": "compiled",
+    "policy_sha256": "25c85be42bc92595b9ba4aba4eac231ed63f90c7b3080928028334c8d04ea747",
+    "records": [
+      {
+        "captures": {
+          "input-block-1": {
+            "file": "input-block-1.pt",
+            "sha256": "3852d14cf5a9ffef85a0e42387b1c3d2b9a84c769283a859bf54d26db28ab48a",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "eab3f7ed8bf41541c8a95e565d39912e9547301ba4766aee9aff8d7e3d7f970b",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-10": {
+            "file": "input-block-10.pt",
+            "sha256": "690803d206c1f3440e0665f07eeadbf8ebd29bfa9936fd16b646598ab73ee580",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ea0750d8277d279b50976603aa4d2492c5002549b1bccb540a6023bc3b711857",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-11": {
+            "file": "input-block-11.pt",
+            "sha256": "5e61d50b664339d5914078c2b3d6a3af88186a4194891311e0728a7786ce31e2",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "5f2838728ae9c8492afd63642bfc5d89453e2fd03c30437d890d6a31d8dc3037",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-12": {
+            "file": "input-block-12.pt",
+            "sha256": "62ac0d41791d06d6a860c9d059b41859b0f98fe145e90681b76aa61b7281e151",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "8f8e26db8bdbc537150811fa04aa5d5fff04efc4c361620c01b7714ed3eec0d7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-2": {
+            "file": "input-block-2.pt",
+            "sha256": "2314bb1b52b2e5662a8d477b870c72e7e4155ba88dde1689847a84d8cc648789",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "0705514a556eb19c71546c43d5ad673eb412c1b185edc9eb9dd03626e4cd616b",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-3": {
+            "file": "input-block-3.pt",
+            "sha256": "6968c5d545927b4227bb9afa56b0b2deaea105c79dac93e2187377c38810da79",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "a693d5e1a8dde8580f1b97a060a99fae582686c786de9e6c36114f25f89d2885",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-4": {
+            "file": "input-block-4.pt",
+            "sha256": "60a48798c1ef8290e6260a1973690b3424e63e1388e6d276945bd8018924cda7",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "a01508677ddfc9e7ec22eb1407f11e5b14c9e64b3d60f635d8291475da52ca34",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-5": {
+            "file": "input-block-5.pt",
+            "sha256": "012a0663ca8dc95be185aabeab4fce3c2947ede518f7c2286c9d6e76024e9c2a",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "7497e50c87c69977888b7db873f94aaa8f3838fa4fe82abdcd64a21285fe3881",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-6": {
+            "file": "input-block-6.pt",
+            "sha256": "bfe4c25e0206ba7f91a87ea653a70b38881678025b852608a9deb7da8b35d7fc",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "815dad0087b7fdccc7633de6ab44c2f14955d4450adb1febd2658f88d7f0547a",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-7": {
+            "file": "input-block-7.pt",
+            "sha256": "9011f176ac59b1a3fbac49c2377838f0a32b52633e30a7dee38ce5ac10c0f79b",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "f0dc63d1db4f8889a55b7292e25c8e63f431f91a0012f135989a2a8c4850d54a",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-8": {
+            "file": "input-block-8.pt",
+            "sha256": "6c2cea97612576b3109fddf9b8f9a0c9c6ea7602274ee94f2048dd85b0d8a3c9",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "73ca4b421f1c6dbd70044c10437c7f6040d849f058951aaf223b78eedb1036c7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-9": {
+            "file": "input-block-9.pt",
+            "sha256": "276178250f85e102cacd7f62afe5781416c19fa4999e3c31408c208c7a8e6562",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "3f2f864067e2d16447450d71a19c9550ca5519a179e01b606af4ac7c7b767c02",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          }
+        },
+        "control_targets": 149,
+        "counts": {
+          "input": 12
+        },
+        "exact_control_matches": 149,
+        "operators": {
+          "aten._scaled_dot_product_flash_attention_for_cpu.default": 12,
+          "aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12,
+          "aten._unsafe_view.default": 1,
+          "aten.addmm.out": 48,
+          "aten.clone.default": 149,
+          "aten.detach.default": 149,
+          "aten.mm.out": 96
+        }
+      },
+      {
+        "captures": {
+          "input-block-1": {
+            "file": "input-block-1.pt",
+            "sha256": "3852d14cf5a9ffef85a0e42387b1c3d2b9a84c769283a859bf54d26db28ab48a",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "eab3f7ed8bf41541c8a95e565d39912e9547301ba4766aee9aff8d7e3d7f970b",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-10": {
+            "file": "input-block-10.pt",
+            "sha256": "690803d206c1f3440e0665f07eeadbf8ebd29bfa9936fd16b646598ab73ee580",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "ea0750d8277d279b50976603aa4d2492c5002549b1bccb540a6023bc3b711857",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-11": {
+            "file": "input-block-11.pt",
+            "sha256": "5e61d50b664339d5914078c2b3d6a3af88186a4194891311e0728a7786ce31e2",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "5f2838728ae9c8492afd63642bfc5d89453e2fd03c30437d890d6a31d8dc3037",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-12": {
+            "file": "input-block-12.pt",
+            "sha256": "62ac0d41791d06d6a860c9d059b41859b0f98fe145e90681b76aa61b7281e151",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "8f8e26db8bdbc537150811fa04aa5d5fff04efc4c361620c01b7714ed3eec0d7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-2": {
+            "file": "input-block-2.pt",
+            "sha256": "2314bb1b52b2e5662a8d477b870c72e7e4155ba88dde1689847a84d8cc648789",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "0705514a556eb19c71546c43d5ad673eb412c1b185edc9eb9dd03626e4cd616b",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-3": {
+            "file": "input-block-3.pt",
+            "sha256": "6968c5d545927b4227bb9afa56b0b2deaea105c79dac93e2187377c38810da79",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "a693d5e1a8dde8580f1b97a060a99fae582686c786de9e6c36114f25f89d2885",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-4": {
+            "file": "input-block-4.pt",
+            "sha256": "60a48798c1ef8290e6260a1973690b3424e63e1388e6d276945bd8018924cda7",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "a01508677ddfc9e7ec22eb1407f11e5b14c9e64b3d60f635d8291475da52ca34",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-5": {
+            "file": "input-block-5.pt",
+            "sha256": "012a0663ca8dc95be185aabeab4fce3c2947ede518f7c2286c9d6e76024e9c2a",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "7497e50c87c69977888b7db873f94aaa8f3838fa4fe82abdcd64a21285fe3881",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-6": {
+            "file": "input-block-6.pt",
+            "sha256": "bfe4c25e0206ba7f91a87ea653a70b38881678025b852608a9deb7da8b35d7fc",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "815dad0087b7fdccc7633de6ab44c2f14955d4450adb1febd2658f88d7f0547a",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-7": {
+            "file": "input-block-7.pt",
+            "sha256": "9011f176ac59b1a3fbac49c2377838f0a32b52633e30a7dee38ce5ac10c0f79b",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "f0dc63d1db4f8889a55b7292e25c8e63f431f91a0012f135989a2a8c4850d54a",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-8": {
+            "file": "input-block-8.pt",
+            "sha256": "6c2cea97612576b3109fddf9b8f9a0c9c6ea7602274ee94f2048dd85b0d8a3c9",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "73ca4b421f1c6dbd70044c10437c7f6040d849f058951aaf223b78eedb1036c7",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          },
+          "input-block-9": {
+            "file": "input-block-9.pt",
+            "sha256": "276178250f85e102cacd7f62afe5781416c19fa4999e3c31408c208c7a8e6562",
+            "tensor": {
+              "contiguous": true,
+              "dtype": "torch.float32",
+              "logical_sha256": "3f2f864067e2d16447450d71a19c9550ca5519a179e01b606af4ac7c7b767c02",
+              "shape": [
+                128,
+                3072
+              ],
+              "storage_offset": 0,
+              "stride": [
+                3072,
+                1
+              ]
+            }
+          }
+        },
+        "control_targets": 149,
+        "counts": {
+          "input": 12
+        },
+        "exact_control_matches": 149,
+        "operators": {
+          "aten._scaled_dot_product_flash_attention_for_cpu.default": 12,
+          "aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12,
+          "aten._unsafe_view.default": 1,
+          "aten.addmm.out": 48,
+          "aten.clone.default": 149,
+          "aten.detach.default": 149,
+          "aten.mm.out": 96
+        }
+      }
+    ],
+    "torch": "2.16.0a0+git2450619",
+    "torch_git_version": "2450619a4c8a11b6f652154d12173794ebe181d5",
+    "use_decompose_tanh": false,
+    "worker_sha256": "92f12290aaed6c464cde62e95d04f9a397f2ac04eb1127356430a58a6f8c4960",
+    "workload_sha256": "0a6fc47ab5b72fc35e7b683953feace042fe19d5cbb3e7f96f4fbe6255b15d62"
+  }
+}
