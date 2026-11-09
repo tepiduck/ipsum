@@ -1,8 +1,12 @@
 # Draft: CPU GPT-2 gradient accuracy shift after the exp_u20 change
 
-Status: local draft; not submitted upstream. This reports a measured accuracy shift and asks
+Status: repository draft; not submitted upstream. This reports a measured accuracy shift and asks
 whether it is an expected numerical trade-off. It does not claim a compiler defect or a change
 in model quality.
+
+Updated with the 0.13 investigation. The [0.12 draft](upstream-report-draft-012.md) is retained
+verbatim. The full GPT-2 workload remains the reproducer: fixed-tensor attention tests did not
+reproduce the full-model shift, so no minimal kernel reproducer is claimed.
 
 ## Observation and source boundary
 
@@ -118,9 +122,11 @@ elementwise ULP counts or theoretical error bounds, and fp64 eager is itself rou
 Near-zero BERT reference gradients (minimum RMS approximately 3.14e-16) inflate relative
 scales; the CSV retains the underlying magnitudes.
 
-BERT and Pythia show their smaller shifts at the same adjacent-nightly boundary in all three
-workers, but neither crosses the unchanged 1.4× predicate. They have not been run on the paired
-source builds, so attribution to this commit is established only for GPT-2. Earlier AMD
+BERT and Pythia show their smaller shifts at the same adjacent-nightly boundary, and 0.13 now
+reproduces both on the paired source builds. All three fresh workers per model/build exactly
+match every complete fp64 evidence row from the corresponding nightly: 198/198 for BERT and
+148/148 for Pythia, including the output. Attribution to this commit therefore covers all three
+full models. Neither BERT nor Pythia crosses the unchanged 1.4× predicate. Earlier AMD
 comparisons did not show this shift; no new AMD source-build result is claimed here.
 
 Ten- and eleven-layer variants retain the original embeddings, prefix blocks and final
@@ -134,3 +140,49 @@ The upstream change improves exceptional-value handling and reports better local
 accuracy. A larger end-to-end gradient error can coexist with that improvement. This may be an
 intended numerical trade-off; the evidence alone does not establish an incorrect kernel,
 an unacceptable tolerance, or application-level harm.
+
+## Kernel isolation follow-up
+
+Actual q/k/v, upstream gradients, output/logsumexp and scalar settings were captured for blocks
+11 and 12 of the frozen twelve-block prefix, on both source builds and in eager/compiled paths.
+All four captures exactly match their uninstrumented output/gradient controls in two repeats.
+Q/k/v and grad_out layouts agree between paths, but their values differ. Compiled backward uses
+a contiguous saved-logsumexp layout; swapping this layout while keeping values fixed changes
+none of the five operator results in the additional three-worker controls.
+
+Each of the eight captured inputs was replayed unchanged on both builds, with three fresh workers
+per build and explicit fp64 math as reference. Block-12 median dq/dk/dv error growth is:
+
+| Inputs captured from | Parent → child kernel error growth |
+|---|---:|
+| Parent eager | 0.994052× |
+| Parent compiled | 1.004449× |
+| Child eager | 0.995670× |
+| Child compiled | 0.999003× |
+
+All three observations agree exactly. Out/logsumexp measurements and block-11 controls are also
+recorded in the [complete kernel table](attention-kernel-013.csv). Backward outputs are bit-identical
+across builds when the same saved out/logsumexp are supplied. The 1.4× kernel predicate is not met.
+The [PyTorch-only measurement script](../examples/sdpa_accuracy.py) is not a reproducer of the
+1.710× shift; it records this null result on fixed tensors. The compiled/eager calling difference
+remains an open question at the full-model level, including propagation of changed activations
+and upstream gradients.
+
+Per-head score histograms contain zero finite entries below -87.3 or -103.97. The smallest
+score-minus-rowmax values are about -17.8954 in block 11 and -13.2607 in block 12. There are no
+exposed heads or rows with which to associate the largest gradient-error ratios. These calls
+do not exercise the subnormal/underflow range fixed by the commit.
+
+A sampled AVX512 microbenchmark confirms improved local exp_u20 accuracy: on 1,048,577 points
+in [-104,0], the child's maximum observed normal-output error is 1.957 ULP and subnormal error
+1.403 ULP versus fp64 exp. The parent's flush-to-zero interval produces much larger errors,
+including some normal outputs. Regular exp, used in backward, has identical sampled accuracy
+in both builds. These are sampled measurements, not exhaustive error bounds.
+
+A source-matched reconstruction reproduces actual forward logsumexp exactly on all 12,288
+captured rows per build. Recomputed backward probability sums differ from one by at most
+approximately 3.94e-7–4.39e-7 across cases, with the same case-wise maxima in both builds;
+mean deviations and probability differences change slightly in both directions. This does not
+show a comparable 1.7× deterioration in local probability consistency. The
+[investigation](attention-investigation.md) includes all controls, timings, limitations, and
+per-case data. The full-model amplification mechanism remains unresolved.

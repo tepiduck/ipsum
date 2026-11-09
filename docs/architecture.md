@@ -1,5 +1,10 @@
 # Faultline architecture and validity
 
+The standalone attention/exponential examples are advisory investigation utilities. They read
+saved CPU operator records or call an explicitly built AVX512 measurement adapter; they do not
+participate in primary comparison, failure signatures, or reducer acceptance. See the
+[attention investigation](attention-investigation.md) for the fixed protocols and their limits.
+
 ## Native workloads
 
 `model capture` runs a trusted factory in a supervised worker and saves its state dictionary,

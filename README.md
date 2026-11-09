@@ -151,6 +151,8 @@ absolute fp64 errors, noise-floor triage, and a distributional cross-version acc
 see [the bisection workflow](docs/bisect.md) for its predicate and resume behavior.
 The [CPU accuracy investigation](docs/accuracy-investigation.md) describes generated-code
 comparison and a standalone GPT-2 measurement for following up a localized shift.
+The [attention follow-up](docs/attention-investigation.md) includes saved-kernel comparisons,
+layout controls, and CPU exponential measurements, including null results.
 The [recorded CPU and AMD sweep](RESULTS.md#version-09-pretrained-environment-sweep) includes
 gradient findings, unstable references, and diagnostic memory limits; it is not a model-correctness claim.
 

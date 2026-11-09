@@ -11,6 +11,7 @@ include examples/models.py
 include examples/native_models.py
 include examples/relu_sensitivity.py
 include examples/gpt2_accuracy.py
+include examples/sdpa_accuracy.py examples/exp_accuracy.py examples/cpu_exp_probe.cpp
 include docs/architecture.md docs/cli.md docs/validation.json
 include docs/diagnostics.md
 include docs/numerics.md
@@ -22,6 +23,12 @@ include docs/accuracy-investigation.md docs/inductor-config-012.diff
 include docs/inductor-code-012.json docs/inductor-code-012.diff docs/inductor-fx-012.diff
 include docs/gradient-scales-012.csv
 include docs/accuracy-investigation-012.csv docs/upstream-report-draft.md
+include docs/upstream-report-draft-012.md docs/attention-investigation.md
+include docs/v013-policy.json docs/v013-kernel-controls.json
+include docs/attribution-013.csv docs/attention-capture-013.json
+include docs/attention-kernel-013.csv docs/attention-heads-013.csv docs/attention-rows-013.csv
+include docs/attention-association-013.csv docs/attention-consistency-013.csv
+include docs/exp-accuracy-013.csv docs/exp-timing-013.csv
 global-exclude __pycache__ *.py[cod] AGENTS.md CLAUDE.md
 exclude tests/test_*.py
 prune reports

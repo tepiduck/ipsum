@@ -1,0 +1,58 @@
+{
+  "version": "0.13.0",
+  "advisory_only": true,
+  "source_commits": {
+    "parent": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42",
+    "child": "2450619a4c8a11b6f652154d12173794ebe181d5"
+  },
+  "attribution": {
+    "models": ["bert", "pythia_160m"],
+    "reference": "Unchanged per-target reference errors from the 0.12 shared-boundary investigation",
+    "fresh_workers_per_environment": 3,
+    "internal_repeats": 2,
+    "threads": 1,
+    "growth_threshold": 1.4,
+    "classification": "Original faultline.bisect predicate; all three workers must agree. Below-threshold numerical growth remains not_shifted.",
+    "nightly_parity": "Exact equality of the complete per-target fp64 evidence, plus exact median-log2-growth equality, with the respective 0.12 November 4/5 observations. Report differences rather than silently widening a tolerance."
+  },
+  "capture": {
+    "workload": "Unchanged frozen twelve-block GPT-2 prefix from 0.11",
+    "blocks": [11, 12],
+    "paths": ["eager", "compiled"],
+    "environments": ["parent", "child"],
+    "internal_repeats": 2,
+    "required": "Capture actual CPU flash forward/backward operator arguments and results, including q/k/v, grad_out, out, logsumexp, scale, dropout, causal flag and attention mask. Preserve tensor storage, offsets, strides and dtype.",
+    "instrumentation_control": "Require exact output and gradient equality with the same path without capture. Warm compiled forward/backward first; intercept runtime calls without changing the compiled graph. Incomplete interception or changed control results are inconclusive.",
+    "comparisons": "Report exact value equality separately from shape/dtype/stride/offset/contiguity equality, within and across builds."
+  },
+  "kernel": {
+    "inputs": "Every block 11/12 capture from each build and execution path is a separate frozen workload. Feed each identical saved workload to both source builds; do not conflate changed upstream inputs with changed kernels.",
+    "fresh_workers_per_environment": 3,
+    "internal_repeats": 2,
+    "threads": 1,
+    "reference": "Explicit fp64 QK^T scaling/masking, logsumexp, softmax and PV, with autograd VJP using the captured fixed upstream gradient. Start from the exact saved fp32 values.",
+    "reported_targets": ["out", "logsumexp", "dq", "dk", "dv"],
+    "shift_predicate": "For each capture, median log2 child/parent RMSE growth across dq, dk, dv must reach log2(1.4) in all three fresh observations. All three parent errors must be positive and finite; absent/nonfinite targets or disagreement are inconclusive. The block-12 shift is reproduced if at least one preregistered block-12 capture qualifies. Report the complete eight-capture matrix, including null results.",
+    "growth_threshold": 1.4,
+    "noise_floor_context": "Also report errors relative to u*RMS(reference), u=2^-24, and child_error/max(parent_error,8*u*RMS(reference)); these are context and do not replace the fixed raw-growth predicate."
+  },
+  "scores": {
+    "computation": "Compute fp64 scaled QK^T plus the recorded mask, before softmax; subtract each row maximum. Separately report masked negative infinities. Threshold counts include only finite permitted entries.",
+    "histogram_edges": [-104.0, -103.97, -87.3, -80.0, -40.0, -20.0, -10.0, -5.0, -1.0, 0.0],
+    "thresholds": [-87.3, -103.97],
+    "association": "For each capture and dq/dk/dv, rank head/row child-to-parent RMSE growth (finite positive parent error only); report overlap and mean growth for rows with any below-threshold entries versus rows without, plus the top ten rows. dq row indexes queries; dk/dv index keys, so also compare key-column exposure rather than treating key rows as queries. No exposure means the proposed subnormal explanation has no observed support in this sample."
+  },
+  "exponential": {
+    "implementations": ["Vectorized<float>::exp_u20", "Vectorized<float>::exp"],
+    "dispatch": "AVX512 on the measured host; compile small measurement adapters against each existing build's installed headers and libraries. Do not rebuild PyTorch.",
+    "samples": "2^20+1 evenly spaced fp32 points on [-104,0], plus 2^18+1 on [-110,-86], 2^18+1 on [0,89], and explicit boundary/NaN/infinity values. Sampled coverage, not an exhaustive float-space bound.",
+    "accuracy": "Compare outputs with exp in fp64; divide absolute error by the local fp32 spacing, using 2^-149 in the subnormal/zero range. Report normal/subnormal/underflow/overflow and NaN/infinity handling separately. Also record distance to correctly rounded fp32 reference.",
+    "timing": "One thread, three fresh workers per build, five warmups then eleven timed iterations per implementation on the fixed [-104,0] array; report medians and spread. Run timings without simultaneous model workers. No performance verdict from a single sample.",
+    "consistency": "Use captured q/k and each build's saved forward logsumexp. Compare exp_u20(score-rowmax), normalized row probabilities, and backward exp(score-logsumexp); report row sums, reconstructed logsumexp errors, and probability differences. Include fp64 scores rounded once and actual fp32 bmm scores as explicitly separate reconstructions; neither is asserted to reproduce internal fused BLAS arithmetic bit-for-bit."
+  },
+  "standalone": {
+    "condition": "Only lead the upstream draft with a kernel reproducer if the fixed block-12 kernel predicate is met and independently confirmed. Otherwise retain the full-model reproducer and document the kernel null result and unresolved calling/input differences.",
+    "dependencies": "PyTorch only, with saved tensors or a separately verified synthetic case; no transformers required for a kernel reproducer.",
+    "upstream_submission": false
+  }
+}

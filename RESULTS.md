@@ -1102,3 +1102,154 @@ two equal boundary modules. The packaged source hash is
 `463b89eab2bfebd0106fe98ca72c1828e2506fbe48e09a15bb66851060ecc907`.
 This normalizes repository line endings through Git; the raw Windows/compiler-test snapshot
 hashes are retained separately. Build and installation logs remain local.
+
+## Version 0.13 attention investigation
+
+The existing parent `eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42` and child
+`2450619a4c8a11b6f652154d12173794ebe181d5` source installations are reused without rebuilding
+PyTorch or changing their dependencies. The [policy](docs/v013-policy.json) and
+[additional kernel controls](docs/v013-kernel-controls.json) fix the comparisons before the
+corresponding experiments. All outputs are advisory. Primary statuses, tolerances, signatures,
+reducer predicates, and existing exit codes remain unchanged; no upstream report was filed.
+
+### Attribution now covers three full models
+
+BERT and Pythia-160M use their original frozen workloads and locked 0.12 reference vectors.
+Each source build receives three fresh workers per model, two internal repeats, one CPU thread,
+900 seconds and a 12 GiB host-memory limit. The original 1.4× predicate is unchanged.
+
+| Model | Parent growth | Child growth | Exact corresponding nightly evidence rows, every worker | Advisory |
+|---|---:|---:|---:|---|
+| BERT | 1.000× | 1.309× | 198/198 | Not shifted on both builds |
+| Pythia-160M | 1.000× | 1.292× | 148/148 | Not shifted on both builds |
+
+All twelve workers reproduce the complete per-target fp64 evidence and growth scores exactly
+from the respective November 4/5 nightlies. The counts include gradients and the output.
+BERT retains `gradient_mismatch`; Pythia retains `numerical_mismatch`. Together with the
+0.12 GPT-2 source comparison, this attributes all three full-model accuracy shifts to the
+same commit. BERT/Pythia still do not cross the fixed 1.4× predicate. The
+[per-worker table](docs/attribution-013.csv) records unrounded values and artifact hashes.
+
+### Exact runtime capture and standalone kernel null result
+
+Actual CPU flash-attention forward/backward arguments were captured at blocks 11 and 12 of
+the unchanged twelve-block prefix, in eager and compiled execution on both builds. Compiled
+forward/backward were warmed before observing the backend callable. All four capture workers
+match all 148 uninstrumented output/gradient control tensors exactly in both internal repeats;
+each observes twelve forward and twelve backward attention calls. Tensor strides, storage
+offsets, and shared storage are preserved in local snapshots.
+
+All q/k/v and grad_out tensors have shape `[2,12,64,64]`, dtype fp32, scale 0.125, causal mode,
+zero dropout and no additive mask. Eager/compiled q/k/v strides agree at `[147456,64,2304,1]`,
+with offsets 0/768/1536. Grad_out strides agree at `[49152,64,768,1]`. Values differ between
+the full-model paths: block-12 q/k/v maximum differences reach 5.25e-6 on the parent and
+7.63e-6 on the child; grad_out reaches 1.48e-5 and 3.24e-5. Backward logsumexp has shape
+`[2,12,64]` and differs in layout: eager `[768,1,12]`, compiled `[768,64,1]`. The
+[capture inventory](docs/attention-capture-013.json) retains all metadata and comparisons.
+
+Each of the eight frozen captures is run unchanged on both builds. Three fresh workers per
+build each execute all eight cases, with two internal repeats. Reference out/logsumexp/dq/dk/dv
+come from explicit fp64 scaled/masked QK, softmax, PV and VJP. The advisory threshold is 1.4×
+median log2-gradient-error growth over dq/dk/dv, with all three workers required to agree.
+
+| Captured inputs | Block 11 growth | Block 12 growth |
+|---|---:|---:|
+| Parent eager | 0.997800× | 0.994052× |
+| Parent compiled | 0.994012× | 1.004449× |
+| Child eager | 1.008243× | 0.995670× |
+| Child compiled | 0.984046× | 0.999003× |
+
+All eight cases are `not_shifted`, with identical measurements in all three workers. The
+matching-build standalone replay reproduces every captured operator result exactly. The
+fp64 reference values agree exactly across builds. Holding the same captured out/logsumexp
+fixed makes backward dq/dk/dv bit-identical across builds. Swapping eager/compiled layouts
+while keeping the logical inputs fixed changes only logsumexp's layout and leaves all five
+operator results exactly equal in all 24 additional block-12 evaluations across six workers.
+
+Thus the isolated kernel does **not** reproduce the 1.710× full-model shift. The
+[PyTorch-only measurement example](examples/sdpa_accuracy.py) is not presented as a reproducer
+of that shift. The condition for promoting a minimal kernel reproducer was not met; the full
+GPT-2 workload remains the report's reproducer. The full-model compiled/eager calling difference,
+including changed activations and upstream gradients, remains open. The
+[40-target kernel table](docs/attention-kernel-013.csv) retains absolute errors and noise-floor context.
+
+### No subnormal-score exposure
+
+Each capture has 49,920 finite permitted score-minus-rowmax entries and 48,384 masked entries.
+None of the finite entries is below -87.3 or -103.97. The minimum across block-11 captures is
+-17.895388; for block 12 it is -13.260713. The
+[192-row batch/head histogram table](docs/attention-heads-013.csv) retains every bin and threshold
+count. Masked negative infinities are separate from finite subnormal-range candidates.
+
+The [top-row data](docs/attention-rows-013.csv) rank the ten largest finite child/parent error
+ratios for every capture and dq/dk/dv target, retaining absolute errors. Dq uses query-row exposure;
+dk/dv use key-column exposure. All [exposure/association counts](docs/attention-association-013.csv)
+are zero, including top-ten overlaps. There is no exposed group from which to estimate an
+association. These captures do not support subnormal attention scores as the explanation.
+
+### Exponential and probability-consistency measurements
+
+Small AVX512 adapters were compiled against the existing installations; PyTorch was not rebuilt.
+The first adapter linked but could not load a private CPUBlas symbol. That attempt is retained;
+the replacement calls the exported SGEMM entry point used by the inspected source path and
+rejects unresolved symbols at link time. Synthetic contiguous and packed-offset checks reproduce
+all 3,072 logsumexp rows per build before the captured-model measurements.
+
+The fixed [-104,0] sample contains 1,048,577 fp32 points. Additional grids cover [-110,-86] and
+[0,89], plus explicit boundary/NaN/infinity inputs. On the main sample, the child's maximum
+observed exp_u20 error is 1.957 ULP for normal outputs and 1.403 ULP for subnormals. The parent's
+flush-to-zero interval gives much larger errors, including some normal outputs; its normal-output
+p99 is 3.979 ULP versus the child's 1.653. Regular vector exp, used in backward, has identical
+sampled accuracy across builds (normal maximum 0.967 ULP). The child also propagates NaN where
+the parent returns infinity. These are sampled measurements, not exhaustive error bounds.
+
+Median-of-three-worker-median times on the fixed array are 0.149764 → 0.129717 ms for exp_u20
+and 0.267188 → 0.262903 ms for regular exp. Each fresh worker uses five warmups and eleven
+alternating timed calls; model workers are not running concurrently. The
+[accuracy](docs/exp-accuracy-013.csv) and [timing](docs/exp-timing-013.csv) tables retain full
+range/category counts and timing spread. This is a Zen 4/WSL microbenchmark, not model throughput.
+
+The source-matched reconstruction preserves native SGEMM shapes/strides, forward scaling,
+backward GEMM alpha, vector exp accumulation and scalar tails. Reconstructed forward logsumexp
+matches all 12,288 actual kernel rows per build exactly, and all three workers agree. Backward
+probability sums have maximum absolute deviations from one of about 3.94e-7–4.39e-7 across cases,
+with the same case-wise maxima on both builds. Mean deviations and forward/backward probability
+RMSE change slightly in both directions, without a comparable 1.7× increase. The
+[consistency table](docs/attention-consistency-013.csv) also retains the separately labeled
+fp64-rounded-score and fp32-bmm reconstructions. Internal P buffers were reconstructed, not
+directly captured; exact agreement with saved logsumexp is the validation check.
+
+The [investigation guide](docs/attention-investigation.md) contains commands, protocols and limits.
+The [updated report draft](docs/upstream-report-draft.md) has not been submitted; its
+[0.12 version](docs/upstream-report-draft-012.md) is preserved verbatim. The cause of full-model
+amplification remains unresolved despite three-model commit attribution. No compiler-bug claim
+follows from this investigation.
+
+### Executed checks
+
+| Check | Result |
+|---|---|
+| Windows portable suite | 295 passed, 1 skipped; 12 compiler tests deselected |
+| Linux CPU Inductor suite | 12 passed; 296 tests deselected |
+| Compiler validation campaign | All 14 checks passed; 17 passes and 1 unconfirmed numerical discrepancy |
+| Legacy tests | 31 passed with asyncio auto mode |
+| Ruff lint and requested formatting | Passed; 88 files in the requested formatting scope |
+
+Five new behavior tests cover preserved packed layouts/storage offsets, the fp64 attention
+reference and a planted gradient error, rejection of incomplete/changed saved arguments,
+explicit backward-layout materialization, and ULP accounting through zero/subnormal/overflow
+ranges. Adapter checks reject implicit precision/layout changes. No existing runtime
+implementation changes apart from the package version are required for this investigation.
+
+The publication audit checks all 136 Git-index files and both distributions: 57 wheel members
+and 139 source-archive members. The wheel and dependencies install into an independent Linux
+virtual environment; package location, version, source hash, eager corpus execution and the
+installed code comparator pass. The standalone attention CLI reproduces the recorded parent
+and child block-12 measurements exactly, including reference-file comparison. License files
+and license metadata remain absent from both archives following the requested removal.
+
+All 51 earlier runtime files other than the version file are unchanged. All 20 prior validation
+entries, earlier results text and evidence remain intact, and the original 0.12 report draft is
+archived byte-for-byte. The Git-normalized packaged source hash is
+`98599a6cbd96b9cc1e23269cfb960ab37146981683bcd31e90766ee4f553691c`.
+Raw captures, compiler caches, adapters, environments and supervision logs remain local.
