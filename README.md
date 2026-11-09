@@ -149,6 +149,8 @@ Use `--set held-out` for nine additional model families or `--set all` for all 2
 absolute fp64 errors, noise-floor triage, and a distributional cross-version accuracy advisory.
 `faultline bisect` can localize a CPU accuracy shift across isolated nightly installations;
 see [the bisection workflow](docs/bisect.md) for its predicate and resume behavior.
+The [CPU accuracy investigation](docs/accuracy-investigation.md) describes generated-code
+comparison and a standalone GPT-2 measurement for following up a localized shift.
 The [recorded CPU and AMD sweep](RESULTS.md#version-09-pretrained-environment-sweep) includes
 gradient findings, unstable references, and diagnostic memory limits; it is not a model-correctness claim.
 

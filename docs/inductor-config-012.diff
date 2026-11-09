@@ -1,0 +1,10 @@
+--- 2026-11-04/config-defaults
++++ 2026-11-05/config-defaults
+@@ -502,6 +502,7 @@
+   "quiesce_async_compile_time": 60,
+   "realize_acc_reads_size_threshold": null,
+   "realize_acc_reads_threshold": null,
++  "realize_broadcast_reuse_threshold": 64,
+   "realize_cpu_acc_reads_threshold": 12,
+   "realize_cpu_opcount_threshold": 50,
+   "realize_opcount_threshold": null,

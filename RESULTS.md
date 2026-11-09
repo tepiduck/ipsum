@@ -911,3 +911,194 @@ matches the Git source hash above. Its version command, deterministic model opti
 retry options, held-out sweep options, and repeated eager corpus all pass. The evidence audit
 also verifies the published CSV hashes, every previous validation record, the unchanged original
 GPT-2 CSV bytes, and the unchanged primary/signature/reducer files.
+
+## Version 0.12 CPU accuracy investigation
+
+This investigation retains the 0.11 bisection predicate and frozen GPT-2 reference vector.
+Every environment receives three fresh workers, each with two internal repeats, one CPU thread,
+900 seconds and 12 GiB of host RSS. The advisory threshold remains 1.4× median compiled/fp64
+gradient-error growth. The experimental harness is the released 0.11 source snapshot with hash
+`9eb40b2a72a15d214b5cac7bf45594565c781116374f67d62bcbbc9c7d78dc2b`.
+New analysis utilities do not participate in the numerical predicate. All earlier evidence above
+and in `validation.json` is preserved. This investigation runs on CPU; the 0.11 AMD results
+remain the AMD evidence.
+
+### Shared nightly boundary
+
+BERT and Pythia use their full frozen workloads and three fresh 2.15.0 reference workers each.
+GPT-2 reuses its original locked 147-target baseline. The boundary-wheel observations are:
+
+| Workload | Positive baseline gradients | November 4 growth | November 5 growth | Fixed 1.4× classification |
+|---|---:|---:|---:|---|
+| GPT-2 | 147 | 1.000× | 1.710× | Not shifted → shifted |
+| BERT | 196 | 1.000× | 1.309× | Not shifted → not shifted |
+| Pythia-160M | 146 | 1.000× | 1.292× | Not shifted → not shifted |
+
+All three scores within each model/date agree exactly. BERT and Pythia show increased error at
+the same adjacent-nightly boundary, but **neither flips the unchanged binary predicate**.
+Their separate distributional `accuracy_shift` labels use the existing 1.25× rule; that rule
+is not substituted into the bisection. BERT retains primary `gradient_mismatch`; Pythia retains
+primary `numerical_mismatch`; GPT-2 retains primary `gradient_mismatch` in both wheels.
+
+### Generated code and interventions
+
+Full GPT-2 forward/backward code was captured in three fresh workers per boundary wheel with
+`TORCH_LOGS=output_code`, `TORCH_COMPILE_DEBUG=1`, and separate compiler caches. Instrumented
+workers reproduce 0.11's scores exactly. Both normalized emitted modules, both pre/post-fusion
+IRs, and the transformed FX syntax are identical. The raw FX comments differ in installation
+paths. The [small generated-code and configuration evidence](docs/accuracy-investigation.md#boundary-wheel-code-comparison)
+records kernel definitions, call sites, fusion groups, reduction/type markers, and hashes;
+full debug dumps remain local. Empty normalized diffs denote observed equality, not absent dumps.
+
+Both versions emit 48 forward `addmm` calls, 96 backward `mm` calls, and 12 external CPU
+flash-attention calls in each stage. No changed fusion, reduction split, accumulation type,
+or matrix-call choice was found in the emitted code. The 1,108 default decomposition identity
+records match, including all 599 available Python source hashes; 509 entries lack inspectable
+Python source. Of 671/672 Inductor defaults, the only substantive addition is the broadcast
+reuse threshold. Both actual wheels report MKL 2024.2 and the same oneDNN 3.14.1 revision.
+Equal generated code does not establish equality of linked ATen kernels or included headers.
+
+| November 5 GPT-2 intervention | Fresh workers | Growth in every worker | Fixed predicate |
+|---|---:|---:|---|
+| Default, debug capture enabled | 3 | 1.710× | Shifted |
+| Broadcast reuse threshold set to `10**12` | 3 | 1.710× | Shifted |
+| CPU flash attention disabled | 3 | 0.978× | Not shifted |
+
+The broadcast control's emitted code is identical to the default. The flash-disabled captures
+contain no CPU flash-attention calls: attention instead adds 24 forward and 48 backward `bmm`
+call sites. That intervention changes eager, compiled, and fp64 backend execution together;
+it implicates the attention path but does not isolate one elementary operation or commit.
+All six controlled runs retain primary `gradient_mismatch`. Their standalone exit code of 1
+denotes that retained mismatch, not a failed experiment or a changed primary policy.
+
+Source inspection of the 78-commit interval identifies the CPU `exp_u20` change in
+[`2450619a`](https://github.com/pytorch/pytorch/commit/2450619a4c8a11b6f652154d12173794ebe181d5)
+as a candidate outside the generated-code diff. CPU float32 flash-attention forward uses this
+AVX2/AVX512 exponential; backward recomputes probabilities using a different exponential path.
+The upstream change improves local approximation and exceptional-value handling according to
+its own tests. That does not guarantee monotonic improvement of a complete model's gradients.
+The [candidate inspection table](docs/accuracy-investigation.md#candidate-inspection) records
+the other reviewed changes and the negative evidence for them.
+
+The [492-target gradient table](docs/gradient-scales-012.csv) retains absolute eager/compiled
+errors and fp64 gradient magnitudes for all three models, including exact gradients. With
+`u = 2^-24`, median compiled `RMSE / (u * RMS(reference))` changes from 31.889 to 58.763 for
+GPT-2, 58.298 to 76.802 for BERT, and 18,636.454 to 24,044.269 for Pythia. These relative scales
+are not elementwise ULP bounds. Near-zero reference gradients can inflate them, so the absolute
+values remain available. No model-quality conclusion or compiler-defect claim follows from them.
+
+### Bounded depth checks
+
+The earlier twelve-block prefix was retried without changing its frozen inputs or weights.
+Two further variants set the full GPT-2 configuration to ten or eleven layers, retaining the
+original embeddings, first N blocks, and final LayerNorm weights without retraining. Each
+variant has three fresh 2.15.0 baseline workers and three November 5 workers, with the same
+1.4× predicate and execution settings. Its reference vector is constructed from its own
+baseline gradients; gradients from different variants are not pooled.
+
+| Variant | Positive baseline gradients | Growth in every candidate worker | Advisory |
+|---|---:|---:|---|
+| Full model configured for 10 layers | 123 | 1.006× | Not shifted |
+| Full model configured for 11 layers | 135 | 0.990× | Not shifted |
+| 12-block prefix with frozen first-block inputs and final LayerNorm | 146 | 1.712× | Shifted |
+| Original full 12-layer GPT-2 | 147 | 1.710× | Shifted |
+
+The prefix includes an input gradient and omits the embedding parameters; its fp64 reference
+starts from the saved, already-rounded activations. It is not the same reference computation
+as the full model. The prefix nevertheless reproduces the shift, so embedding execution is
+not required to observe it. On these inputs, the effect appears when the final pretrained
+block is retained. These bounded variants do not prove a universal model-size threshold or
+distinguish conditioning from cancellation of numerical errors. They are manually constructed
+investigations, not accepted reducer outputs or a claim of minimality. The previously lost
+0.11 worker remains recorded as inconclusive; its evidence was not overwritten.
+
+### Source-commit isolation
+
+Two matching local PyTorch source builds bracket the shift at the single commit
+[`2450619a4c8a11b6f652154d12173794ebe181d5`](https://github.com/pytorch/pytorch/commit/2450619a4c8a11b6f652154d12173794ebe181d5),
+which changes CPU AVX2/AVX512 `exp_u20` and its tests. Its direct parent is
+`eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42`. The original full frozen GPT-2 workload and locked
+0.11 reference were used without changing the three-worker predicate.
+
+| Source build | Fresh workers | Median log2 growth in every worker | Growth | Advisory |
+|---|---:|---:|---:|---|
+| Direct parent `eb48c7e2` | 3 | 0 | 1.000× | Not shifted |
+| Child `2450619a` | 3 | 0.7739668316531798 | 1.710× | Shifted |
+
+Every worker retains primary `gradient_mismatch`. In addition to matching the aggregate score,
+all 149 complete fp64 evidence rows (148 gradients and one output) match the respective
+November 4/5 nightly evidence exactly in all six workers. The source pair therefore attributes
+this workload's shift to the single commit; further binary subdivision of the 78-commit interval
+was unnecessary. BERT/Pythia were not run on these source builds, so their shared nightly
+boundary does not establish commit-level attribution for them.
+
+Builds ran under WSL Ubuntu 24.04 on a Ryzen 7 7700X with Python 3.12.3, GCC 13.3, MKL 2024.2,
+oneDNN 3.14.1 and AVX512. Both used CPU-only settings, disabled distributed/test/Kineto builds,
+OpenMP MKL threading, and two build jobs. The common incremental build directory was reused
+between the child and parent, but the wheels and installed environments are separate. Logs
+verify recompilation of both AVX2 and AVX512 attention objects; normalized build configurations
+and the complete compilation-command hashes agree. The successful child build took 3,829 s
+with 5,499 MiB peak process-tree RSS; the incremental parent build took 818 s with 2,995 MiB.
+These are build observations, not model or kernel performance benchmarks.
+
+All unsuccessful build attempts remain recorded: two invalid/cached MKL-threading configurations,
+one intentional interruption to change build parallelism, and one attempt ending in a WSL
+`psutil` pidfd `EINVAL` cleanup error without a serialized completion result. The successful
+retry used a local build-helper workaround that verified the exited parent had no live owned
+descendants before accepting that specific cleanup condition. Faultline's production watchdog
+was not changed. The successful source predicates used the unmodified 0.11 worker supervisor.
+
+The commit fixes exceptional-value handling and changes the normal exponential approximation;
+this investigation does not show that subnormal inputs triggered the model result. Its local
+accuracy improvements can coexist with a larger end-to-end gradient error. The exact mechanism
+of the twelve-block amplification remains unresolved. This is an attributed accuracy shift,
+possibly an intended numerical trade-off, not a compiler-bug claim.
+
+The [upstream report draft](docs/upstream-report-draft.md) has not been filed. The
+[54-observation table](docs/accuracy-investigation-012.csv) includes every baseline, boundary,
+intervention, depth, and source worker from this investigation; the additional standalone
+script checks are recorded separately. `accuracy_investigation_validation` in
+`docs/validation.json` retains settings, source/environment identities, build attempts,
+artifact hashes, and per-worker scores. Large raw dumps, checkpoints, wheels, and environments
+remain local. All 19 prior validation entries and the earlier result text are preserved.
+
+### Executed release checks
+
+| Check | Result |
+|---|---|
+| Windows portable suite, Python 3.12.10 / PyTorch 2.15.0+cpu | 290 passed, 1 skipped; 12 compiler tests deselected |
+| Linux CPU Inductor suite, Python 3.12.3 / PyTorch 2.15.0+cpu | 12 passed |
+| Compiler validation campaign | All 14 checks passed; 17 corpus/generated passes and 1 unconfirmed numerical discrepancy |
+| Legacy tests | 31 passed with asyncio auto mode; legacy code unchanged by subsequent additions |
+| Ruff lint and requested formatting | Passed; 84 files in the requested formatting scope |
+| Independent PyTorch/transformers-only GPT-2 script, frozen assets | All 148 eager and compiled gradient RMSE values exactly match the harness in stable, November 4, and November 5 environments |
+| Same script, normal pinned-checkpoint loading on November 5 | All gradient evidence exactly matches the frozen-assets execution |
+| Publication allowlist and content audit | 119 public files; no internal instructions, personal paths, notes, raw runs, or environments included |
+| Built distribution audit | 58 wheel members and 122 source-archive members checked |
+| Independent installed-wheel smoke checks | Version, imported-package identity, eager corpus, and comparison of the actual boundary debug dumps passed |
+
+The standalone script uses one fresh process per environment, not the three-worker bisection
+protocol. Its 147-positive-gradient comparison nevertheless reproduces the exact 0 and
+0.7739668316531798 log2-growth scores. These are independently executed measurements; the script
+does not read Faultline outcome files or import Faultline. Each execution uses a new compiler
+cache. It verifies frozen asset checksums, token values, dtypes, strides, and storage offsets
+before measurement. Behavior tests reject corrupted assets and equal-valued inputs with a
+different dtype or layout.
+The normal loading path also reproduces the same comparison and gradient evidence without
+reading the local frozen-assets directory. All four independent script runs completed within
+the recorded supervision budgets.
+
+Generated-code tests cover meaningful arithmetic/type changes, repeated captures, incomplete
+artifacts, changed IR with identical emitted code, and FX comment differences versus arithmetic
+differences. The release adds inspection utilities and a standalone measurement example; all
+50 existing implementation files apart from the separately updated package-version file are
+unchanged. Primary statuses, tolerances, failure signatures, reducer predicates, and existing
+command exit codes are preserved.
+
+The distribution checks build from the audited Git index and install the wheel plus its
+dependencies into an independent virtual environment. The imported package location and
+Git-normalized source hash are verified; the installed code comparator reproduces the same
+two equal boundary modules. The packaged source hash is
+`463b89eab2bfebd0106fe98ca72c1828e2506fbe48e09a15bb66851060ecc907`.
+This normalizes repository line endings through Git; the raw Windows/compiler-test snapshot
+hashes are retained separately. Build and installation logs remain local.

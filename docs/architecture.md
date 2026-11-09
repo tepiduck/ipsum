@@ -298,3 +298,12 @@ reports are advisory and never feed the reducer or the primary oracle. See [bise
 `accuracy.py` owns the cross-version fraction and distributional advisories. `native_precision.py`
 retains absolute errors, legacy ratios, and the declared noise floor. `native_numerics.py` combines
 this evidence with mask reachability and same-input backward checks for advisory triage.
+
+## Generated-code inspection
+
+`code_diff.py` inventories Inductor debug dumps without importing or executing generated code.
+It records normalized source hashes, static call sites, and separate IR/FX comparisons, retaining
+duplicate capture occurrences and missing companion artifacts. The comparison writes to a new
+directory and has no connection to primary verdicts or reduction. Equal emitted code does not
+imply equal implementations in linked libraries or included headers. See the
+[CPU accuracy investigation](accuracy-investigation.md) for its use and limits.

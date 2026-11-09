@@ -11567,6 +11567,1678 @@
     },
     "version": "0.11.0"
   },
+  "accuracy_investigation_validation": {
+    "advisory_only": true,
+    "checks": [
+      {
+        "name": "compiler-tests",
+        "returncode": 0
+      },
+      {
+        "name": "compiler-campaign",
+        "returncode": 0
+      }
+    ],
+    "code_comparison": {
+      "file": "docs/inductor-code-012.json",
+      "sha256": "2e4e8a0dcec8952ba59e046fc7add1118a0db133caf6f0e21e7ae04aa307b1d8"
+    },
+    "compiler_campaign": {
+      "checks": [
+        {
+          "name": "eager-control",
+          "passed": true
+        },
+        {
+          "name": "sum-mutant",
+          "passed": true
+        },
+        {
+          "name": "relu-mutant",
+          "passed": true
+        },
+        {
+          "name": "softmax-mutant",
+          "passed": true
+        },
+        {
+          "name": "nan-mutant",
+          "passed": true
+        },
+        {
+          "name": "unstable-control",
+          "passed": true
+        },
+        {
+          "name": "exception-control",
+          "passed": true
+        },
+        {
+          "name": "worker-crash-control",
+          "passed": true
+        },
+        {
+          "name": "independent-standalone-reproducer",
+          "passed": true
+        },
+        {
+          "name": "reduction-retains-target-operation",
+          "passed": true
+        },
+        {
+          "name": "saved-finding-replay-preserves-policy-and-evidence",
+          "passed": true
+        },
+        {
+          "name": "standalone-exception-confirmation",
+          "passed": true
+        },
+        {
+          "name": "resume-preserves-completed-evidence",
+          "passed": true
+        },
+        {
+          "name": "compiler-toolchain-operational",
+          "passed": true
+        }
+      ],
+      "raw_validation_sha256": "24067e6b47b5e7bdf37fc9a77a9b341ad29c4864a0b4ad99911d6838ead89584",
+      "real_compiler": {
+        "counts": {
+          "numerical_mismatch": 1,
+          "pass": 17
+        },
+        "failure_families": {
+          "numerical_mismatch:outputs=[(0, 'numeric')]:backend=inductor": [
+            "0009-5a23a48497fa"
+          ]
+        },
+        "note": "Tolerance exceedances are unconfirmed candidates."
+      },
+      "validation_passed": true
+    },
+    "compiler_checks_source_sha256": "787e9fe8dbdbaea80730d7cde31c1898d7971bb09f701e0e4daf894d79c987d3",
+    "distribution_checks": {
+      "archive_members": {
+        "faultline_ml-0.12.0-py3-none-any.whl": 58,
+        "faultline_ml-0.12.0.tar.gz": 122
+      },
+      "build": {
+        "peak_tree_rss_mb": 115.73828125,
+        "returncode": 0,
+        "status": "complete",
+        "wall_s": 2.8049111159999995
+      },
+      "git_normalized_source_sha256": "463b89eab2bfebd0106fe98ca72c1828e2506fbe48e09a15bb66851060ecc907",
+      "independent_wheel_install_smoke": {
+        "checks": {
+          "code-diff": {
+            "peak_tree_rss_mb": 32.11328125,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 0.3561283169999854
+          },
+          "corpus": {
+            "peak_tree_rss_mb": 464.1484375,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 6.7236398699999995
+          },
+          "identity": {
+            "peak_tree_rss_mb": 2.75,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 0.051093495000003486
+          },
+          "version": {
+            "peak_tree_rss_mb": 224.83984375,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 0.9198923729999819
+          }
+        },
+        "installed_code_diff_same_normalized_modules": true,
+        "scope": "Wheel and dependencies installed into an independent venv; imported file location and Git-normalized source hash verified.",
+        "source_sha256": "463b89eab2bfebd0106fe98ca72c1828e2506fbe48e09a15bb66851060ecc907"
+      },
+      "preservation": {
+        "existing_source_files_unchanged": 50,
+        "prior_results_prefix_preserved": true,
+        "prior_validation_entries_unchanged": 19
+      },
+      "public_index_files": 119,
+      "stage": "Prepublication build; final evidence documentation is added afterward, with unchanged executable source."
+    },
+    "executed_checks_summary": {
+      "legacy": {
+        "asyncio_mode": "auto",
+        "passed": 31,
+        "seconds": 3.47
+      },
+      "linux_cpu_inductor": {
+        "deselected": 291,
+        "passed": 12
+      },
+      "ruff": {
+        "lint": "passed",
+        "requested_format": "passed",
+        "requested_format_files": 84
+      },
+      "windows_portable": {
+        "compiler_deselected": 12,
+        "passed": 290,
+        "skipped": 1
+      }
+    },
+    "experiment_source_sha256": "9eb40b2a72a15d214b5cac7bf45594565c781116374f67d62bcbbc9c7d78dc2b",
+    "gradient_scales": {
+      "csv_sha256": "4bf5a63a3e3167c88707e3447eed38219bbe3efe99dd1a77a270e092b575e43e",
+      "models": {
+        "bert": {
+          "compiled_rmse_over_u_reference_rms": {
+            "after": {
+              "available": 197,
+              "maximum": 1.0411823850431546e+16,
+              "median": 76.80173074369463,
+              "minimum": 0.0
+            },
+            "before": {
+              "available": 197,
+              "maximum": 1.3160344292616644e+16,
+              "median": 58.2982806795519,
+              "minimum": 0.0
+            }
+          },
+          "gradient_targets": 197,
+          "identical_gradient_evidence_in_three_workers_per_date": true,
+          "outcome_sha256": {
+            "2026-11-04": [
+              "80f2f5c7613d2062e954d0ff27bf084a993b01885520fa2d089808f120024423",
+              "eeeeba2acaa2caacc53f99cb7be3dc7a91b2a026f6b23f882f3dbb19a16557f1",
+              "49c5008c7d89fdb22a938fc0333daab4699aaa2e9dbdb866d77d8bb3356fe73d"
+            ],
+            "2026-11-05": [
+              "3961a58b6277b9c5cd1cd954c34286de481ab7454855dafeee41808de1a0c7d4",
+              "1d82f240fbf10ae2b7c2a12c75fbd657936d9cf85bf4069932de271154620d7c",
+              "01aff765b2074f80eb018eef825b50e3426234ac7c9008fc596d5c57727d8ec7"
+            ]
+          },
+          "reference_rms_range": [
+            3.138054033654642e-16,
+            66.31483609214568
+          ]
+        },
+        "gpt2": {
+          "compiled_rmse_over_u_reference_rms": {
+            "after": {
+              "available": 148,
+              "maximum": 131.83158000384034,
+              "median": 58.76295547925932,
+              "minimum": 0.0
+            },
+            "before": {
+              "available": 148,
+              "maximum": 112.46505276582037,
+              "median": 31.88934262727674,
+              "minimum": 0.0
+            }
+          },
+          "gradient_targets": 148,
+          "identical_gradient_evidence_in_three_workers_per_date": true,
+          "outcome_sha256": {
+            "2026-11-04": [
+              "33f7941aed48c3c2695b6a077657435a0cc09c01448ce2cc323ea0f43920c679",
+              "249a280831b2123b639ae9e3957f69910701824809d1d8081658ca0bcb458db0",
+              "48b0b4ad3eee6d21c638fdcec1a5544a6bf3ae948b1541d0909519fe71b542e6"
+            ],
+            "2026-11-05": [
+              "0a29c215dd6792fbad12a5cf6661170b379ca15d4233b228d2b33239cc17297b",
+              "7298bc5ed0eb4fc3ddb5279bfd9283a9758977ad41427df6b9caa34881b909a5",
+              "95ca94f384b4bb83acaff61391b4ecdd8d23a5abf1e4ecde8555bd8ae691d795"
+            ]
+          },
+          "reference_rms_range": [
+            0.4014950284619945,
+            407.0186349537063
+          ]
+        },
+        "pythia_160m": {
+          "compiled_rmse_over_u_reference_rms": {
+            "after": {
+              "available": 147,
+              "maximum": 122783.28356270879,
+              "median": 24044.269356795463,
+              "minimum": 0.0
+            },
+            "before": {
+              "available": 147,
+              "maximum": 122861.13806799422,
+              "median": 18636.45375408852,
+              "minimum": 0.0
+            }
+          },
+          "gradient_targets": 147,
+          "identical_gradient_evidence_in_three_workers_per_date": true,
+          "outcome_sha256": {
+            "2026-11-04": [
+              "4a1cd049fd3fc180234220cb95f6c4a6dad89f32371035c4cf6808b8f6cf0fc0",
+              "da206f4dc2cbcb336d3ad22d5f1306f6c590058f2dca076cfb160f6764d65590",
+              "453fb31a1c08e8167b7c4abe24aabf6be3fd2cabb0a6c6b77382fc5a9cb0ed39"
+            ],
+            "2026-11-05": [
+              "9287c56fab5c26f6643b7c182dbebf95970bbc13ba0ec38a3c37eadb92f7b8aa",
+              "9c230b60a6de4d330d31059089d0c222812bd8b813719ab8c4881994db1e0ae8",
+              "f8d86e14036d19422216e77b46eb131420b2202198086d22ae02c5ab513246b1"
+            ]
+          },
+          "reference_rms_range": [
+            1.8095741928355855,
+            75.4338623098988
+          ]
+        }
+      },
+      "scope": "All gradient targets, first observation per wheel; all three repeat observations have identical complete gradient evidence. Includes exact gradients. Not elementwise ULP bounds.",
+      "unit_roundoff": 5.960464477539063e-08
+    },
+    "intervention_code": {
+      "broadcast-disabled": [
+        {
+          "modules": [
+            {
+              "extern_call_sites": {
+                "extern_kernels.mm": 96
+              },
+              "kernel_definition_count": 7,
+              "normalized_sha256": "de49fc3b751cd9c1bfed0446527d1340a044af68edea5516b8f16ee616adbb61",
+              "operator_call_sites": {
+                "torch.ops.aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12
+              }
+            },
+            {
+              "extern_call_sites": {
+                "extern_kernels.addmm": 48
+              },
+              "kernel_definition_count": 11,
+              "normalized_sha256": "8fac0cfbd65677e705b68e36fa27049aaa3c92a25a3f855ccafea0ce824631d6",
+              "operator_call_sites": {
+                "torch.ops.aten._scaled_dot_product_flash_attention_for_cpu.default": 12
+              }
+            }
+          ],
+          "observation": 0,
+          "policy": {
+            "after": {
+              "broadcast_threshold": 1000000000000,
+              "flash_sdp_enabled": true
+            },
+            "before": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": true
+            },
+            "git": "084f8661f5bb5de149860f74d82f5313766f4256",
+            "intervention": "broadcast-disabled",
+            "torch": "2.16.0.dev20261105+cpu"
+          },
+          "same_generated_code_as_nov5": true
+        },
+        {
+          "modules": [
+            {
+              "extern_call_sites": {
+                "extern_kernels.mm": 96
+              },
+              "kernel_definition_count": 7,
+              "normalized_sha256": "de49fc3b751cd9c1bfed0446527d1340a044af68edea5516b8f16ee616adbb61",
+              "operator_call_sites": {
+                "torch.ops.aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12
+              }
+            },
+            {
+              "extern_call_sites": {
+                "extern_kernels.addmm": 48
+              },
+              "kernel_definition_count": 11,
+              "normalized_sha256": "8fac0cfbd65677e705b68e36fa27049aaa3c92a25a3f855ccafea0ce824631d6",
+              "operator_call_sites": {
+                "torch.ops.aten._scaled_dot_product_flash_attention_for_cpu.default": 12
+              }
+            }
+          ],
+          "observation": 1,
+          "policy": {
+            "after": {
+              "broadcast_threshold": 1000000000000,
+              "flash_sdp_enabled": true
+            },
+            "before": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": true
+            },
+            "git": "084f8661f5bb5de149860f74d82f5313766f4256",
+            "intervention": "broadcast-disabled",
+            "torch": "2.16.0.dev20261105+cpu"
+          },
+          "same_generated_code_as_nov5": true
+        },
+        {
+          "modules": [
+            {
+              "extern_call_sites": {
+                "extern_kernels.mm": 96
+              },
+              "kernel_definition_count": 7,
+              "normalized_sha256": "de49fc3b751cd9c1bfed0446527d1340a044af68edea5516b8f16ee616adbb61",
+              "operator_call_sites": {
+                "torch.ops.aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12
+              }
+            },
+            {
+              "extern_call_sites": {
+                "extern_kernels.addmm": 48
+              },
+              "kernel_definition_count": 11,
+              "normalized_sha256": "8fac0cfbd65677e705b68e36fa27049aaa3c92a25a3f855ccafea0ce824631d6",
+              "operator_call_sites": {
+                "torch.ops.aten._scaled_dot_product_flash_attention_for_cpu.default": 12
+              }
+            }
+          ],
+          "observation": 2,
+          "policy": {
+            "after": {
+              "broadcast_threshold": 1000000000000,
+              "flash_sdp_enabled": true
+            },
+            "before": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": true
+            },
+            "git": "084f8661f5bb5de149860f74d82f5313766f4256",
+            "intervention": "broadcast-disabled",
+            "torch": "2.16.0.dev20261105+cpu"
+          },
+          "same_generated_code_as_nov5": true
+        }
+      ],
+      "flash-disabled": [
+        {
+          "modules": [
+            {
+              "extern_call_sites": {
+                "extern_kernels.bmm": 48,
+                "extern_kernels.mm": 96
+              },
+              "kernel_definition_count": 8,
+              "normalized_sha256": "ef5b75e82b9f886340877b52b20b62c24f6549bb9ab8186ae116274bc1bea105",
+              "operator_call_sites": {}
+            },
+            {
+              "extern_call_sites": {
+                "extern_kernels.addmm": 48,
+                "extern_kernels.bmm": 24
+              },
+              "kernel_definition_count": 13,
+              "normalized_sha256": "e76345dec302e80bc5fcb7b1304c98e500348748c7ddf36b285dd9ea4bf42625",
+              "operator_call_sites": {}
+            }
+          ],
+          "observation": 0,
+          "policy": {
+            "after": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": false
+            },
+            "before": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": true
+            },
+            "git": "084f8661f5bb5de149860f74d82f5313766f4256",
+            "intervention": "flash-disabled",
+            "torch": "2.16.0.dev20261105+cpu"
+          },
+          "same_generated_code_as_nov5": false
+        },
+        {
+          "modules": [
+            {
+              "extern_call_sites": {
+                "extern_kernels.bmm": 48,
+                "extern_kernels.mm": 96
+              },
+              "kernel_definition_count": 8,
+              "normalized_sha256": "ef5b75e82b9f886340877b52b20b62c24f6549bb9ab8186ae116274bc1bea105",
+              "operator_call_sites": {}
+            },
+            {
+              "extern_call_sites": {
+                "extern_kernels.addmm": 48,
+                "extern_kernels.bmm": 24
+              },
+              "kernel_definition_count": 13,
+              "normalized_sha256": "e76345dec302e80bc5fcb7b1304c98e500348748c7ddf36b285dd9ea4bf42625",
+              "operator_call_sites": {}
+            }
+          ],
+          "observation": 1,
+          "policy": {
+            "after": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": false
+            },
+            "before": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": true
+            },
+            "git": "084f8661f5bb5de149860f74d82f5313766f4256",
+            "intervention": "flash-disabled",
+            "torch": "2.16.0.dev20261105+cpu"
+          },
+          "same_generated_code_as_nov5": false
+        },
+        {
+          "modules": [
+            {
+              "extern_call_sites": {
+                "extern_kernels.bmm": 48,
+                "extern_kernels.mm": 96
+              },
+              "kernel_definition_count": 8,
+              "normalized_sha256": "ef5b75e82b9f886340877b52b20b62c24f6549bb9ab8186ae116274bc1bea105",
+              "operator_call_sites": {}
+            },
+            {
+              "extern_call_sites": {
+                "extern_kernels.addmm": 48,
+                "extern_kernels.bmm": 24
+              },
+              "kernel_definition_count": 13,
+              "normalized_sha256": "e76345dec302e80bc5fcb7b1304c98e500348748c7ddf36b285dd9ea4bf42625",
+              "operator_call_sites": {}
+            }
+          ],
+          "observation": 2,
+          "policy": {
+            "after": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": false
+            },
+            "before": {
+              "broadcast_threshold": 64,
+              "flash_sdp_enabled": true
+            },
+            "git": "084f8661f5bb5de149860f74d82f5313766f4256",
+            "intervention": "flash-disabled",
+            "torch": "2.16.0.dev20261105+cpu"
+          },
+          "same_generated_code_as_nov5": false
+        }
+      ]
+    },
+    "observations": {
+      "depth": {
+        "full-10": {
+          "records": {
+            "2026-11-05": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "numerical_mismatch",
+                "numerical_mismatch",
+                "numerical_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 123,
+                  "median_log2_growth": 0.008820948107441495,
+                  "status": "complete",
+                  "total": 123
+                },
+                {
+                  "matched": 123,
+                  "median_log2_growth": 0.008820948107441495,
+                  "status": "complete",
+                  "total": 123
+                },
+                {
+                  "matched": 123,
+                  "median_log2_growth": 0.008820948107441495,
+                  "status": "complete",
+                  "total": 123
+                }
+              ]
+            },
+            "stable": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "numerical_mismatch",
+                "numerical_mismatch",
+                "numerical_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 123,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 123
+                },
+                {
+                  "matched": 123,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 123
+                },
+                {
+                  "matched": 123,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 123
+                }
+              ]
+            }
+          },
+          "workload_sha256": "da15ca85c82ff8250fd52ad2bbfc1e42856ab3bea04f30151bd4070cfd91cc9b"
+        },
+        "full-11": {
+          "records": {
+            "2026-11-05": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "gradient_mismatch",
+                "gradient_mismatch",
+                "gradient_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 135,
+                  "median_log2_growth": -0.014426760012998585,
+                  "status": "complete",
+                  "total": 135
+                },
+                {
+                  "matched": 135,
+                  "median_log2_growth": -0.014426760012998585,
+                  "status": "complete",
+                  "total": 135
+                },
+                {
+                  "matched": 135,
+                  "median_log2_growth": -0.014426760012998585,
+                  "status": "complete",
+                  "total": 135
+                }
+              ]
+            },
+            "stable": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "gradient_mismatch",
+                "gradient_mismatch",
+                "gradient_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 135,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 135
+                },
+                {
+                  "matched": 135,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 135
+                },
+                {
+                  "matched": 135,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 135
+                }
+              ]
+            }
+          },
+          "workload_sha256": "d0756e8b91cc520acb112f570e83587566af993009bceceba7ceeeaffe6538f2"
+        },
+        "prefix-12": {
+          "records": {
+            "2026-11-05": {
+              "classification": "shifted",
+              "primary_statuses": [
+                "gradient_mismatch",
+                "gradient_mismatch",
+                "gradient_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.7754673518403346,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.7754673518403346,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.7754673518403346,
+                  "status": "complete",
+                  "total": 146
+                }
+              ]
+            },
+            "stable": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "gradient_mismatch",
+                "gradient_mismatch",
+                "gradient_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 146
+                }
+              ]
+            }
+          },
+          "workload_sha256": "dab8e443f4b77113b9c035672b17173bf05ba0f0002ae4b5470cf3cc06eeee74"
+        }
+      },
+      "gpt2-code": {
+        "2026-11-04": {
+          "classification": "not_shifted",
+          "observations": [
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.0,
+              "median_log2_growth": 0.0,
+              "observation": 0,
+              "outcome_sha256": "33f7941aed48c3c2695b6a077657435a0cc09c01448ce2cc323ea0f43920c679",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0.dev20261104+cpu",
+              "torch_git_version": "7f24a19c0967db04f2d5ba44c1e56eca489932ec"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.0,
+              "median_log2_growth": 0.0,
+              "observation": 1,
+              "outcome_sha256": "249a280831b2123b639ae9e3957f69910701824809d1d8081658ca0bcb458db0",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0.dev20261104+cpu",
+              "torch_git_version": "7f24a19c0967db04f2d5ba44c1e56eca489932ec"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.0,
+              "median_log2_growth": 0.0,
+              "observation": 2,
+              "outcome_sha256": "48b0b4ad3eee6d21c638fdcec1a5544a6bf3ae948b1541d0909519fe71b542e6",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0.dev20261104+cpu",
+              "torch_git_version": "7f24a19c0967db04f2d5ba44c1e56eca489932ec"
+            }
+          ]
+        },
+        "2026-11-05": {
+          "classification": "shifted",
+          "observations": [
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 0,
+              "outcome_sha256": "0a29c215dd6792fbad12a5cf6661170b379ca15d4233b228d2b33239cc17297b",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 1,
+              "outcome_sha256": "7298bc5ed0eb4fc3ddb5279bfd9283a9758977ad41427df6b9caa34881b909a5",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 2,
+              "outcome_sha256": "95ca94f384b4bb83acaff61391b4ecdd8d23a5abf1e4ecde8555bd8ae691d795",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            }
+          ]
+        }
+      },
+      "intervention": {
+        "broadcast-disabled": {
+          "classification": "shifted",
+          "observations": [
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 0,
+              "outcome_sha256": "6141e19b91fffb08b9af6358d937efacf8cb3f95447862600398012e66ce75ed",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 1,
+              "outcome_sha256": "047faf9e70d9e64b36abb61905bb832f4ccc82e7df2dfe57f60e0795800d78b7",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 2,
+              "outcome_sha256": "2397df1870ccf9a5ed3c5c15943b20612eed97dc00f509db19af647343761025",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            }
+          ]
+        },
+        "flash-disabled": {
+          "classification": "not_shifted",
+          "observations": [
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 0.9781541303557063,
+              "median_log2_growth": -0.03186628249131118,
+              "observation": 0,
+              "outcome_sha256": "f4057bc5f7733bfd3fecfd96a449c204fdc9f40283d19133808094e43b061ef8",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 0.9781541303557063,
+              "median_log2_growth": -0.03186628249131118,
+              "observation": 1,
+              "outcome_sha256": "e07d582606880302c1248f9da13432c3b53cfa5c6acc00656677357bd4b03007",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 0.9781541303557063,
+              "median_log2_growth": -0.03186628249131118,
+              "observation": 2,
+              "outcome_sha256": "7043f34f81c10d60bf953d7a7551028c8d2a0e1a738e2dd6c61ae9186207621a",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0.dev20261105+cpu",
+              "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+            }
+          ]
+        }
+      },
+      "shared-boundary": {
+        "bert": {
+          "records": {
+            "2026-11-04": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "gradient_mismatch",
+                "gradient_mismatch",
+                "gradient_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 196,
+                  "median_log2_growth": 1.3175238677831658e-11,
+                  "status": "complete",
+                  "total": 196
+                },
+                {
+                  "matched": 196,
+                  "median_log2_growth": 1.3175238677831658e-11,
+                  "status": "complete",
+                  "total": 196
+                },
+                {
+                  "matched": 196,
+                  "median_log2_growth": 1.3175238677831658e-11,
+                  "status": "complete",
+                  "total": 196
+                }
+              ]
+            },
+            "2026-11-05": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "gradient_mismatch",
+                "gradient_mismatch",
+                "gradient_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 196,
+                  "median_log2_growth": 0.3884966354249775,
+                  "status": "complete",
+                  "total": 196
+                },
+                {
+                  "matched": 196,
+                  "median_log2_growth": 0.3884966354249775,
+                  "status": "complete",
+                  "total": 196
+                },
+                {
+                  "matched": 196,
+                  "median_log2_growth": 0.3884966354249775,
+                  "status": "complete",
+                  "total": 196
+                }
+              ]
+            },
+            "stable": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "gradient_mismatch",
+                "gradient_mismatch",
+                "gradient_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 196,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 196
+                },
+                {
+                  "matched": 196,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 196
+                },
+                {
+                  "matched": 196,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 196
+                }
+              ]
+            }
+          },
+          "workload_sha256": "8bad6e531d35e9551c1a83fe6f54b13a886a5436ea6b78b250b13a464d963312"
+        },
+        "pythia_160m": {
+          "records": {
+            "2026-11-04": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "numerical_mismatch",
+                "numerical_mismatch",
+                "numerical_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 146,
+                  "median_log2_growth": -8.411937812979886e-12,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": -8.411937812979886e-12,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": -8.411937812979886e-12,
+                  "status": "complete",
+                  "total": 146
+                }
+              ]
+            },
+            "2026-11-05": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "numerical_mismatch",
+                "numerical_mismatch",
+                "numerical_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.3690593316807449,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.3690593316807449,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.3690593316807449,
+                  "status": "complete",
+                  "total": 146
+                }
+              ]
+            },
+            "stable": {
+              "classification": "not_shifted",
+              "primary_statuses": [
+                "numerical_mismatch",
+                "numerical_mismatch",
+                "numerical_mismatch"
+              ],
+              "scores": [
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 146
+                },
+                {
+                  "matched": 146,
+                  "median_log2_growth": 0.0,
+                  "status": "complete",
+                  "total": 146
+                }
+              ]
+            }
+          },
+          "workload_sha256": "710e55c48a3c9bd81fb2139c4e17861c35cfcebf8284f041bcc471f42288b169"
+        }
+      },
+      "source-commit": {
+        "exp-after": {
+          "classification": "shifted",
+          "observations": [
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 0,
+              "outcome_sha256": "04fce895bf2ceace4f7d19a1a9167b639d5261c38ac693136faf17fcea2b0316",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0a0+git2450619",
+              "torch_git_version": "2450619a4c8a11b6f652154d12173794ebe181d5"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 1,
+              "outcome_sha256": "7775fe8365d16b1904b942e732ddcff946f93440bc3987d86f244a684913867e",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0a0+git2450619",
+              "torch_git_version": "2450619a4c8a11b6f652154d12173794ebe181d5"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.709965042301924,
+              "median_log2_growth": 0.7739668316531798,
+              "observation": 2,
+              "outcome_sha256": "5117a78119f14034e38fbb6f97c8269706f3d7230b5d634a240d2b4adfb7ded4",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "shifted",
+              "torch": "2.16.0a0+git2450619",
+              "torch_git_version": "2450619a4c8a11b6f652154d12173794ebe181d5"
+            }
+          ]
+        },
+        "exp-before": {
+          "classification": "not_shifted",
+          "observations": [
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.0,
+              "median_log2_growth": 0.0,
+              "observation": 0,
+              "outcome_sha256": "d054ca60b3dc6c6d6f1e7a563d1659dc6a2ef0808a57b9512cb56364929c17da",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0a0+giteb48c7e",
+              "torch_git_version": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.0,
+              "median_log2_growth": 0.0,
+              "observation": 1,
+              "outcome_sha256": "5a511fc0296be15baf9ea12e84b71114d55f26920609ee54277c1a1c80876982",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0a0+giteb48c7e",
+              "torch_git_version": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42"
+            },
+            {
+              "matched_gradients": 147,
+              "median_error_growth": 1.0,
+              "median_log2_growth": 0.0,
+              "observation": 2,
+              "outcome_sha256": "57f1f27d2cd7f510ada88814200f06acfd5fb787c925816598e02facf947bb5d",
+              "positive_baseline_gradients": 147,
+              "primary_status": "gradient_mismatch",
+              "score_status": "complete",
+              "three_worker_classification": "not_shifted",
+              "torch": "2.16.0a0+giteb48c7e",
+              "torch_git_version": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42"
+            }
+          ]
+        }
+      }
+    },
+    "predicate": {
+      "fresh_workers": 3,
+      "gpt2_reference": "Original locked 0.11 reference vector, unchanged.",
+      "growth_threshold": 1.4,
+      "missing_or_mixed": "inconclusive",
+      "reference": "Per-target median of three stable 2.15.0 observations; strictly positive finite gradient errors only."
+    },
+    "public_artifacts": {
+      "docs/accuracy-investigation-012.csv": "848fbd8b0b357d7a353d2e539c88578d8dea0befe44cf8fd0c6d4cc97b8d27bb",
+      "docs/gradient-scales-012.csv": "4bf5a63a3e3167c88707e3447eed38219bbe3efe99dd1a77a270e092b575e43e",
+      "docs/inductor-code-012.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "docs/inductor-code-012.json": "2e4e8a0dcec8952ba59e046fc7add1118a0db133caf6f0e21e7ae04aa307b1d8",
+      "docs/inductor-config-012.diff": "cb1613e51fd4ea97e61097e73a7a06d1b5bcfad65b0a70fecb32f4d73c1e4eb9",
+      "docs/inductor-fx-012.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "scope": "CPU accuracy investigation; no primary status, tolerance, signature, reducer predicate, or existing exit-code change. No compiler-defect claim.",
+    "settings": {
+      "atol": null,
+      "backend": "inductor",
+      "device": "cpu",
+      "fp64_advisory": true,
+      "gradients": true,
+      "max_rss_mb": 12288,
+      "repeats": 2,
+      "rtol": null,
+      "threads": 1,
+      "timeout_s": 900
+    },
+    "source_build_configuration": {
+      "builds": {
+        "exp-after": {
+          "build_description": [
+            "  - GCC 13.3",
+            "  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications",
+            "  - Intel(R) MKL-DNN v3.14.1 (Git Hash a190d4ab9b001e930d91a9c323089602b6c3d730)",
+            "  - OpenMP 201511 (a.k.a. OpenMP 4.5)",
+            "  - CPU capability usage: AVX512"
+          ],
+          "cmake_cache_sha256": "ce7619cc624288ff463939ab2c53b8a1989799423461222176d6fd27b1af1ea5",
+          "commit": "2450619a4c8a11b6f652154d12173794ebe181d5",
+          "compile_commands_sha256": "466d7381ec49ce64e768cce29e559f16c6331cd98f4ed36fa0243290340078c9",
+          "flash_attention_objects_recompiled": {
+            "AVX2": true,
+            "AVX512": true
+          },
+          "normalized_torch_build_sha256": "672f58df37ad8aee458a6a68f6e5480670203819ebc2830c2aeb03030a08213f",
+          "wheel_sha256": "27a9172a74ef21b58aad18b01d79b034924fec5bf6b0640387e36a9c0da76e63"
+        },
+        "exp-before": {
+          "build_description": [
+            "  - GCC 13.3",
+            "  - Intel(R) oneAPI Math Kernel Library Version 2024.2-Product Build 20240605 for Intel(R) 64 architecture applications",
+            "  - Intel(R) MKL-DNN v3.14.1 (Git Hash a190d4ab9b001e930d91a9c323089602b6c3d730)",
+            "  - OpenMP 201511 (a.k.a. OpenMP 4.5)",
+            "  - CPU capability usage: AVX512"
+          ],
+          "cmake_cache_sha256": "e2009430cefb4b8a03edf4ce2ae386e56b21eff90865f388de0003005a6cbeaa",
+          "commit": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42",
+          "compile_commands_sha256": "466d7381ec49ce64e768cce29e559f16c6331cd98f4ed36fa0243290340078c9",
+          "flash_attention_objects_recompiled": {
+            "AVX2": true,
+            "AVX512": true
+          },
+          "normalized_torch_build_sha256": "672f58df37ad8aee458a6a68f6e5480670203819ebc2830c2aeb03030a08213f",
+          "wheel_sha256": "4570df5d26d0cbc95e700ec4625eaf93ff3480bf99a17af11285784a674d4473"
+        }
+      },
+      "normalization": "Only the full/short tested commit SHA is normalized in torch.__config__.show().",
+      "same_normalized_build_configuration": true,
+      "scope": "Matching local source builds, distinct from official nightly wheels."
+    },
+    "source_build_nightly_parity": {
+      "exp-after": {
+        "nightly_date": "2026-11-05",
+        "nightly_outcome_sha256": "0a29c215dd6792fbad12a5cf6661170b379ca15d4233b228d2b33239cc17297b",
+        "observations": [
+          {
+            "exact_compiled_rmse": 149,
+            "exact_complete_fp64_rows": 149,
+            "exact_eager_rmse": 149,
+            "observation": 0,
+            "outcome_sha256": "04fce895bf2ceace4f7d19a1a9167b639d5261c38ac693136faf17fcea2b0316",
+            "value_targets": 149
+          },
+          {
+            "exact_compiled_rmse": 149,
+            "exact_complete_fp64_rows": 149,
+            "exact_eager_rmse": 149,
+            "observation": 1,
+            "outcome_sha256": "7775fe8365d16b1904b942e732ddcff946f93440bc3987d86f244a684913867e",
+            "value_targets": 149
+          },
+          {
+            "exact_compiled_rmse": 149,
+            "exact_complete_fp64_rows": 149,
+            "exact_eager_rmse": 149,
+            "observation": 2,
+            "outcome_sha256": "5117a78119f14034e38fbb6f97c8269706f3d7230b5d634a240d2b4adfb7ded4",
+            "value_targets": 149
+          }
+        ]
+      },
+      "exp-before": {
+        "nightly_date": "2026-11-04",
+        "nightly_outcome_sha256": "33f7941aed48c3c2695b6a077657435a0cc09c01448ce2cc323ea0f43920c679",
+        "observations": [
+          {
+            "exact_compiled_rmse": 149,
+            "exact_complete_fp64_rows": 149,
+            "exact_eager_rmse": 149,
+            "observation": 0,
+            "outcome_sha256": "d054ca60b3dc6c6d6f1e7a563d1659dc6a2ef0808a57b9512cb56364929c17da",
+            "value_targets": 149
+          },
+          {
+            "exact_compiled_rmse": 149,
+            "exact_complete_fp64_rows": 149,
+            "exact_eager_rmse": 149,
+            "observation": 1,
+            "outcome_sha256": "5a511fc0296be15baf9ea12e84b71114d55f26920609ee54277c1a1c80876982",
+            "value_targets": 149
+          },
+          {
+            "exact_compiled_rmse": 149,
+            "exact_complete_fp64_rows": 149,
+            "exact_eager_rmse": 149,
+            "observation": 2,
+            "outcome_sha256": "57f1f27d2cd7f510ada88814200f06acfd5fb787c925816598e02facf947bb5d",
+            "value_targets": 149
+          }
+        ]
+      }
+    },
+    "source_builds": {
+      "exp-after": {
+        "attempts": [
+          {
+            "attempt": "attempt-0001",
+            "commit": "2450619a4c8a11b6f652154d12173794ebe181d5",
+            "environment": {
+              "BUILD_TEST": "0",
+              "CMAKE_BUILD_PARALLEL_LEVEL": "1",
+              "MAX_JOBS": "1",
+              "MKL_THREADING": "GNU",
+              "OMP_NUM_THREADS": "1",
+              "USE_CUDA": "0",
+              "USE_DISTRIBUTED": "0",
+              "USE_KINETO": "0",
+              "USE_ROCM": "0",
+              "USE_XPU": "0"
+            },
+            "limits": {
+              "max_tree_rss_mb": 4096,
+              "timeout_s": 14400
+            },
+            "specification_sha256": "abc45b80772058e0ce9fc69eacc0aa532e0a075cd2b2f0da7ec78eb36ef5c761",
+            "supervision": {
+              "peak_tree_rss_mb": 189.31640625,
+              "returncode": 1,
+              "status": "command_failed",
+              "wall_s": 7.0484216770000785
+            },
+            "tracked_diff_empty": true
+          },
+          {
+            "attempt": "attempt-0002",
+            "commit": "2450619a4c8a11b6f652154d12173794ebe181d5",
+            "environment": {
+              "BUILD_TEST": "0",
+              "CMAKE_BUILD_PARALLEL_LEVEL": "1",
+              "MAX_JOBS": "1",
+              "MKL_THREADING": "OMP",
+              "OMP_NUM_THREADS": "1",
+              "USE_CUDA": "0",
+              "USE_DISTRIBUTED": "0",
+              "USE_KINETO": "0",
+              "USE_ROCM": "0",
+              "USE_XPU": "0"
+            },
+            "limits": {
+              "max_tree_rss_mb": 4096,
+              "timeout_s": 14400
+            },
+            "specification_sha256": "6f0078528bae24dceb5e7f2e3a86ff2c3970cc560b1c8a6abbe994ab918e8c7c",
+            "supervision": {
+              "peak_tree_rss_mb": 110.9375,
+              "returncode": 1,
+              "status": "command_failed",
+              "wall_s": 1.3835010390000662
+            },
+            "tracked_diff_empty": true
+          },
+          {
+            "attempt": "attempt-0003",
+            "commit": "2450619a4c8a11b6f652154d12173794ebe181d5",
+            "environment": {
+              "BUILD_TEST": "0",
+              "CMAKE_BUILD_PARALLEL_LEVEL": "1",
+              "MAX_JOBS": "1",
+              "MKL_THREADING": "OMP",
+              "OMP_NUM_THREADS": "1",
+              "USE_CUDA": "0",
+              "USE_DISTRIBUTED": "0",
+              "USE_KINETO": "0",
+              "USE_ROCM": "0",
+              "USE_XPU": "0"
+            },
+            "limits": {
+              "max_tree_rss_mb": 4096,
+              "timeout_s": 14400
+            },
+            "specification_sha256": "1e4371f7c8339bf20f8e39333fcfa506f80c75d1ece4905d78098e5f299e4ca7",
+            "supervision": {
+              "peak_tree_rss_mb": 588.109375,
+              "returncode": 1,
+              "status": "command_failed",
+              "wall_s": 219.17268289499998
+            },
+            "tracked_diff_empty": true
+          },
+          {
+            "attempt": "attempt-0004",
+            "commit": "2450619a4c8a11b6f652154d12173794ebe181d5",
+            "environment": {
+              "BUILD_TEST": "0",
+              "CMAKE_BUILD_PARALLEL_LEVEL": "3",
+              "MAX_JOBS": "3",
+              "MKL_THREADING": "OMP",
+              "OMP_NUM_THREADS": "1",
+              "USE_CUDA": "0",
+              "USE_DISTRIBUTED": "0",
+              "USE_KINETO": "0",
+              "USE_ROCM": "0",
+              "USE_XPU": "0"
+            },
+            "limits": {
+              "max_tree_rss_mb": 6144,
+              "timeout_s": 14400
+            },
+            "specification_sha256": "775620467c7fb1f058cd3573f86c8282a0478223a570fbe0d5ff8f4286ba0e65",
+            "supervision": {
+              "status": "unserialized_interruption_or_cleanup_failure"
+            },
+            "tracked_diff_empty": true
+          },
+          {
+            "attempt": "attempt-0005",
+            "commit": "2450619a4c8a11b6f652154d12173794ebe181d5",
+            "environment": {
+              "BUILD_TEST": "0",
+              "CMAKE_BUILD_PARALLEL_LEVEL": "2",
+              "MAX_JOBS": "2",
+              "MKL_THREADING": "OMP",
+              "OMP_NUM_THREADS": "1",
+              "USE_CUDA": "0",
+              "USE_DISTRIBUTED": "0",
+              "USE_KINETO": "0",
+              "USE_ROCM": "0",
+              "USE_XPU": "0"
+            },
+            "limits": {
+              "max_tree_rss_mb": 6144,
+              "timeout_s": 14400
+            },
+            "specification_sha256": "e6c46b26512216cfa957b31a0d64f24ea17caae4f24ca42faf5e152f3db4908d",
+            "supervision": {
+              "peak_tree_rss_mb": 5499.25,
+              "returncode": 0,
+              "status": "complete",
+              "wall_s": 3829.279862715
+            },
+            "tracked_diff_empty": true
+          }
+        ],
+        "commit": "2450619a4c8a11b6f652154d12173794ebe181d5",
+        "environment": {
+          "packages": {
+            "annotated-doc": "0.0.5",
+            "anyio": "4.16.0",
+            "click": "8.5.0",
+            "filelock": "4.2.4",
+            "fsspec": "2026.9.0",
+            "h11": "0.16.0",
+            "hf-xet": "1.8.0",
+            "httpcore2": "2.16.0",
+            "httpx2": "2.16.0",
+            "huggingface-hub": "2.4.0",
+            "idna": "3.20",
+            "jinja2": "3.1.6",
+            "markdown-it-py": "4.2.0",
+            "markupsafe": "3.0.3",
+            "mdurl": "0.1.2",
+            "mpmath": "1.3.0",
+            "networkx": "3.7",
+            "numpy": "2.5.4",
+            "packaging": "26.3",
+            "pip": "24.0",
+            "psutil": "7.2.2",
+            "pygments": "2.21.0",
+            "pyyaml": "6.0.3",
+            "regex": "2026.9.29",
+            "rich": "15.0.0",
+            "safetensors": "0.8.0",
+            "setuptools": "78.1.0",
+            "shellingham": "1.5.4",
+            "sympy": "1.14.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.16.0a0+git2450619",
+            "tqdm": "4.70.1",
+            "transformers": "5.22.1",
+            "truststore": "0.10.5",
+            "typer": "0.27.3",
+            "typing-extensions": "4.16.0"
+          },
+          "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "torch": "2.16.0a0+git2450619",
+          "torch_git_version": "2450619a4c8a11b6f652154d12173794ebe181d5"
+        },
+        "torch_build_sha256": "7a00ebe72c3bf4349a6f22e337a3d29ddc366d3418022451f7f419c6075fea16",
+        "wheel_sha256": "27a9172a74ef21b58aad18b01d79b034924fec5bf6b0640387e36a9c0da76e63"
+      },
+      "exp-before": {
+        "attempts": [
+          {
+            "attempt": "attempt-0001",
+            "commit": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42",
+            "environment": {
+              "BUILD_TEST": "0",
+              "CMAKE_BUILD_PARALLEL_LEVEL": "2",
+              "MAX_JOBS": "2",
+              "MKL_THREADING": "OMP",
+              "OMP_NUM_THREADS": "1",
+              "USE_CUDA": "0",
+              "USE_DISTRIBUTED": "0",
+              "USE_KINETO": "0",
+              "USE_ROCM": "0",
+              "USE_XPU": "0"
+            },
+            "limits": {
+              "max_tree_rss_mb": 6144,
+              "timeout_s": 14400
+            },
+            "specification_sha256": "43ae15493960a71729f321c9b4251527ff7e90bebba64a1ab7f03dd46b87cb50",
+            "supervision": {
+              "peak_tree_rss_mb": 2995.2109375,
+              "returncode": 0,
+              "status": "complete",
+              "wall_s": 818.3539435289995
+            },
+            "tracked_diff_empty": true
+          }
+        ],
+        "commit": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42",
+        "environment": {
+          "packages": {
+            "annotated-doc": "0.0.5",
+            "anyio": "4.16.0",
+            "click": "8.5.0",
+            "filelock": "4.2.4",
+            "fsspec": "2026.9.0",
+            "h11": "0.16.0",
+            "hf-xet": "1.8.0",
+            "httpcore2": "2.16.0",
+            "httpx2": "2.16.0",
+            "huggingface-hub": "2.4.0",
+            "idna": "3.20",
+            "jinja2": "3.1.6",
+            "markdown-it-py": "4.2.0",
+            "markupsafe": "3.0.3",
+            "mdurl": "0.1.2",
+            "mpmath": "1.3.0",
+            "networkx": "3.7",
+            "numpy": "2.5.4",
+            "packaging": "26.3",
+            "pip": "24.0",
+            "psutil": "7.2.2",
+            "pygments": "2.21.0",
+            "pyyaml": "6.0.3",
+            "regex": "2026.9.29",
+            "rich": "15.0.0",
+            "safetensors": "0.8.0",
+            "setuptools": "78.1.0",
+            "shellingham": "1.5.4",
+            "sympy": "1.14.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.16.0a0+giteb48c7e",
+            "tqdm": "4.70.1",
+            "transformers": "5.22.1",
+            "truststore": "0.10.5",
+            "typer": "0.27.3",
+            "typing-extensions": "4.16.0"
+          },
+          "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+          "python": "3.12.3 (main, Aug 31 2026, 10:18:26) [GCC 13.3.0]",
+          "torch": "2.16.0a0+giteb48c7e",
+          "torch_git_version": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42"
+        },
+        "torch_build_sha256": "eb7e5ef8b03c95fcb9cc6e88b9c8b04745483f79e0c5831c312fa9428e2cd55f",
+        "wheel_sha256": "4570df5d26d0cbc95e700ec4625eaf93ff3480bf99a17af11285784a674d4473"
+      }
+    },
+    "source_comparison_scope": "Direct-parent versus child source builds of full frozen GPT-2 only. BERT/Pythia were checked on the two boundary wheels, not these source builds. Matching build flags and independently installed wheels; all three fresh workers per source commit use the unchanged 0.11 predicate.",
+    "standalone_default_loading": {
+      "comparison": {
+        "median_log2_growth": 0.7739668316531798,
+        "missing": [],
+        "paired_positive_gradients": 147
+      },
+      "gradient_evidence_exactly_matches_frozen_assets": true,
+      "gradients": 148,
+      "outcome_sha256": "3da93212ae7a6c619146d4fda1bcc5865d09434034f3b73db7e9e0b0f63cb7b1",
+      "scope": "Default pinned-checkpoint loading; no frozen assets directory or Faultline import.",
+      "script_sha256": "bdd39e9a3fb49a593504bd164d131ed7f82f67551028278c84a5031101197dc3",
+      "supervision": {
+        "peak_tree_rss_mb": 4395.95703125,
+        "returncode": 0,
+        "status": "complete",
+        "wall_s": 39.758178772000065
+      }
+    },
+    "standalone_script": {
+      "file": "examples/gpt2_accuracy.py",
+      "sha256": "bdd39e9a3fb49a593504bd164d131ed7f82f67551028278c84a5031101197dc3"
+    },
+    "standalone_verification": {
+      "observations": {
+        "2026-11-04": {
+          "comparison": {
+            "median_log2_growth": 0.0,
+            "missing": [],
+            "paired_positive_gradients": 147
+          },
+          "differences": [],
+          "exact_error_matches": {
+            "compiled_rmse": 148,
+            "eager_rmse": 148
+          },
+          "gradients": 148,
+          "harness_outcome_sha256": "33f7941aed48c3c2695b6a077657435a0cc09c01448ce2cc323ea0f43920c679",
+          "max_relative_error_difference": {
+            "compiled_rmse": 0,
+            "eager_rmse": 0
+          },
+          "outcome_sha256": "d0fb223bd7a89c1b11bd777a31efb57cbe85e40aaa52b17ab4797b15782435c5",
+          "script_sha256": "bdd39e9a3fb49a593504bd164d131ed7f82f67551028278c84a5031101197dc3",
+          "supervision": {
+            "peak_tree_rss_mb": 4371.41015625,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 45.67156985800011
+          },
+          "torch": "2.16.0.dev20261104+cpu",
+          "torch_git_version": "7f24a19c0967db04f2d5ba44c1e56eca489932ec"
+        },
+        "2026-11-05": {
+          "comparison": {
+            "median_log2_growth": 0.7739668316531798,
+            "missing": [],
+            "paired_positive_gradients": 147
+          },
+          "differences": [],
+          "exact_error_matches": {
+            "compiled_rmse": 148,
+            "eager_rmse": 148
+          },
+          "gradients": 148,
+          "harness_outcome_sha256": "0a29c215dd6792fbad12a5cf6661170b379ca15d4233b228d2b33239cc17297b",
+          "max_relative_error_difference": {
+            "compiled_rmse": 0,
+            "eager_rmse": 0
+          },
+          "outcome_sha256": "3da93212ae7a6c619146d4fda1bcc5865d09434034f3b73db7e9e0b0f63cb7b1",
+          "script_sha256": "bdd39e9a3fb49a593504bd164d131ed7f82f67551028278c84a5031101197dc3",
+          "supervision": {
+            "peak_tree_rss_mb": 4449.44140625,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 41.70115502600038
+          },
+          "torch": "2.16.0.dev20261105+cpu",
+          "torch_git_version": "084f8661f5bb5de149860f74d82f5313766f4256"
+        },
+        "stable": {
+          "comparison": null,
+          "differences": [],
+          "exact_error_matches": {
+            "compiled_rmse": 148,
+            "eager_rmse": 148
+          },
+          "gradients": 148,
+          "harness_outcome_sha256": "1afa5339bcede873bcc2c404cc0150aabf5e4c5fa565fba8c0930570e9c34983",
+          "max_relative_error_difference": {
+            "compiled_rmse": 0,
+            "eager_rmse": 0
+          },
+          "outcome_sha256": "852e67314f3488408690a8e215ac31b0b17aa731c3a4d5684b8ab005eebd1c8a",
+          "script_sha256": "bdd39e9a3fb49a593504bd164d131ed7f82f67551028278c84a5031101197dc3",
+          "supervision": {
+            "peak_tree_rss_mb": 4455.49609375,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 44.78708053399987
+          },
+          "torch": "2.15.0+cpu",
+          "torch_git_version": "d0f2af8b66b20da4baa50644c0cd3f887a2eae2e"
+        }
+      },
+      "scope": "One independent PyTorch/transformers-only execution per environment; not a three-worker bisection."
+    },
+    "upstream_report": {
+      "file": "docs/upstream-report-draft.md",
+      "sha256": "5a6019a426e17712d8fca2b36b0bef339fee99378665a3b55d01b96f00e45dcc",
+      "submitted": false
+    },
+    "version": "0.12.0",
+    "windows_portable": {
+      "returncode": 0,
+      "seconds": 473.89100000000326,
+      "source": {
+        "created_utc": "2026-11-09T00:53:18.273359+00:00",
+        "faultline_source_sha256": "787e9fe8dbdbaea80730d7cde31c1898d7971bb09f701e0e4daf894d79c987d3",
+        "git_sha": "db0c8f7fedeb0cf15f6e2bba93760c346686ace4",
+        "platform": "Windows-11-10.0.26200-SP0",
+        "python": "3.12.10"
+      }
+    }
+  },
   "accuracy_triage_validation": {
     "bert_amd_determinism": [
       {

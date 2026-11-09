@@ -1,0 +1,654 @@
+{
+  "schema_version": 1,
+  "advisory_only": true,
+  "unique_modules": [
+    2,
+    2
+  ],
+  "shared_normalized_modules": 2,
+  "same_normalized_modules": true,
+  "companions": {
+    "ir_pre_fusion.txt": {
+      "status": "complete",
+      "available": [
+        12,
+        12
+      ],
+      "total": [
+        12,
+        12
+      ],
+      "same_content_for_modules": true
+    },
+    "ir_post_fusion.txt": {
+      "status": "complete",
+      "available": [
+        12,
+        12
+      ],
+      "total": [
+        12,
+        12
+      ],
+      "same_content_for_modules": true
+    },
+    "fx_graph_transformed.py": {
+      "status": "complete",
+      "available": [
+        12,
+        12
+      ],
+      "total": [
+        12,
+        12
+      ],
+      "same_content_for_modules": false,
+      "same_syntax_for_modules": true
+    }
+  },
+  "dates": [
+    "2026-11-04",
+    "2026-11-05"
+  ],
+  "observations_per_date": 3,
+  "inventory_scope": "Each worker has forward/backward artifacts in the debug directory and duplicate cache-side copies: 12 file occurrences per date, two unique generated modules. These are six total worker observations, not 24 executions.",
+  "default_config_counts": [
+    671,
+    672
+  ],
+  "identical_decomposition_entries": 1108,
+  "decomposition_python_source_hashes": 599,
+  "decompositions_without_inspectable_python_source": 509,
+  "decomposition_scope": "All 1108 module/qualname/source-hash records match; only 599 have non-null inspectable Python source hashes. Registry identity does not establish native implementation equality.",
+  "material_config_changes": {
+    "realize_broadcast_reuse_threshold": {
+      "before": "absent",
+      "after": 64
+    }
+  },
+  "config_normalization": "Two installation-specific CUTLASS paths normalized to <site-packages>.",
+  "note": "Advisory static code inspection. Generated code equality does not establish equality of included headers or linked ATen/BLAS/oneDNN kernels.",
+  "modules": {
+    "backward": {
+      "normalized_sha256": "de49fc3b751cd9c1bfed0446527d1340a044af68edea5516b8f16ee616adbb61",
+      "kernel_definitions": [
+        {
+          "names": [
+            "cpp_fused_native_layer_norm_backward_0"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "e24e1bc85ba26de02f9d2d29a9c2ebe37f22b751c03a5b918fd23117276b9ab9",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 42
+          },
+          "explicit_accumulator_types": {
+            "float": 4
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_mul_pow_sum_tanh_tanh_backward_view_1"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "a82e3a8f71ca441b382196f668d3b9ba3c006d3d571560cc86e476deaa22d080",
+          "reduction_markers": {},
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 20
+          },
+          "explicit_accumulator_types": {
+            "float": 1
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_mul_native_layer_norm_backward_pow_sum_tanh_backward_view_2"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "f74523063c5c7a5424672c0c02d8086c4417867d7aa3f3328677ef16bdd2d683",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 49
+          },
+          "explicit_accumulator_types": {
+            "float": 5
+          }
+        },
+        {
+          "names": [
+            "cpp_fused__scaled_dot_product_flash_attention_for_cpu_backward_sum_transpose_view_3"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "98fc0cdbf4bc11a2903c25398230b28e999cf628a7a5d13ddadb5d74ed2e6135",
+          "reduction_markers": {},
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 12
+          },
+          "explicit_accumulator_types": {
+            "float": 1
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_cat_transpose_view_4"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "bcc53d98b5ebc5d2b7f0d2dbaa0f8d7a8a5d9f1fee2eaf6b7cc5edde72e240c3",
+          "reduction_markers": {},
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 9
+          },
+          "explicit_accumulator_types": {}
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_backward_sum_view_5"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "f10c918d6d4236b53aee8fd080fc6acf08e47b8717c6a054b5ad3b5203f13423",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 49
+          },
+          "explicit_accumulator_types": {
+            "float": 5
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_embedding_dense_backward_native_layer_norm_native_layer_norm_backward_sum_view_6"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "735e7d520b676ca65ce56ebd00e7af4c39b89d069f26cfdc934c2aab15fbce2e",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 82
+          },
+          "explicit_accumulator_types": {
+            "float": 5
+          }
+        }
+      ],
+      "kernel_definition_count": 7,
+      "generated_kernel_call_sites": {
+        "cpp_fused__scaled_dot_product_flash_attention_for_cpu_backward_sum_transpose_view_3": 12,
+        "cpp_fused_add_embedding_dense_backward_native_layer_norm_native_layer_norm_backward_sum_view_6": 1,
+        "cpp_fused_add_mul_native_layer_norm_backward_pow_sum_tanh_backward_view_2": 12,
+        "cpp_fused_add_mul_pow_sum_tanh_tanh_backward_view_1": 12,
+        "cpp_fused_add_native_layer_norm_backward_sum_view_5": 11,
+        "cpp_fused_cat_transpose_view_4": 12,
+        "cpp_fused_native_layer_norm_backward_0": 1
+      },
+      "extern_call_sites": {
+        "extern_kernels.mm": 96
+      },
+      "operator_call_sites": {
+        "torch.ops.aten._scaled_dot_product_flash_attention_for_cpu_backward.default": 12
+      },
+      "scope": "Static emitted code. Counts are definitions/call sites, not runtime launches. Reduction markers and type tokens are observations, not inferred accumulation semantics. Equal generated code does not establish equal linked libraries or included headers.",
+      "generated_call_site_count": 61,
+      "ir_pre_fusion": {
+        "normalized_sha256": "1c087407dc6ff817850f7de2e5d58653936c664b6b5221929e641fabc3871ba6",
+        "status": "parsed",
+        "top_level_node_count": 405,
+        "top_level_node_kinds": {
+          "ExternKernelSchedulerNode(ExternKernelOut)": 96,
+          "ExternKernelSchedulerNode(FallbackKernel)": 12,
+          "ExternKernelSchedulerNode(MultiOutput)": 36,
+          "NopKernelSchedulerNode(ConcatKernel)": 12,
+          "SchedulerNode(ComputedBuffer)": 249
+        },
+        "top_level_fusion_groups": {},
+        "nested_child_count": 0,
+        "reduction_signatures": {
+          "torch.float32, torch.float32, 'sum'": 148
+        }
+      },
+      "ir_post_fusion": {
+        "normalized_sha256": "e879086d54c221438eab6a15d9369c194a26923f6e56f75b81ce78ee12a84361",
+        "status": "parsed",
+        "top_level_node_count": 320,
+        "top_level_node_kinds": {
+          "ExternKernelSchedulerNode(ExternKernelOut)": 96,
+          "ExternKernelSchedulerNode(FallbackKernel)": 12,
+          "ExternKernelSchedulerNode(MultiOutput)": 36,
+          "FusedSchedulerNode(SchedulerNode,SchedulerNode)": 36,
+          "NopKernelSchedulerNode(ConcatKernel)": 12,
+          "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode)": 1,
+          "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)": 24,
+          "SchedulerNode(ComputedBuffer)": 103
+        },
+        "top_level_fusion_groups": {
+          "op0_op1_op2": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op3_op4": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op8_op9": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op13_op14_op17": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op15_op16": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op33_op34_op37": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op35_op36": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op41_op42": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op46_op47_op50": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op48_op49": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op66_op67_op70": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op68_op69": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op74_op75": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op79_op80_op83": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op81_op82": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op99_op100_op103": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op101_op102": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op107_op108": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op112_op113_op116": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op114_op115": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op132_op133_op136": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op134_op135": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op140_op141": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op145_op146_op149": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op147_op148": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op165_op166_op169": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op167_op168": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op173_op174": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op178_op179_op182": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op180_op181": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op198_op199_op202": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op200_op201": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op206_op207": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op211_op212_op215": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op213_op214": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op231_op232_op235": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op233_op234": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op239_op240": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op244_op245_op248": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op246_op247": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op264_op265_op268": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op266_op267": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op272_op273": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op277_op278_op281": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op279_op280": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op297_op298_op301": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op299_op300": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op305_op306": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op310_op311_op314": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op312_op313": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op330_op331_op334": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op332_op333": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op338_op339": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op343_op344_op347": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op345_op346": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op363_op364_op367": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op365_op366": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op371_op372": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op376_op377_op380": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op378_op379": "FusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op397_op400": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode)"
+        },
+        "nested_child_count": 146,
+        "reduction_signatures": {
+          "torch.float32, torch.float32, 'sum'": 148
+        }
+      },
+      "fx_syntax_sha256": "304d046755bd8ed88f54c335740d730ee9660c889778fe71afaa9080b3e87414"
+    },
+    "forward": {
+      "normalized_sha256": "8fac0cfbd65677e705b68e36fa27049aaa3c92a25a3f855ccafea0ce824631d6",
+      "kernel_definitions": [
+        {
+          "names": [
+            "cpp_fused_add_embedding_native_layer_norm_unsqueeze_0"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "22a071cb571a64f68a6ec47990e59a93e7e8178d9a11111c013cf6a47616df1b",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float",
+            "int64_t,2"
+          ],
+          "scalar_types": {
+            "float": 44
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        },
+        {
+          "names": [
+            "cpp_fused__to_copy_add_arange_bitwise_and_expand_index_le_new_ones_scalar_tensor_unsqueeze_where_1"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "edb18c3ef16ca5fd7dfed3e0bdc81e57ac6b0c89393b379ed0195496d801252d",
+          "reduction_markers": {},
+          "vector_types": [
+            "float",
+            "int64_t,2"
+          ],
+          "scalar_types": {
+            "float": 7
+          },
+          "explicit_accumulator_types": {}
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_view_2"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "1ee4e67a3e0bb64ae3d0e797eadf16414790adb0e720df0b511851fcd81b4da3",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 44
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_mul_pow_tanh_view_3"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "841086e83fb515908f96a58332fa7765b930ffbf5bd162cc32ec1ced8765c33e",
+          "reduction_markers": {},
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 11
+          },
+          "explicit_accumulator_types": {}
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_view_4"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "cd312f21ce8cc90d84b5fde4322c425f95ae403cba3f6a87de3a7b166a4b6e9c",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 48
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_5"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "2f022765270fb0181530bb150e278b32eaa2d99b4d9389f6ea5f1158a35e9f66",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 50
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_6"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "d8fa2d7f92300d01bd15cf50a3f651a0bb6bd7cc0f5ce9c6d66268956b85df22",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 45
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_7"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "b57532d7abd6c6ab0b1f2dcaed314fbd40898740df514e6ae2bdfe988553c376",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 49
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_8"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "e265dce40c83a55b9391c345c30d719c3f18b1a725a5ab75a0bb57f4b53f9008",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 53
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_9"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "1c081917d079846d510a9d1d3e1a605643c2bc4ccb52a78a86cdf13f346ad252",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 50
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        },
+        {
+          "names": [
+            "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_10"
+          ],
+          "compiler": "async_compile.cpp_pybinding",
+          "source_sha256": "5766d39dab140a7c379fec0e3a51c673005c5c12fc9da213c698ffcc897d640f",
+          "reduction_markers": {
+            "vec_reduce_all": 2
+          },
+          "vector_types": [
+            "float"
+          ],
+          "scalar_types": {
+            "float": 57
+          },
+          "explicit_accumulator_types": {
+            "float": 2
+          }
+        }
+      ],
+      "kernel_definition_count": 11,
+      "generated_kernel_call_sites": {
+        "cpp_fused__to_copy_add_arange_bitwise_and_expand_index_le_new_ones_scalar_tensor_unsqueeze_where_1": 1,
+        "cpp_fused_add_embedding_native_layer_norm_unsqueeze_0": 1,
+        "cpp_fused_add_mul_pow_tanh_view_3": 12,
+        "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_10": 1,
+        "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_5": 1,
+        "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_6": 5,
+        "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_7": 5,
+        "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_8": 5,
+        "cpp_fused_add_native_layer_norm_native_layer_norm_backward_view_9": 5,
+        "cpp_fused_add_native_layer_norm_view_2": 1,
+        "cpp_fused_add_native_layer_norm_view_4": 1
+      },
+      "extern_call_sites": {
+        "extern_kernels.addmm": 48
+      },
+      "operator_call_sites": {
+        "torch.ops.aten._scaled_dot_product_flash_attention_for_cpu.default": 12
+      },
+      "scope": "Static emitted code. Counts are definitions/call sites, not runtime launches. Reduction markers and type tokens are observations, not inferred accumulation semantics. Equal generated code does not establish equal linked libraries or included headers.",
+      "generated_call_site_count": 38,
+      "ir_pre_fusion": {
+        "normalized_sha256": "4c8e7d1357c43455009e8c053dfce5e2a94f973666181e95bd3b9eda8409bd45",
+        "status": "parsed",
+        "top_level_node_count": 255,
+        "top_level_node_kinds": {
+          "ExternKernelSchedulerNode(ExternKernelOut)": 48,
+          "ExternKernelSchedulerNode(FallbackKernel)": 12,
+          "ExternKernelSchedulerNode(MultiOutput)": 24,
+          "SchedulerNode(ComputedBuffer)": 171
+        },
+        "top_level_fusion_groups": {},
+        "nested_child_count": 0,
+        "reduction_signatures": {
+          "torch.float32, torch.float32, 'sum'": 50
+        }
+      },
+      "ir_post_fusion": {
+        "normalized_sha256": "46c6c072026bff2299e6d5f2425bddf7c83cfd0f12a98ea37ae8e0b92bfb8878",
+        "status": "parsed",
+        "top_level_node_count": 142,
+        "top_level_node_kinds": {
+          "ExternKernelSchedulerNode(ExternKernelOut)": 48,
+          "ExternKernelSchedulerNode(FallbackKernel)": 12,
+          "ExternKernelSchedulerNode(MultiOutput)": 24,
+          "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode)": 3,
+          "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)": 22,
+          "SchedulerNode(ComputedBuffer)": 33
+        },
+        "top_level_fusion_groups": {
+          "op1_op2": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op16_op17": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op24_op25": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode)",
+          "op33_op34_op35_op36_op37_op252": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op41_op42_op43_op44_op45_op251": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op51_op52_op53_op54_op55_op250": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op59_op60_op61_op62_op63_op249": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op70_op71_op72_op73_op74_op248": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op78_op79_op80_op81_op82_op247": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op88_op89_op90_op91_op92_op246": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op96_op97_op98_op99_op100_op245": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op107_op108_op109_op110_op111_op244": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op115_op116_op117_op118_op119_op243": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op125_op126_op127_op128_op129_op242": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op133_op134_op135_op136_op137_op241": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op144_op145_op146_op147_op148_op240": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op152_op153_op154_op155_op156_op239": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op162_op163_op164_op165_op166_op238": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op170_op171_op172_op173_op174_op237": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op181_op182_op183_op184_op185_op236": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op189_op190_op191_op192_op193_op235": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op199_op200_op201_op202_op203_op234": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op207_op208_op209_op210_op211_op233": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op218_op219_op220_op221_op222_op232": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)",
+          "op226_op227_op228_op229_op230_op231": "OuterLoopFusedSchedulerNode(SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode,SchedulerNode)"
+        },
+        "nested_child_count": 138,
+        "reduction_signatures": {
+          "torch.float32, torch.float32, 'sum'": 50
+        }
+      },
+      "fx_syntax_sha256": "d6d9dbe4d04d04f2aaf0457ad5b2d6e21405d390714ff385093e4abcb11345c3"
+    }
+  },
+  "observations": {
+    "2026-11-04": [
+      {
+        "status": "gradient_mismatch",
+        "outcome_sha256": "33f7941aed48c3c2695b6a077657435a0cc09c01448ce2cc323ea0f43920c679",
+        "paired_gradients": 147,
+        "median_log2_growth": 0.0
+      },
+      {
+        "status": "gradient_mismatch",
+        "outcome_sha256": "249a280831b2123b639ae9e3957f69910701824809d1d8081658ca0bcb458db0",
+        "paired_gradients": 147,
+        "median_log2_growth": 0.0
+      },
+      {
+        "status": "gradient_mismatch",
+        "outcome_sha256": "48b0b4ad3eee6d21c638fdcec1a5544a6bf3ae948b1541d0909519fe71b542e6",
+        "paired_gradients": 147,
+        "median_log2_growth": 0.0
+      }
+    ],
+    "2026-11-05": [
+      {
+        "status": "gradient_mismatch",
+        "outcome_sha256": "0a29c215dd6792fbad12a5cf6661170b379ca15d4233b228d2b33239cc17297b",
+        "paired_gradients": 147,
+        "median_log2_growth": 0.7739668316531798
+      },
+      {
+        "status": "gradient_mismatch",
+        "outcome_sha256": "7298bc5ed0eb4fc3ddb5279bfd9283a9758977ad41427df6b9caa34881b909a5",
+        "paired_gradients": 147,
+        "median_log2_growth": 0.7739668316531798
+      },
+      {
+        "status": "gradient_mismatch",
+        "outcome_sha256": "95ca94f384b4bb83acaff61391b4ecdd8d23a5abf1e4ecde8555bd8ae691d795",
+        "paired_gradients": 147,
+        "median_log2_growth": 0.7739668316531798
+      }
+    ]
+  }
+}
