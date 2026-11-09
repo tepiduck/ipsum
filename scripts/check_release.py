@@ -17,7 +17,6 @@ FILES = {
     ".github/workflows/ci.yml",
     ".github/workflows/gpu.yml",
     ".github/workflows/nightly.yml",
-    "LICENSE",
     "README.md",
     "RESULTS.md",
     "pyproject.toml",
@@ -86,8 +85,6 @@ def archive_allowed(name, wheel):
                 "RECORD",
                 "entry_points.txt",
                 "top_level.txt",
-                "licenses/LICENSE",
-                "LICENSE",
             }
         )
     if public_source(name) or name in {"PKG-INFO", "setup.cfg"}:

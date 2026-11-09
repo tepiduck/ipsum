@@ -399,7 +399,3 @@ for relevant floating-point behavior.
 
 Faultline's reducer is independent of PyTorch's internal minifier. Exported scripts can request the
 upstream debugger with `--native-minifier`; its behavior depends on the PyTorch version and failure.
-
-## License
-
-MIT. See [LICENSE](LICENSE).
