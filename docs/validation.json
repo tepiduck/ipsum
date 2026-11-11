@@ -30948,5 +30948,506 @@
       },
       "license_metadata_and_files_absent": true
     }
+  },
+  "input_accuracy_validation": {
+    "version": "0.15.0",
+    "advisory_only": true,
+    "upstream_submitted": false,
+    "scope": "Final bounded exp_u20 investigation: input batches as replication units. No primary status, tolerance, signature, reducer predicate, exit-code or earlier advisory label changes.",
+    "provenance": {
+      "policy_sha256": "8fbb91b63d7a33d572fc75a8d4c586562545e0ef195aec6066eafeffe9dca770",
+      "source": {
+        "created_utc": "2026-11-11T10:56:42.778399+00:00",
+        "faultline_source_sha256": "9eb40b2a72a15d214b5cac7bf45594565c781116374f67d62bcbbc9c7d78dc2b",
+        "git_sha": null,
+        "platform": "Linux-6.6.87.2-microsoft-standard-WSL2-x86_64-with-glibc2.39",
+        "python": "3.12.3"
+      }
+    },
+    "policy_sha256": "8fbb91b63d7a33d572fc75a8d4c586562545e0ef195aec6066eafeffe9dca770",
+    "measurement_file": "docs/input-accuracy-015.json",
+    "input_file": "docs/input-batches-015.json",
+    "table": "docs/input-accuracy-015.csv",
+    "summary": {
+      "gpt2": {
+        "expected_batches": 20,
+        "unit_of_replication": "input_batch",
+        "compiled": {
+          "conclusive_batches": 20,
+          "inconclusive_batch_ids": [],
+          "worse": 11,
+          "better": 9,
+          "ties": 0,
+          "sign_trials": 20,
+          "descriptive_p_value": 0.41190147399902344,
+          "median_log2_growth": {
+            "status": "finite",
+            "value": 0.011486444586099154
+          },
+          "median_growth": {
+            "status": "finite",
+            "value": 1.0079935760670482
+          },
+          "decision": "not_systematic"
+        },
+        "eager": {
+          "conclusive_batches": 20,
+          "inconclusive_batch_ids": [],
+          "worse": 12,
+          "better": 8,
+          "ties": 0,
+          "sign_trials": 20,
+          "descriptive_p_value": 0.2517223358154297,
+          "median_log2_growth": {
+            "status": "finite",
+            "value": 0.03896258227291538
+          },
+          "median_growth": {
+            "status": "finite",
+            "value": 1.0273747930489698
+          },
+          "decision": "not_systematic"
+        }
+      },
+      "bert": {
+        "expected_batches": 20,
+        "unit_of_replication": "input_batch",
+        "compiled": {
+          "conclusive_batches": 20,
+          "inconclusive_batch_ids": [],
+          "worse": 8,
+          "better": 12,
+          "ties": 0,
+          "sign_trials": 20,
+          "descriptive_p_value": 0.8684120178222656,
+          "median_log2_growth": {
+            "status": "finite",
+            "value": -0.007573583079144797
+          },
+          "median_growth": {
+            "status": "finite",
+            "value": 0.9947641473525898
+          },
+          "decision": "not_systematic"
+        },
+        "eager": {
+          "conclusive_batches": 20,
+          "inconclusive_batch_ids": [],
+          "worse": 6,
+          "better": 14,
+          "ties": 0,
+          "sign_trials": 20,
+          "descriptive_p_value": 0.9793052673339844,
+          "median_log2_growth": {
+            "status": "finite",
+            "value": -0.041222589748066696
+          },
+          "median_growth": {
+            "status": "finite",
+            "value": 0.9718310350753745
+          },
+          "decision": "not_systematic"
+        }
+      },
+      "pythia_160m": {
+        "expected_batches": 20,
+        "unit_of_replication": "input_batch",
+        "compiled": {
+          "conclusive_batches": 20,
+          "inconclusive_batch_ids": [],
+          "worse": 9,
+          "better": 11,
+          "ties": 0,
+          "sign_trials": 20,
+          "descriptive_p_value": 0.7482776641845703,
+          "median_log2_growth": {
+            "status": "finite",
+            "value": -0.013373093729152519
+          },
+          "median_growth": {
+            "status": "finite",
+            "value": 0.9907733073685597
+          },
+          "decision": "not_systematic"
+        },
+        "eager": {
+          "conclusive_batches": 20,
+          "inconclusive_batch_ids": [],
+          "worse": 11,
+          "better": 9,
+          "ties": 0,
+          "sign_trials": 20,
+          "descriptive_p_value": 0.41190147399902344,
+          "median_log2_growth": {
+            "status": "finite",
+            "value": 0.0125571046329096
+          },
+          "median_growth": {
+            "status": "finite",
+            "value": 1.0087419109370739
+          },
+          "decision": "not_systematic"
+        }
+      },
+      "gpt2_11": {
+        "expected_batches": 20,
+        "unit_of_replication": "input_batch",
+        "compiled": {
+          "conclusive_batches": 20,
+          "inconclusive_batch_ids": [],
+          "worse": 9,
+          "better": 11,
+          "ties": 0,
+          "sign_trials": 20,
+          "descriptive_p_value": 0.7482776641845703,
+          "median_log2_growth": {
+            "status": "finite",
+            "value": -0.003864603777522291
+          },
+          "median_growth": {
+            "status": "finite",
+            "value": 0.9973248454080442
+          },
+          "decision": "not_systematic"
+        },
+        "eager": {
+          "conclusive_batches": 20,
+          "inconclusive_batch_ids": [],
+          "worse": 9,
+          "better": 11,
+          "ties": 0,
+          "sign_trials": 20,
+          "descriptive_p_value": 0.7482776641845703,
+          "median_log2_growth": {
+            "status": "finite",
+            "value": -0.006390941226662061
+          },
+          "median_growth": {
+            "status": "finite",
+            "value": 0.9955799344778962
+          },
+          "decision": "not_systematic"
+        }
+      }
+    },
+    "calibration_controls": 7,
+    "planned_workers": 160,
+    "analysis_cli_matches": true,
+    "independent_analysis": {
+      "all_equal": true,
+      "method": "Independent direct child/parent quotient; public analysis uses difference of logarithms. Agreement to 1e-12, exact signs, p-values and decisions.",
+      "models": {
+        "gpt2": {
+          "compiled": {
+            "worse": 11,
+            "better": 9,
+            "ties": 0,
+            "growth": 1.007993576067048,
+            "p": 0.41190147399902344,
+            "decision": "not_systematic",
+            "min_growth": 0.37827956596663265,
+            "max_growth": 1.5969369977063703
+          },
+          "eager": {
+            "worse": 12,
+            "better": 8,
+            "ties": 0,
+            "growth": 1.0273747930489692,
+            "p": 0.2517223358154297,
+            "decision": "not_systematic",
+            "min_growth": 0.595094223516313,
+            "max_growth": 1.8742965155881195
+          }
+        },
+        "bert": {
+          "compiled": {
+            "worse": 8,
+            "better": 12,
+            "ties": 0,
+            "growth": 0.994764147352589,
+            "p": 0.8684120178222656,
+            "decision": "not_systematic",
+            "min_growth": 0.34757970940069316,
+            "max_growth": 1.5246389040490127
+          },
+          "eager": {
+            "worse": 6,
+            "better": 14,
+            "ties": 0,
+            "growth": 0.9718310350753749,
+            "p": 0.9793052673339844,
+            "decision": "not_systematic",
+            "min_growth": 0.3632603865847526,
+            "max_growth": 1.2751971987360677
+          }
+        },
+        "pythia_160m": {
+          "compiled": {
+            "worse": 9,
+            "better": 11,
+            "ties": 0,
+            "growth": 0.9907733073685597,
+            "p": 0.7482776641845703,
+            "decision": "not_systematic",
+            "min_growth": 0.6851818075597056,
+            "max_growth": 1.1480250287581015
+          },
+          "eager": {
+            "worse": 11,
+            "better": 9,
+            "ties": 0,
+            "growth": 1.0087419109370739,
+            "p": 0.41190147399902344,
+            "decision": "not_systematic",
+            "min_growth": 0.5468287148993113,
+            "max_growth": 1.315204945932744
+          }
+        },
+        "gpt2_11": {
+          "compiled": {
+            "worse": 9,
+            "better": 11,
+            "ties": 0,
+            "growth": 0.9973248454080442,
+            "p": 0.7482776641845703,
+            "decision": "not_systematic",
+            "min_growth": 0.8734277658697416,
+            "max_growth": 1.1197371118646393
+          },
+          "eager": {
+            "worse": 9,
+            "better": 11,
+            "ties": 0,
+            "growth": 0.9955799344778956,
+            "p": 0.7482776641845703,
+            "decision": "not_systematic",
+            "min_growth": 0.9285199539777099,
+            "max_growth": 1.2677184601197395
+          }
+        }
+      }
+    },
+    "checks": [
+      {
+        "name": "compiler-tests",
+        "returncode": 0
+      },
+      {
+        "name": "compiler-campaign",
+        "returncode": 0
+      }
+    ],
+    "compiler_checks_source_sha256": "d6d387e671e203c30011e04aa2a7498cb984bd7acd16a954d9e6ed0d9fecd8d8",
+    "windows_portable": {
+      "returncode": 0,
+      "seconds": 484.0470000000205,
+      "source": {
+        "created_utc": "2026-11-11T11:08:03.248303+00:00",
+        "python": "3.12.10",
+        "platform": "Windows-11-10.0.26200-SP0",
+        "git_sha": "3e0ea8c0b8d7623b14f2a6d23f54c51fa58e04f4",
+        "faultline_source_sha256": "d6d387e671e203c30011e04aa2a7498cb984bd7acd16a954d9e6ed0d9fecd8d8"
+      }
+    },
+    "compiler_campaign": {
+      "validation_passed": true,
+      "checks": [
+        {
+          "name": "eager-control",
+          "passed": true
+        },
+        {
+          "name": "sum-mutant",
+          "passed": true
+        },
+        {
+          "name": "relu-mutant",
+          "passed": true
+        },
+        {
+          "name": "softmax-mutant",
+          "passed": true
+        },
+        {
+          "name": "nan-mutant",
+          "passed": true
+        },
+        {
+          "name": "unstable-control",
+          "passed": true
+        },
+        {
+          "name": "exception-control",
+          "passed": true
+        },
+        {
+          "name": "worker-crash-control",
+          "passed": true
+        },
+        {
+          "name": "independent-standalone-reproducer",
+          "passed": true
+        },
+        {
+          "name": "reduction-retains-target-operation",
+          "passed": true
+        },
+        {
+          "name": "saved-finding-replay-preserves-policy-and-evidence",
+          "passed": true
+        },
+        {
+          "name": "standalone-exception-confirmation",
+          "passed": true
+        },
+        {
+          "name": "resume-preserves-completed-evidence",
+          "passed": true
+        },
+        {
+          "name": "compiler-toolchain-operational",
+          "passed": true
+        }
+      ],
+      "real_compiler": {
+        "counts": {
+          "numerical_mismatch": 1,
+          "pass": 17
+        },
+        "failure_families": {
+          "numerical_mismatch:outputs=[(0, 'numeric')]:backend=inductor": [
+            "0009-5a23a48497fa"
+          ]
+        },
+        "note": "Tolerance exceedances are unconfirmed candidates."
+      },
+      "raw_validation_sha256": "85dca97c1199d1a69ce507ad8257f9eba767e8fcc7ceb7fd55127d659cf61433"
+    },
+    "executed_checks_summary": {
+      "windows_portable": {
+        "passed": 309,
+        "skipped": 1,
+        "compiler_deselected": 12
+      },
+      "linux_cpu_inductor": {
+        "passed": 12,
+        "deselected": 310
+      },
+      "legacy": {
+        "passed": 31,
+        "asyncio_mode": "auto"
+      },
+      "ruff": {
+        "lint": "passed",
+        "requested_format": "passed",
+        "requested_format_files": 92,
+        "full_format_files": 98
+      }
+    },
+    "preservation": {
+      "base_commit": "3e0ea8c0b8d7623b14f2a6d23f54c51fa58e04f4",
+      "unchanged_existing_source_files": 51,
+      "prior_validation_entries_unchanged": 22,
+      "prior_results_prefix_preserved": true,
+      "prior_evidence_sha256": {
+        "docs/accuracy-investigation-012.csv": "848fbd8b0b357d7a353d2e539c88578d8dea0befe44cf8fd0c6d4cc97b8d27bb",
+        "docs/accuracy-investigation.md": "dae221f72b1785132178e2a5e8a13654d36c84351b300d306efc457074fcd909",
+        "docs/accuracy-shift-010.csv": "44070ab769346daae40cc6c4dde244394b58ea39e1afee41f518b1267a0c4e2b",
+        "docs/accuracy-shift-011.csv": "337ca7a5c7a93527ca428a1b188ad484ff49663802fed2fb4f5e7df4ee258868",
+        "docs/attention-association-013.csv": "8935924f8bc133580396e6a4f16ac690767b9b0f37b91ecff905037f3b33b2cc",
+        "docs/attention-capture-013.json": "b2216b816d47d35b6d77e06fadbf569e76baa01c03da859d410b7d5433c76e13",
+        "docs/attention-consistency-013.csv": "5a5b26c4efb7fb7cf626a1b6d5d0eee209fc172d76f5feed5ab7e4e73f3ed806",
+        "docs/attention-heads-013.csv": "819e9efc2662b8cd7de85a00b57a04b6e35b7635c9736cf8c10e7107c7b13da3",
+        "docs/attention-investigation.md": "91613f399adea279a8df326a64b9494e17d67eb028ba6e4eaaa9f9c277753420",
+        "docs/attention-kernel-013.csv": "b9c232102e8c855cecef698719222cad2fca9f6d577b5ca3b5e35c3a27ea083e",
+        "docs/attention-rows-013.csv": "d35b704545b790c17b5834841fdede799a5ee47850a4510f8b464758a824b748",
+        "docs/attribution-013.csv": "76ae311ab3e76a51e32820f202fb16fde81eeef1bca72672ac9257eeef265f81",
+        "docs/bisect.md": "2e071d7ff1edb1abbccc307fc442d311b35a31e63608c4586d5fab3df482821e",
+        "docs/bisection-011.csv": "80f472f9b85db70853b845dfc6c98aed830ce901995a209447c9caa05f90c0f9",
+        "docs/cli.md": "0dd11fcdf9fc79821138b0f8b97fbd510f050b438246b2361ad31032bd9d3e0e",
+        "docs/diagnostics.md": "f136c9383b2a742f48e45dd3627e02af095520984a2b0a139510cd01334722ef",
+        "docs/exp-accuracy-013.csv": "1beef360561efd65a2cd34ee5950b625a9df7a39a059ac24ca05efd7de51de00",
+        "docs/exp-timing-013.csv": "df2b24e0e9d5e786dde24ddb78431b7728bcdd672d5bf900664291ca086f5aa6",
+        "docs/gelu-block12-014.csv": "17cc0706b1da77d361020cecceb8872adef887a790634230f22da23f22e5831a",
+        "docs/gelu-capture-014.json": "387d588560d689728f99817cc730394373bc0c5e40b59cc59aa72b36a16eb1ea",
+        "docs/gelu-code-014.json": "7445752cc44cb9ea2f4db6a0c045d81dba9bd48dc7aebd400180c7c7ee06c0de",
+        "docs/gelu-exp-grid-014.csv": "8c02ce455138efe72945e454c6f40055b3b000ea272e5d3b9b91256e4b76e34d",
+        "docs/gelu-investigation.md": "8b2d7ab32999c54ec222df5eb53bbe3b2c0a98e4f076b7f23417043263834b9f",
+        "docs/gelu-ranges-014.csv": "ad75353046668069903b7e376801d178c48a8e377ba6b504378d0035dc049fdd",
+        "docs/gpt2-accuracy.csv": "814e622da726f7330d0b69ed1d3940935acb26af2f48227813a9b447e04c2135",
+        "docs/gradient-scales-012.csv": "4bf5a63a3e3167c88707e3447eed38219bbe3efe99dd1a77a270e092b575e43e",
+        "docs/inductor-code-012.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "docs/inductor-code-012.json": "2e4e8a0dcec8952ba59e046fc7add1118a0db133caf6f0e21e7ae04aa307b1d8",
+        "docs/inductor-config-012.diff": "cb1613e51fd4ea97e61097e73a7a06d1b5bcfad65b0a70fecb32f4d73c1e4eb9",
+        "docs/inductor-fx-012.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "docs/upstream-report-draft-012.md": "5a6019a426e17712d8fca2b36b0bef339fee99378665a3b55d01b96f00e45dcc",
+        "docs/upstream-report-draft-013.md": "01a18e15e2c8283a80ef6f0860312f177a6c93efd53ab8e5de4654972f3ee12f",
+        "docs/v011-policy.json": "4a15461e835897b15086d83d54f00736235bd7e2a737b10a8bc0ab8425af8877",
+        "docs/v013-kernel-controls.json": "6bb2f9d66e413316999364f01499a6af7517db02f56527b3e9a4b27d5b688437",
+        "docs/v013-policy.json": "685400cf355486d8d124bc625b8b67bf60a8cfdda08336fd7e53b1f643f8e12d",
+        "docs/v014-policy.json": "25c85be42bc92595b9ba4aba4eac231ed63f90c7b3080928028334c8d04ea747"
+      },
+      "original_report_archive": "docs/upstream-report-draft-014.md"
+    },
+    "public_artifacts": {
+      "docs/input-accuracy-015.csv": "64af07cd3f52aa515620936d8bb40f4b035307033ee13e3b1886a78bfe60f3bc",
+      "docs/input-accuracy-015.json": "5fee55b929757886f7042185ae9014d4b99394b4dbbb8cd20ff8421c5a073c79",
+      "docs/input-accuracy.md": "56843661b0ed177b9ddc636430c8331554cb9ebeda38074e17621a65330fd090",
+      "docs/input-batches-015.json": "1eac30a967f7298d8f451727ae490946b5ffbcc8e67a87577885082847cbfb1d",
+      "docs/numerics.md": "04f577e709c210411a2bc323cc2dbe4d7cfcfb3d39a71196d546913eedcd70eb",
+      "docs/sweeps.md": "d7f879291910cf279275ad77ab2ed76fd61887ba6bdb490c17f2b7eb61d33b43",
+      "docs/upstream-report-draft-014.md": "7a5fe7b537c8dd9f24ab00071252cd3fe3a5361456b1fdf826f1b486b084d245",
+      "docs/upstream-report-draft.md": "60cc4e9e48cf622c06637a542e6ce0cbdb70b7ab7026a71ab3fb9b1c7f93dfc4",
+      "docs/v015-policy.json": "8fbb91b63d7a33d572fc75a8d4c586562545e0ef195aec6066eafeffe9dca770",
+      "examples/input_batch_accuracy.py": "59af0634a044a4ba4ad074e9c07e532156e5c23730f77ffaff9950a24dcf36ed",
+      "scripts/summarize_input_accuracy.py": "ff9cb3a0c447efd6e5fcb4073bbdc036e2dd8cc4b0f3860d9a117cedfdec7ab8"
+    },
+    "distribution_checks": {
+      "stage": "Prepublication audited-index build; final documentation added afterward with unchanged executable source.",
+      "git_normalized_source_sha256": "9324cff1ca078196fe7c03075996963fdf90d11273d9140cae37a33789cd694f",
+      "archive_members": {
+        "faultline_ml-0.15.0-py3-none-any.whl": 57,
+        "faultline_ml-0.15.0.tar.gz": 158
+      },
+      "public_index_files": 155,
+      "build": {
+        "peak_tree_rss_mb": 115.94140625,
+        "returncode": 0,
+        "status": "complete",
+        "wall_s": 2.914499117000105
+      },
+      "independent_wheel_install_smoke": {
+        "checks": {
+          "code-diff": {
+            "peak_tree_rss_mb": 32.1171875,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 0.41508744600014325
+          },
+          "corpus": {
+            "peak_tree_rss_mb": 463.87890625,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 7.046044151999922
+          },
+          "identity": {
+            "peak_tree_rss_mb": 4.25,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 0.05156779100025233
+          },
+          "version": {
+            "peak_tree_rss_mb": 225.40625,
+            "returncode": 0,
+            "status": "complete",
+            "wall_s": 1.0860898179998912
+          }
+        },
+        "installed_code_diff_same_normalized_modules": true,
+        "scope": "Wheel and dependencies installed into an independent venv; imported file location and Git-normalized source hash verified.",
+        "source_sha256": "9324cff1ca078196fe7c03075996963fdf90d11273d9140cae37a33789cd694f"
+      },
+      "license_metadata_and_files_absent": true
+    }
   }
 }

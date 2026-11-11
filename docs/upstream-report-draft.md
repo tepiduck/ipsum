@@ -1,13 +1,51 @@
-# Draft: CPU GPT-2 gradient accuracy shift after the exp_u20 change
+# Draft: CPU accuracy shift — multi-input evidence
 
-Status: repository draft; not submitted upstream. This reports a measured accuracy shift and asks
-whether it is an expected numerical trade-off. It does not claim a compiler defect or a change
-in model quality.
+Status: **Not recommended for filing. Repository draft only; not submitted upstream. No compiler-defect claim.**
 
-Updated with the 0.14 investigation. The [0.12 draft](upstream-report-draft-012.md) and
-[0.13 draft](upstream-report-draft-013.md) are retained verbatim. The full GPT-2 workload remains
-the reproducer: fixed-tensor attention tests did not reproduce the full-model shift, and the
-generated GELU kernels do not call exp_u20. No minimal kernel reproducer is claimed.
+The original full GPT-2 compiled shift did not meet the predeclared systematic-across-inputs rule.
+The single-input shift was not an input-robust regression in this experiment. The upstream report
+draft is not recommended for filing. The original numerical measurements and three-model
+parent/child attribution remain valid for their frozen inputs; they do not establish a systematic
+degradation across passages.
+
+## Twenty-batch replication (0.15)
+
+| Model | Path | Worse / better / ties | Median growth | Batch sign p | Decision |
+|---|---|---:|---:|---:|---|
+| GPT-2 (12 layers) | compiled | 11 / 9 / 0 | 1.007994× | 0.41190147 | not systematic |
+| GPT-2 (12 layers) | eager | 12 / 8 / 0 | 1.027375× | 0.25172234 | not systematic |
+| BERT | compiled | 8 / 12 / 0 | 0.994764× | 0.86841202 | not systematic |
+| BERT | eager | 6 / 14 / 0 | 0.971831× | 0.97930527 | not systematic |
+| Pythia-160M | compiled | 9 / 11 / 0 | 0.990773× | 0.74827766 | not systematic |
+| Pythia-160M | eager | 11 / 9 / 0 | 1.008742× | 0.41190147 | not systematic |
+| GPT-2 (11 layers) | compiled | 9 / 11 / 0 | 0.997325× | 0.74827766 | not systematic |
+| GPT-2 (11 layers) | eager | 9 / 11 / 0 | 0.995580× | 0.74827766 | not systematic |
+
+All 160 fresh workers completed, covering 80 paired batches. Seven original-input controls
+reproduced every retained eager and compiled gradient RMSE exactly before the new runs.
+The present-gradient counts are 148 for GPT-2, 197 for BERT, 147 for Pythia and 136 for GPT-2-11.
+The original GPT-2's 149 value targets included one forward output. No target is treated as
+an independent input replicate. All fp64 gradient hashes match across builds in 80/80 pairs.
+Each build is compared with its own fp64 reference as predeclared.
+
+No passages were replaced, no thresholds were fitted after observing results, and no previous
+labels changed. Exact ties are excluded only from the binomial trial count. The p-values are
+descriptive: the batches were sampled without replacement from one book and share model weights
+and a fixed VJP. This is neither a false-positive rate nor evidence about task accuracy.
+
+The [predeclared policy](v015-policy.json), [sampling and method](input-accuracy.md),
+[per-batch CSV](input-accuracy-015.csv) and [machine-readable evidence](input-accuracy-015.json)
+document the final bounded investigation. Existing source builds of parent `eb48c7e2` and
+child `2450619a` were reused. The original three-model source attribution is retained below;
+it must be read together with the input-level results above. Numerical changes may reflect
+an intended trade-off. The full-model propagation mechanism remains unresolved.
+
+The original GPT-2 script below reproduces its frozen-input observation. It is not evidence
+that every input gets the same change. The new [batch measurement example](../examples/input_batch_accuracy.py)
+and [summary script](../scripts/summarize_input_accuracy.py) provide the separate input-level analysis.
+
+The [0.14 draft](upstream-report-draft-014.md), [0.13 draft](upstream-report-draft-013.md) and
+[0.12 draft](upstream-report-draft-012.md) remain archived unchanged. No upstream issue was filed.
 
 ## Observation and source boundary
 

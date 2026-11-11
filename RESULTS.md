@@ -1367,3 +1367,90 @@ The Git-normalized packaged source hash is
 `3f3fc9b7f303cbbdb06a042d106897ab881a3a027704f37e3f38823dfd4424cc`.
 This release changes the version and adds a separate diagnostic example and evidence; no
 numerical tolerance, primary verdict or reducer behavior changes.
+
+## 0.15 — replication across input batches
+
+The original full GPT-2 compiled shift did not meet the predeclared systematic-across-inputs rule.
+The single-input shift was not an input-robust regression in this experiment. The upstream report
+draft is not recommended for filing. The original numerical measurements and three-model
+parent/child attribution remain valid for their frozen inputs; they do not establish a systematic
+degradation across passages.
+
+The policy in [v015-policy.json](docs/v015-policy.json) was frozen before execution. Twenty
+batches per model were drawn with seed 150015 from disjoint 200-word chunks of the frozen
+public-domain Alice text, excluding both original paragraphs. The original pinned tokenizers
+produce 2×64-token inputs. Full GPT-2, BERT, Pythia-160M and the existing eleven-layer GPT-2
+variant run on the unchanged parent and child source builds; GPT-2 variants share token tensors.
+The fixed seed-zero ±1 VJP, weights, layouts and one-thread settings are retained.
+
+For each path, one batch contributes the median log2 child/parent gradient RMSE growth against
+each build's fp64 reference. The forward output is excluded. The predeclared rule requires
+at least 16/20 worsening batches and median growth ≥1.25× for “systematic across inputs”;
+≤13/20 is “not systematic”, otherwise “mixed”. The exact one-sided binomial p-value on batch
+signs is descriptive and is not an additional threshold.
+
+| Model | Path | Worse / better / ties | Median growth | Batch sign p | Decision |
+|---|---|---:|---:|---:|---|
+| GPT-2 (12 layers) | compiled | 11 / 9 / 0 | 1.007994× | 0.41190147 | not systematic |
+| GPT-2 (12 layers) | eager | 12 / 8 / 0 | 1.027375× | 0.25172234 | not systematic |
+| BERT | compiled | 8 / 12 / 0 | 0.994764× | 0.86841202 | not systematic |
+| BERT | eager | 6 / 14 / 0 | 0.971831× | 0.97930527 | not systematic |
+| Pythia-160M | compiled | 9 / 11 / 0 | 0.990773× | 0.74827766 | not systematic |
+| Pythia-160M | eager | 11 / 9 / 0 | 1.008742× | 0.41190147 | not systematic |
+| GPT-2 (11 layers) | compiled | 9 / 11 / 0 | 0.997325× | 0.74827766 | not systematic |
+| GPT-2 (11 layers) | eager | 9 / 11 / 0 | 0.995580× | 0.74827766 | not systematic |
+
+All 160 fresh workers completed, covering 80 paired batches. Seven original-input controls
+reproduced every retained eager and compiled gradient RMSE exactly before the new runs.
+The present-gradient counts are 148 for GPT-2, 197 for BERT, 147 for Pythia and 136 for GPT-2-11.
+The original GPT-2's 149 value targets included one forward output. No target is treated as
+an independent input replicate. All fp64 gradient hashes match across builds in 80/80 pairs.
+Each build is compared with its own fp64 reference as predeclared.
+
+No passages were replaced, no thresholds were fitted after observing results, and no previous
+labels changed. Exact ties are excluded only from the binomial trial count. The p-values are
+descriptive: the batches were sampled without replacement from one book and share model weights
+and a fixed VJP. This is neither a false-positive rate nor evidence about task accuracy.
+
+The [investigation guide](docs/input-accuracy.md), [complete per-batch table](docs/input-accuracy-015.csv),
+[input manifest](docs/input-batches-015.json) and [measurement evidence](docs/input-accuracy-015.json)
+retain all models and paths. Large raw measurements, weights, source builds and caches remain local.
+The target-level `accuracy_shift` documentation now explicitly distinguishes correlated targets
+from input replicates. Its thresholds and prior labels remain unchanged. A separate standalone
+batch summary implements the new rule; the production sweep extension remains a design note.
+
+This concludes the bounded exp_u20 investigation. The kernel and generated-GELU null results
+from 0.13–0.14 remain intact; no new causal mechanism or compiler defect is claimed. The
+[report draft](docs/upstream-report-draft.md) leads with the new evidence and preserves the
+earlier single-input context. Its [0.14 version](docs/upstream-report-draft-014.md) is archived
+byte-for-byte. Nothing was filed upstream.
+
+### 0.15 executed checks
+
+| Check | Result |
+|---|---|
+| Original-input calibration | 7 controls, every retained eager/compiled gradient RMSE exact |
+| New-input measurements | 160/160 workers complete; all 80 paired fp64 gradient references exact |
+| Independent batch calculation | All scores agree to 1e-12; signs, decisions and exact p-values agree |
+| Summary CLI | Matches the recorded summaries for all four models |
+| Windows portable suite | 309 passed, 1 skipped; 12 compiler tests deselected |
+| Linux CPU Inductor suite | 12 passed; 310 tests deselected |
+| Compiler validation campaign | All 14 checks passed; 17 passes and 1 unconfirmed numerical discrepancy |
+| Legacy tests | 31 passed with asyncio auto mode |
+| Ruff lint and formatting | Passed; 92 files in the requested format scope, 98 with all scripts |
+| Publication audit | 155 allowed Git-index files; 57 wheel and 158 source-archive members |
+| Independent installed-wheel checks | Package location, version, source hash, eager corpus and code comparator passed |
+
+Eleven new tests cover the fixed decision boundaries, a planted uniform 1.5× shift,
+same-error ties, correlated targets counted as one batch, missing/duplicate batches,
+zero-error extended values, mismatched identities, changed gradient presence and reference
+hashes, and exact sign-test handling of ties. No primary oracle tests or tolerances were altered.
+
+All 51 earlier runtime implementation files other than the version file are unchanged.
+All 22 prior validation entries and the earlier RESULTS prefix remain intact. Earlier numerical
+evidence is unchanged; the 0.14 report is archived byte-for-byte. The public input manifest
+retains exact token IDs and sampling metadata. Raw per-gradient measurements, environments,
+weights, logs and caches remain local. License files and license metadata remain absent.
+
+The Git-normalized packaged source hash is
+`9324cff1ca078196fe7c03075996963fdf90d11273d9140cae37a33789cd694f`.

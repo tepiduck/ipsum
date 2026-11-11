@@ -1,0 +1,62 @@
+{
+  "version": "0.15.0",
+  "advisory_only": true,
+  "upstream_submission": false,
+  "models": ["gpt2", "bert", "pythia_160m", "gpt2_11"],
+  "batches_per_model": 20,
+  "source_commits": {"parent": "eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42", "child": "2450619a4c8a11b6f652154d12173794ebe181d5"},
+  "text_source": {
+    "title": "Alice's Adventures in Wonderland",
+    "author": "Lewis Carroll",
+    "url": "https://www.gutenberg.org/ebooks/11.txt.utf-8",
+    "catalog_url": "https://www.gutenberg.org/ebooks/11",
+    "copyright_status": "Project Gutenberg identifies this work as public domain in the USA.",
+    "sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+    "bytes": 174311,
+    "source_copy": "Reuse the exact locally frozen 0.9 download, verified by SHA-256; do not replace it with a newer download.",
+    "sampling_seed": 150015,
+    "sampling": "Decode UTF-8-sig with universal newlines. Start at 'Alice was beginning to get very tired'; stop before '*** END OF THE PROJECT GUTENBERG'. Split at blank lines, strip paragraphs and replace internal newlines with spaces, exactly as the original sweep. Verify the first two paragraphs equal the original passages and exclude both entirely. Join the remaining paragraphs, split on whitespace, partition into disjoint consecutive 200-word chunks, discard the final incomplete chunk. random.Random(150015).sample(range(number_of_chunks),40) selects 40 distinct chunks without replacement; pair consecutive selected chunks into batches 0-19. Use the same text pairs for every model. Record selected indices, word spans, text/token hashes and token IDs before execution.",
+    "scope": "Sampling from one book, without replacement; batches are replication units, not evidence representative of all language inputs. Shared model weights, fixed probe and literary source limit population inference."
+  },
+  "inputs": {
+    "shape": [2, 64],
+    "tokenization": "Use each frozen checkpoint's exact repository/revision and the installed tokenizer version, with the original padding=max_length, truncation=True, max_length=64, return_tensors=pt options; assign eos as pad only when the original tokenizer lacks pad. First require exact reproduction of every original input tensor from the original two paragraphs. All new rows must contain 64 nonpadding tokens. GPT-2-11 receives the identical saved input tensors as GPT-2.",
+    "checkpoints": {
+      "gpt2": {"repository": "openai-community/gpt2", "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e"},
+      "bert": {"repository": "google-bert/bert-base-uncased", "revision": "86b5e0934494bd15c9632b12f734a8a67f723594"},
+      "pythia_160m": {"repository": "EleutherAI/pythia-160m", "revision": "50f5173d932e8e61f858120bcb800b97af589f46"}
+    },
+    "model_state": "Reuse the original frozen model configurations, weights and trainability flags. GPT-2-11 reuses the existing 0.12 variant: embeddings, first eleven blocks, and original final LayerNorm, without retraining. Eval mode, SDPA, no generation cache.",
+    "vjp": "For every batch and path, torch.randint(0,2,(2,64,768),generator=torch.Generator(device='cpu').manual_seed(0)).float()*2-1. Save and hash the probe; verify it equals each original captured probe. The construction and probe remain fixed across batches, models, builds and precisions."
+  },
+  "execution": {
+    "fresh_workers_per_batch_per_build": 1,
+    "observations_per_path_in_worker": 1,
+    "paths": ["eager_fp32", "inductor_fp32", "eager_fp64"],
+    "threads": 1,
+    "float32_matmul_precision": "highest",
+    "worker_timeout_s": 900,
+    "worker_max_rss_mb": 6144,
+    "maximum_concurrent_workers": 2,
+    "concurrency": "At most one worker per source build at a time; two workers total fit the 15-GiB WSL host using separate 6-GiB process-tree limits. Calibration workers run sequentially first. No timing/performance conclusion is drawn.",
+    "cache": "New 0.15 cache directory per model/build; reuse that compilation cache across fresh batch processes, never earlier experiment caches. Cache identity locks source, environment, model and execution settings. No persistent model process or previous-batch runtime state.",
+    "metrics": "Record scaled fp64 RMSE for every present parameter gradient and reference magnitude/hash, with exact/missing/nonfinite distinctions. The model output is recorded separately and excluded from the gradient statistic. Gradients absent in all paths remain explicitly absent; changed presence is inconclusive. Expected present gradient counts: GPT-2 148, BERT 197, Pythia 147, GPT-2-11 136. Thus the original GPT-2's 149 value targets comprised 148 gradients plus one forward output.",
+    "calibration": "Before the new batches, run the generalized worker on the original input for both builds of GPT-2/BERT/Pythia and for the child GPT-2-11. Require exact gradient RMSE equality with retained source-build outcomes (child GPT-2-11 uses its retained November 5 outcome). These seven validation controls are excluded from N=20 and do not alter the sampling or rule. If they fail, preserve the attempt and resolve harness equivalence before the experiment."
+  },
+  "per_batch_statistic": {
+    "compiled": "Median over present parameter gradients of log2(child_compiled_rmse_vs_own_fp64 / parent_compiled_rmse_vs_own_fp64).",
+    "eager": "The identical calculation using child_eager_rmse and parent_eager_rmse against each build's own fp64 reference.",
+    "zero_errors": "Both-zero RMSE contributes zero log-growth (a tie). Parent-only zero contributes positive infinity; child-only zero contributes negative infinity. Store extended values with explicit statuses and JSON null, never invalid JSON infinities. An indeterminate median is inconclusive.",
+    "missing": "Require the same complete present-gradient set and finite nonnegative errors in both builds. Missing/reference errors, nonfinite measurements, execution failures or changed gradient presence make the batch inconclusive, never a replacement sample. Keep all 20 batches in the denominator and give no complete model decision until all 20 are conclusive.",
+    "reference_check": "Record whether all fp64 reference gradient hashes match across builds. Reference changes remain visible; statistics compare each build against its own fp64 reference as declared. No compiler-correctness conclusion follows.",
+    "worse": "Per-batch median log2 growth strictly greater than zero; no fitted epsilon. Exact zero is a tie."
+  },
+  "decision": {
+    "systematic_across_inputs": "Child worse on at least 16 of 20 batches AND median of the 20 per-batch log2 growth values >= log2(1.25).",
+    "not_systematic": "Child worse on at most 13 of 20 batches.",
+    "mixed": "All remaining complete cases, including 14-15 worse batches or at least 16 worse with median growth below 1.25x.",
+    "p_value": "Exact one-sided binomial upper-tail probability under p=0.5 on batch signs, excluding exact ties from the trials. Report worse/better/tie counts and the trial denominator; this p-value is descriptive and is not an additional decision threshold. Do not treat gradient targets as independent replicates.",
+    "paths": "Apply the same rule separately to compiled and eager for each of the four model variants; do not pool models or paths."
+  },
+  "conclusion": "The original GPT-2 result generalizes under this rule only if full GPT-2 compiled is systematic across inputs. Otherwise mark the report draft not recommended for filing, retaining the three-model commit attribution and all earlier evidence. Record every model/path result regardless of direction. No thresholds or prior labels change; no upstream issue is filed. Optional multi-input sweep support is a design note unless implementation is small."
+}

@@ -81,3 +81,20 @@ settings, and prepared input identity must match. An unfinished attempt is retai
 attempt directory is used. Completed inconclusive results remain completed evidence; use a new
 campaign with an explicit changed policy to investigate them. Run campaigns sequentially when
 they share host RAM or the same GPU, so resource contention does not dominate the measurements.
+
+## Multiple inputs: advisory design
+
+A model's output and parameter gradients from one input batch are correlated targets, not
+independent repetitions. The current sweep's target-level `accuracy_shift` sign test is
+descriptive. Do not interpret its target count as an input sample size.
+
+An optional multi-input extension should prepare a fixed list of disjoint input batches before
+execution and keep model weights, tokenizer, VJP construction and compiler settings fixed. Run
+each batch in fresh workers in both environments, store its existing primary result unchanged,
+then reduce its paired gradient errors to one median log2 growth score. Apply a separate
+batch-level sign test; retain missing batches in the planned denominator. Resume must validate
+each batch's input/probe hashes as well as the shared model and environment identities.
+
+The [0.15 investigation](input-accuracy.md) implements that analysis as a standalone example and
+summary script. It is not a new `sweep` CLI option. Its predeclared twenty-batch decision rule is
+specific to that experiment; existing sweep thresholds and previous labels remain unchanged.

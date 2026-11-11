@@ -18,7 +18,7 @@ jobs:
       - run: python -m ruff format --check src/faultline tests/faultline scripts examples
       - run: python scripts/check_release.py --index
       - run: python -m build
-      - run: python scripts/check_release.py dist/faultline_ml-0.14.0-py3-none-any.whl dist/faultline_ml-0.14.0.tar.gz
+      - run: python scripts/check_release.py dist/faultline_ml-0.15.0-py3-none-any.whl dist/faultline_ml-0.15.0.tar.gz
   compiler:
     runs-on: ubuntu-latest
     steps:

@@ -314,3 +314,9 @@ duplicate capture occurrences and missing companion artifacts. The comparison wr
 directory and has no connection to primary verdicts or reduction. Equal emitted code does not
 imply equal implementations in linked libraries or included headers. See the
 [CPU accuracy investigation](accuracy-investigation.md) for its use and limits.
+
+The independent `examples/input_batch_accuracy.py` records eager/compiled gradient RMSE against
+each build's fp64 reference for a frozen input batch. `scripts/summarize_input_accuracy.py`
+validates paired identities and reduces correlated targets to one score per batch before
+counting batch signs. These investigation tools do not feed the runtime oracle or reducer.
+See [input accuracy](input-accuracy.md) for the fixed 0.15 policy and limits.

@@ -227,6 +227,17 @@ unchanged alongside this advisory. The [40-pair 0.10 table](accuracy-shift-010.c
 not held-out validation. Applying an unchanged rule to newly held-out models is reported separately
 in [RESULTS](../RESULTS.md).
 
+Targets within a single input batch share one forward computation and are correlated. The
+target-level sign test is descriptive only: 149 value targets are not 149 independent input
+replicates. To investigate generalization across inputs, first reduce each batch to one score,
+then count batch signs. The separate [0.15 input experiment](input-accuracy.md) uses twenty
+predeclared batches per model and reports compiled and eager separately. It does not change the
+existing `accuracy_shift` thresholds or relabel earlier results. Its exact binomial p-values are
+also descriptive: one book, shared model weights and a fixed VJP limit population inference.
+The original GPT-2 compiled result did not generalize under that rule: 11/20 new batches
+worsened and median growth was 1.008×. The retained single-input observation is not evidence
+of an input-robust regression; see the complete per-batch results in the linked investigation.
+
 Triage distinguishes missing explanations from positive contrary evidence. A comparability or
 eager-control explanation covering only some failing targets stays `unexplained_missing_evidence`,
 with matched/total counts. Contrary evidence requires compiled RMSE beyond twice the declared
