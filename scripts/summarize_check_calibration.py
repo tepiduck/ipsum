@@ -99,11 +99,12 @@ def compact(
 def collect(args):
     rows = []
     same_entries = {}
+    same_origins = {}
     for filename in ("complete.json", "progress.json"):
         if (args.same_version / filename).exists():
-            same_entries = {
-                r["model"]: Path(r["evidence"]) for r in read_json(args.same_version / filename)
-            }
+            records = read_json(args.same_version / filename)
+            same_entries = {r["model"]: Path(r["evidence"]) for r in records}
+            same_origins = {r["model"]: r.get("origin") for r in records}
             break
     for model in MODELS:
         same = same_entries.get(model, args.same_version / "models" / model)
@@ -116,7 +117,8 @@ def collect(args):
                 10,
                 expected="SAFE",
                 hashes=hashes,
-                note="Fresh independent same-version workers; cost-study standard runs may supply the recorded pair.",
+                note=same_origins.get(model)
+                or "Planned independent same-version pair; execution provenance is recorded on completion.",
             )
         )
         observations, hashes = verified_attempts(args.cross_version / "cases" / model)

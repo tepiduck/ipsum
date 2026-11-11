@@ -2,6 +2,7 @@
 
 import copy
 import json
+import subprocess
 import sys
 from pathlib import Path
 
@@ -14,6 +15,20 @@ from faultline.evaluate import Settings
 from faultline.native import capture_workload
 from faultline.storage import atomic_json, read_json
 from faultline.verdict import assessment, summarize
+
+
+def test_environment_probe_error_keeps_actionable_stderr():
+    from faultline.check_cli import setup_help
+
+    error = subprocess.CalledProcessError(
+        1,
+        ["python", "-c", "a long bootstrap program"],
+        stderr="Traceback ...\nModuleNotFoundError: No module named 'torch'\n",
+    )
+    message = setup_help(error)
+    assert "ModuleNotFoundError: No module named 'torch'" in message
+    assert "install PyTorch" in message
+    assert "bootstrap program" not in message
 
 
 def outcome(status="pass", explained=False, contrary=False):

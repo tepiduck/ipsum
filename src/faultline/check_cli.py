@@ -105,7 +105,15 @@ def terminal(verdict, output):
 
 
 def setup_help(error):
-    text = str(error)
+    if isinstance(error, subprocess.CalledProcessError):
+        detail = (error.stderr or "").strip().splitlines()
+        text = (
+            f"Python environment probe failed: {detail[-1]}"
+            if detail
+            else f"Python environment probe exited with code {error.returncode}."
+        )
+    else:
+        text = str(error)
     lower = text.lower()
     if "compiler" in lower or "cl.exe" in lower or "g++" in lower:
         return (

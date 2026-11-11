@@ -25,6 +25,14 @@ sweep is summarized retrospectively under the new policy; those workers use two 
 and AOT capture, rather than the new standard preset's lazy diagnostic scheduling.
 Cost-study standard pairs can also supply the matching same-version calibration cell.
 
+For the other same-version cells, the preserved 2.15 upgrade baseline is compared with a
+fresh independent 2.15 worker using the same full-diagnostic source, settings, interpreter
+and frozen workload. Source/environment equality and workload/commit hashes are checked
+before execution. This avoids rerunning an existing baseline; it is not a comparison of
+an observation with itself. The two cohorts share those baseline measurements and their
+counts are therefore correlated. This scheduling change was declared before starting
+the fresh same-version workers and does not change the verdict or replication policy.
+
 Historical-issue fixtures reuse the preserved 0.6 evidence. Controlled injected faults
 are new executions with explicit mutant labels. The exp_u20 control reuses the 20-batch
 measurements from 0.15: that script recorded accuracy errors, not full primary oracle
