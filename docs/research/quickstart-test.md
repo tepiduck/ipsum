@@ -1,9 +1,10 @@
 # Fresh-user installation test
 
-This development record will be completed with the published-commit clone transcript.
-The prepublication test below used a clean venv and a built wheel from the candidate
-files. It did not substitute an editable install. The source staging step differs from
-the README's `git clone`; the remaining quickstart commands were run as written.
+The README quickstart was run from its public GitHub clone at commit
+[`ae22c21`](https://github.com/tepiduck/ipsum/commit/ae22c21696d236eeb14bb1910c051633b4a00a6d),
+in a new directory and clean venv. Every command below exited successfully. Faultline
+was installed from the built wheel; an import-location check confirms `site-packages`,
+not an editable source install. No `PYTHONPATH` override was inherited.
 
 Host: Ubuntu under WSL2, AMD Ryzen 7 7700X, Python 3.12, existing `g++` and Python headers.
 The venv and Faultline output/cache directory were new. The machine's pip and pretrained
@@ -12,15 +13,17 @@ Other validation work was active on the host.
 
 | Command | Wall seconds | Exit |
 |---|---:|---:|
-| `python3 -m venv .venv` | 2.43 | 0 |
-| `. .venv/bin/activate` | Included in following shell commands | 0 |
-| `python -m pip install build` | 1.00 | 0 |
-| `python -m build --wheel` | 2.92 | 0 |
-| `python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu` | 27.27 | 0 |
-| `python -m pip install 'dist/faultline_ml-0.16.0-py3-none-any.whl[sweep]'` | 15.11 | 0 |
-| `faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart` | 74.95 | 0 |
+| `git clone https://github.com/tepiduck/ipsum.git` | 1.44 | 0 |
+| `cd ipsum` | 0.002 | 0 |
+| `python3 -m venv .venv` | 2.64 | 0 |
+| `. .venv/bin/activate` | 0.003 | 0 |
+| `python -m pip install build` | 0.73 | 0 |
+| `python -m build --wheel` | 1.76 | 0 |
+| `python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu` | 23.21 | 0 |
+| `python -m pip install 'dist/faultline_ml-0.16.0-py3-none-any.whl[sweep]'` | 14.47 | 0 |
+| `faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart` | 72.31 | 0 |
 
-Total measured commands: approximately 124 seconds. ResNet-18 reports SAFE for three
+Total measured commands: 116.56 seconds. ResNet-18 reports SAFE for three
 forward batches. The terminal output, with the temporary checkout path shortened, is:
 
 ```text
@@ -35,7 +38,7 @@ Scope: tested inputs and settings only; not a general correctness guarantee.
 
 ## Friction found
 
-A follow-up cross-environment probe exposed dependency shadowing when Faultline was
+A prepublication cross-environment probe exposed dependency shadowing when Faultline was
 installed as a wheel. The fix explicitly loads Faultline without adding the coordinator's
 entire `site-packages` to the worker path. The rebuilt wheel's three-batch paired check
 completed in 64.24 seconds with SAFE, and worker records confirm distinct 2.15.0+cpu and

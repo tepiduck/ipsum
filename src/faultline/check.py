@@ -12,6 +12,7 @@ from pathlib import Path
 from .batches import verify_batches
 from .bisect_env import supervise
 from .bootstrap import python_command
+from .check_report import accuracy_html, finding_html
 from .compare_envs import interpreter
 from .evaluate import Settings
 from .native import NativeJob, file_hash
@@ -189,11 +190,13 @@ def report(output, verdict, evidence):
     reasons = "".join(f"<li>{html.escape(r['message'])}</li>" for r in verdict["reasons"])
     notes = "".join(f"<li>{html.escape(r['message'])}</li>" for r in verdict["notes"])
     batches = []
+    findings = []
     for row in evidence.get("batches", []):
         for side in ("baseline", "candidate"):
             if side not in row:
                 continue
             result = row[side]
+            findings.append(finding_html(row["batch"], side, result))
             context = result.get("numerical_context", {})
             phases = row.get("diagnostics", {}).get(side, [])
             values = [
@@ -228,7 +231,7 @@ def report(output, verdict, evidence):
             )
     (output / "report.html").write_text(
         '<!doctype html><meta charset="utf-8"><title>Faultline check</title>'
-        "<style>body{font:16px system-ui;max-width:1100px;margin:3rem auto;padding:1rem}li{margin:.5rem 0}table{border-collapse:collapse}td,th{padding:.5rem;border:1px solid #ccc;text-align:left}pre{white-space:pre-wrap}</style>"
+        "<style>body{font:16px system-ui;max-width:1100px;margin:3rem auto;padding:1rem}li{margin:.5rem 0}table{border-collapse:collapse}td,th{padding:.5rem;border:1px solid #ccc;text-align:left}td{overflow-wrap:anywhere;max-width:30rem}details{margin:1rem 0}pre{white-space:pre-wrap}</style>"
         f"<h1>{verdict['verdict']}</h1><p>{html.escape(verdict['scope']['statement'])}</p>"
         f"<p>{html.escape(scope['mode'])}; {html.escape(scope['level'])}; "
         f"{scope['completed_batches']}/{scope['planned_batches']} conclusive primary batches. "
@@ -237,7 +240,9 @@ def report(output, verdict, evidence):
         '<p><a href="verdict.json">Verdict JSON</a> · <a href="evidence.json">Full evidence</a></p>'
         f"<h2>Reasons</h2><ul>{reasons or '<li>No blocking evidence in the requested checks.</li>'}</ul>"
         f"<h2>Notes</h2><ul>{notes}</ul>"
+        f"{accuracy_html(verdict['accuracy_shift_replicated'])}"
         f"<h2>Batch evidence</h2><table><tr><th>Batch</th><th>Environment</th><th>Primary status</th><th>Explanation labels</th><th>Diagnostics</th></tr>{''.join(batches)}</table>"
+        f"<h2>Finding details</h2>{''.join(findings) or '<p>No failing primary targets.</p>'}"
         f"<h2>Reproducers</h2><ul>{reproduction or '<li>No failing primary workload exported.</li>'}</ul>"
         "<p>Primary statuses are unchanged. Inspect the full evidence for explanation coverage, contrary evidence, input hashes, settings and environment versions.</p>",
         encoding="utf-8",

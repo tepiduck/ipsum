@@ -46,6 +46,9 @@ Without `--baseline`, compiled and eager execute in `--candidate` (default: curr
 With two interpreters, both execute the same captured inputs, weights and backward probes.
 Each interpreter must have PyTorch and all factory dependencies. `env create` can install
 these in new venvs; its printed interpreter path and `ready.json` identify the exact environment.
+Manually prepared interpreters also need `numpy`, `psutil` and `packaging` for the workers.
+They do not need a second Faultline installation: the coordinator supplies its harness code
+while dependencies are imported from the selected interpreter.
 
 Quick uses three batches and forward only. Standard uses ten batches and gradients; paired
 checks also obtain fp64 errors. Fully explained findings avoid additional mask diagnostics.
