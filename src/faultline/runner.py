@@ -94,8 +94,6 @@ def run_case(case, settings, directory, *, python=None):
         },
     )
     environment = os.environ.copy()
-    source = str(Path(__file__).resolve().parents[1])
-    environment["PYTHONPATH"] = source + os.pathsep + environment.get("PYTHONPATH", "")
     environment["OMP_NUM_THREADS"] = str(settings.threads)
     environment["TORCHINDUCTOR_COMPILE_THREADS"] = "1"
     environment["PYTHONHASHSEED"] = str(case.seed)
@@ -115,16 +113,19 @@ def run_case(case, settings, directory, *, python=None):
         (directory / "stdout.log").open("wb") as stdout,
         (directory / "stderr.log").open("wb") as stderr,
     ):
+        from .bootstrap import python_command
+
         process = subprocess.Popen(
-            [
-                str(python or sys.executable),
-                "-m",
-                "faultline.worker",
-                "--job",
-                str(job_path),
-                "--result",
-                str(raw_path),
-            ],
+            python_command(
+                python or sys.executable,
+                "import runpy;runpy.run_module('faultline.worker',run_name='__main__')",
+                [
+                    "--job",
+                    str(job_path),
+                    "--result",
+                    str(raw_path),
+                ],
+            ),
             stdout=stdout,
             stderr=stderr,
             env=environment,

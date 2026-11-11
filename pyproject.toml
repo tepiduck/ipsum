@@ -4,14 +4,14 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "faultline-ml"
-version = "0.15.0"
+version = "0.16.0"
 description = "Differential testing and failure reduction for PyTorch compilers"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = ["torch>=2.6,<3", "psutil>=5.9,<8", "numpy>=1.26,<3", "packaging>=24,<27"]
 
 [project.optional-dependencies]
-dev = ["pytest>=8", "ruff>=0.9", "build>=1.2"]
+dev = ["pytest>=8", "ruff>=0.9", "build>=1.2", "jsonschema>=4,<5"]
 sweep = ["torchvision>=0.21,<1", "transformers>=5,<6", "safetensors>=0.5,<1", "pillow>=11,<14"]
 
 [project.urls]

@@ -22,17 +22,22 @@ def selected_models(names):
     return selected
 
 
-def prepare_sweep(output, names=None, *, python=None, progress=print):
+def prepare_sweep(output, names=None, *, python=None, progress=print, input_batches=1):
     output = Path(output).resolve()
     names = selected_models(names)
     output.mkdir(parents=True, exist_ok=False)
-    inputs = real_inputs(output / "inputs")
+    inputs = (
+        real_inputs(output / "inputs", input_batches)
+        if input_batches != 1
+        else real_inputs(output / "inputs")
+    )
     manifest = {
         "schema_version": 1,
         "created_utc": now(),
         "planned": names,
         "inputs": inputs,
         "models": [],
+        "input_batches": input_batches,
     }
     atomic_json(output / "prepared.json", manifest)
     for name in names:
@@ -46,12 +51,19 @@ def prepare_sweep(output, names=None, *, python=None, progress=print):
                 capture_settings,
                 include=("model.json", "weights.pt", "inputs.pt"),
                 python=python,
+                **({"input_batches": input_batches} if input_batches != 1 else {}),
             )
             row = {
                 "id": name,
                 "status": "ready",
                 "bundle": str(bundle.relative_to(output)),
-                "bundle_hash": file_hash(bundle / "workload.json"),
+                "bundle_hash": file_hash(
+                    bundle / ("batches.json" if input_batches > 1 else "workload.json")
+                ),
+                "input_batches": input_batches,
+                "prepared_batches": len(read_json(bundle / "batches.json")["batches"])
+                if input_batches > 1
+                else 1,
                 "model": spec,
             }
         except Exception as exc:  # noqa: BLE001 -- each download/provider/capture failure stays in denominator
@@ -68,17 +80,17 @@ def prepare_sweep(output, names=None, *, python=None, progress=print):
 
 
 def runtime_environment(python):
+    from .bootstrap import python_command
+
     environment = os.environ.copy()
-    source = str(Path(__file__).resolve().parents[1])
-    environment["PYTHONPATH"] = source + os.pathsep + environment.get("PYTHONPATH", "")
     program = """import json, importlib.metadata
 from faultline.environment import describe
 result = describe()
-result['model_packages'] = {k: importlib.metadata.version(k) for k in ['torchvision', 'transformers', 'safetensors', 'pillow']}
+result['model_packages'] = {k: result['packages'].get(k) for k in ['torchvision', 'transformers', 'safetensors', 'pillow']}
 print(json.dumps(result))
 """
     run = subprocess.run(
-        [python, "-c", program],
+        python_command(python, program),
         capture_output=True,
         text=True,
         timeout=60,
@@ -173,12 +185,19 @@ def verify_prepared(prepared, names):
         row = entries[name]
         if row["status"] == "ready":
             bundle = (prepared / row["bundle"]).resolve()
+            multi = row.get("input_batches", 1) > 1
             if (
                 not bundle.is_relative_to(prepared)
-                or file_hash(bundle / "workload.json") != row["bundle_hash"]
+                or file_hash(bundle / ("batches.json" if multi else "workload.json"))
+                != row["bundle_hash"]
             ):
                 raise ValueError("Prepared workload changed or escaped its directory")
-            verify_native(bundle)
+            if multi:
+                from .batches import verify_batches
+
+                verify_batches(bundle)
+            else:
+                verify_native(bundle)
     return entries
 
 
@@ -200,6 +219,20 @@ def run_sweep(
         raise ValueError("Pretrained sweeps require Inductor, gradients, and numerical diagnostics")
     baseline_python, candidate_python = interpreter(baseline_python), interpreter(candidate_python)
     entries = verify_prepared(prepared, names)
+    if read_json(prepared / "prepared.json").get("input_batches", 1) > 1:
+        from .batch_sweep import run_batch_sweep
+
+        return run_batch_sweep(
+            prepared,
+            output,
+            baseline_python,
+            candidate_python,
+            settings,
+            names=names,
+            entries=entries,
+            resume=resume,
+            progress=progress,
+        )
     config = {
         "schema_version": 1,
         "prepared_hash": file_hash(prepared / "prepared.json"),
@@ -327,6 +360,7 @@ def add_sweep_commands(commands, execution_options):
     prepare.add_argument("--model", action="append", choices=MODELS)
     prepare.add_argument("--set", choices=("original", "held-out", "all"), dest="catalog_set")
     prepare.add_argument("--output", type=Path, required=True)
+    prepare.add_argument("--input-batches", type=int, default=1)
     run = sub.add_parser("run", help="compare prepared models with stable/nightly interpreters")
     run.add_argument("prepared", type=Path)
     run.add_argument("--model", action="append", choices=MODELS)
@@ -356,8 +390,15 @@ def sweep_command(args, settings_from):
         "all": MODELS,
     }.get(args.catalog_set, ORIGINAL_MODELS)
     if args.sweep_command == "prepare":
-        result = prepare_sweep(args.output, names)
-        return 0 if all(row["status"] == "ready" for row in result["models"]) else 2
+        result = prepare_sweep(args.output, names, input_batches=args.input_batches)
+        return (
+            0
+            if all(
+                row["status"] == "ready" and row.get("prepared_batches", 1) == args.input_batches
+                for row in result["models"]
+            )
+            else 2
+        )
     result = run_sweep(
         args.prepared,
         args.output,

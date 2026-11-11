@@ -24,7 +24,7 @@ def workload_imports(directory):
         sys.path[:] = previous
 
 
-def load_native_factory(directory, name):
+def load_native_factory(directory, name, *, seed=None):
     path = Path(directory) / "factory.py"
     spec = importlib.util.spec_from_file_location("faultline_workload_factory", path)
     module = importlib.util.module_from_spec(spec)
@@ -33,7 +33,8 @@ def load_native_factory(directory, name):
         sys.modules[spec.name] = module
         sys.path.insert(0, str(path.parent))
         spec.loader.exec_module(module)
-        return getattr(module, name)()
+        factory = getattr(module, name)
+        return factory(seed=seed) if seed is not None else factory()
     finally:
         sys.path[:] = paths
         if previous is None:
@@ -389,7 +390,9 @@ def make_native_execution(
         names = [node["name"] for node in spec["nodes"] if node["op"] == "placeholder"]
         initial_state = {name: value.detach().clone() for name, value in model.state_dict().items()}
     else:
-        model, _ = load_native_factory(bundle, manifest["factory"])
+        model, _ = load_native_factory(
+            bundle, manifest["factory"], seed=manifest.get("factory_seed")
+        )
         if any(module.training for module in model.modules()):
             raise ValueError("The workload factory no longer returns an eval model")
         model.to(device)

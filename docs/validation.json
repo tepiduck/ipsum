@@ -31449,5 +31449,56 @@
       },
       "license_metadata_and_files_absent": true
     }
+  },
+  "usability_validation": {
+    "version": "0.16.0",
+    "status": "catalog_calibration_in_progress",
+    "advisory_only": true,
+    "policy": "docs/verdict-policy.md",
+    "replication_policy": "docs/v016-policy.json",
+    "implementation_checks": {
+      "windows_portable": {
+        "passed": 353,
+        "skipped": 1,
+        "compiler_deselected": 12
+      },
+      "linux_portable": {
+        "passed": 354,
+        "compiler_deselected": 12
+      },
+      "linux_inductor": {
+        "passed": 12
+      },
+      "compiler_campaign": {
+        "checks": 14,
+        "passed": true,
+        "counts": {
+          "pass": 17,
+          "numerical_mismatch": 1
+        }
+      },
+      "legacy": {
+        "passed": 31
+      },
+      "ruff_check": true,
+      "ruff_format": true,
+      "installed_wheel_quick_and_standard": "SAFE with independent 2.15 and 2.16 nightly workers; JSON schema validated"
+    },
+    "tested_source_sha256": "bee2a0327db058bc20878762df3f7e03dde6fa5d30c7096220f441e5419ee713",
+    "memory_control": {
+      "model": "SmolLM2-135M",
+      "level": "standard",
+      "batches": 10,
+      "verdict": "NEEDS_REVIEW",
+      "peak_worker_rss_mb": 8027.6640625,
+      "command_wall_s": 2067.085246954
+    },
+    "limitations": [
+      "Full 29-model calibration and preset table still running.",
+      "Prepublication fresh-wheel test used candidate files; published-commit clone test is pending.",
+      "No new GPU execution is claimed."
+    ],
+    "license_unchanged": true,
+    "upstream_filed": false
   }
 }

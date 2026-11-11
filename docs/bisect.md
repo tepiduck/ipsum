@@ -1,5 +1,33 @@
 # CPU nightly accuracy bisection
 
+## Replicated accuracy predicate (0.16)
+
+Pass a collection from `model capture --input-batches N` (or a sweep model's batch bundle)
+with `--predicate replicated`. Each nightly is compared with the stable baseline on the same
+prepared batches, using fresh workers and the [0.16 policy](v016-policy.json): at least ten
+completed batches, at least 80% worsening, median batch growth at least 1.25x. One batch's score
+is the median log2 compiled/fp64 error growth across its paired present parameter gradients.
+The report keeps batch signs, the exact one-sided binomial p-value, distribution and coverage.
+Partial non-flagged evidence is inconclusive, not a good boundary. A flag with partial coverage
+retains that coverage explicitly. Boundary confirmation uses new workers in a separate directory.
+
+```bash
+faultline bisect prepared/models/gpt2/bundle --predicate replicated \
+  --baseline-python /path/stable/bin/python --start 2026-10-05 --end 2026-11-05 \
+  --requirements pinned-model-dependencies.txt --output replicated-bisect
+```
+
+The replicated predicate uses the fixed batch rule, not the single-input `--growth` or
+`--observations` tuning parameters. Within-worker repeat checks remain unchanged.
+All primary outcomes and existing exit codes remain unchanged. Resume validates the collection,
+source, settings, environment and completed evidence; missing batches are never replaced.
+
+Single-input accuracy predicates can localize **rounding changes rather than regressions**.
+The [exp_u20 investigation](accuracy-investigation.md#case-study-from-a-sweep-flag-to-input-replication)
+localized a reproducible input-specific change to one commit, but twenty-batch replication found
+no systematic effect. The historical single-input predicate below remains available, with its
+original thresholds and labels. It is **single_input, descriptive only**.
+
 `faultline bisect` compares a captured workload with CPU TorchInductor across dated PyTorch
 nightly wheels. It measures compiled error against each build's repeated eager fp64 reference.
 It does not bisect the primary pass/fail verdict, change tolerances, or file upstream issues.

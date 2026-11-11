@@ -82,7 +82,7 @@ attempt directory is used. Completed inconclusive results remain completed evide
 campaign with an explicit changed policy to investigate them. Run campaigns sequentially when
 they share host RAM or the same GPU, so resource contention does not dominate the measurements.
 
-## Multiple inputs: advisory design
+## Multiple inputs: 0.15 design (historical)
 
 A model's output and parameter gradients from one input batch are correlated targets, not
 independent repetitions. The current sweep's target-level `accuracy_shift` sign test is
@@ -98,3 +98,61 @@ each batch's input/probe hashes as well as the shared model and environment iden
 The [0.15 investigation](input-accuracy.md) implements that analysis as a standalone example and
 summary script. It is not a new `sweep` CLI option. Its predeclared twenty-batch decision rule is
 specific to that experiment; existing sweep thresholds and previous labels remain unchanged.
+
+## 0.16: input batches are the replication unit
+
+The design above is now available through `sweep prepare --input-batches N`:
+
+```bash
+faultline sweep prepare --set all --input-batches 10 --output prepared-016
+faultline sweep run prepared-016 --set all --baseline-python /path/stable/bin/python \
+  --candidate-python /path/nightly/bin/python --device cpu --output sweep-016
+# Continue with the same arguments and --resume.
+```
+
+Preparation fixes all batches before comparison. Text batches contain pairs of disjoint
+200-word passages after the original two paragraphs, tokenized to 64 tokens. Vision batches
+contain disjoint vertical strips of the two original photographs, resized by the checkpoint's
+usual transform. These are **not independent photographs or a representative image dataset**;
+the two source images and one book remain shared sources. The input manifest records source
+regions and hashes. No sample is replaced after observing a failure.
+
+Each batch has an independently saved VJP probe, generated with seed equal to its batch index,
+and the same model weights. The collection hashes every workload, input and probe. Its
+workers run each batch separately in both environments. The batch results retain all primary
+statuses and the old `accuracy_shift`, explicitly marked **single_input, descriptive only**.
+No new label changes the primary gate, reduction predicates or exit codes.
+
+The policy was declared in [v016-policy.json](v016-policy.json) before the new run. Each completed
+batch contributes the median log2 candidate/baseline compiled-to-fp64 RMSE growth over paired,
+present parameter gradients. The new `accuracy_shift_replicated` flags when at least ten batches
+complete, at least 80% of completed batches worsen, and their median growth is at least 1.25x.
+This agrees with the earlier 16/20 threshold; historical 0.15 classifications remain unchanged.
+The exact one-sided binomial tail uses worsening versus improving batches, excluding exact ties.
+It is reported descriptively, not used as another flag threshold.
+
+Missing or unusable batches remain in the planned denominator and coverage. The flag's fraction
+uses completed batches, so a flagged partial campaign must still be read with its coverage.
+Zero/zero target errors tie; zero/nonzero gives positive infinity; nonzero/zero gives negative
+infinity. An indeterminate median or changed gradient set makes a batch incomplete.
+
+The JSON/HTML report contains the full score distribution, sign counts, p-value and coverage.
+Resume checks source, settings, interpreters, packages, workload and probe identity, and committed
+result hashes. Interrupted attempts are retained; completed inconclusive results are not replaced.
+Batch comparisons reference their prepared bundles rather than duplicating large weights into
+two standalone exports per batch. Retain the prepared directory alongside the results.
+
+For custom workloads, use `model capture factory.py:factory --input-batches N --output batches`.
+The factory returns `(eval_model, sequence_of_N_input_batches)`. Each input batch has the same
+format as an ordinary factory's inputs, with a common leading sample dimension. Capture rejects
+repeated tensor-valued samples across batches and changes to the frozen weights. It does not
+infer whether distinct values represent overlapping real-world examples; the caller must supply
+disjoint source examples. `--trace` and scalar-loss probes are not supported for this mode.
+`model compare batches ... --resume` uses the same batch coordinator and advisory.
+
+### Annotation of the 0.11 flags
+
+All original 0.11 `accuracy_shift` labels and measurements remain intact. They are
+**single_input, descriptive only**: their target counts are not input-replication counts.
+The [exp_u20 case study](accuracy-investigation.md#case-study-from-a-sweep-flag-to-input-replication)
+shows why localizing a real numerical change is not sufficient to call it a systematic regression.

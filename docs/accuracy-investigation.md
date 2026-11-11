@@ -1,5 +1,29 @@
 # CPU accuracy investigation
 
+## Case study: from a sweep flag to input replication
+
+The 0.11 sweep flagged GPT-2 on one frozen input. Nightly bisection narrowed the change to
+November 4 versus November 5, and source-build tests localized it to commit
+`2450619a4c8a11b6f652154d12173794ebe181d5`, following parent
+`eb48c7e2d9fd6b16c0a7291703c94b16fb33cc42`. The `exp_u20` mechanism tests then separated
+the observed change from proposed explanations; the kernel and generated-GELU null results
+are retained in the later investigation notes.
+
+The crucial final check was replication across inputs. On twenty disjoint input batches,
+GPT-2's compiled gradients worsened on 11 and improved on 9, with median growth 1.007994x.
+None of GPT-2, BERT, Pythia or the eleven-layer GPT-2 variant met the predeclared systematic
+effect rule. The [0.15 measurements](input-accuracy.md) retain all batch results and controls.
+
+The original change was real and reproducible for that input, but it did not establish a
+systematic accuracy regression. This is how Faultline separates a candidate regression from
+an input-sensitive rounding change: preserve the initial flag, localize it, test the mechanism,
+then check whether the effect survives new inputs. The original 0.11 flags remain labeled
+`accuracy_shift`, annotated **single_input, descriptive only**. No primary result or earlier
+measurement has been rewritten, and no upstream defect report was filed.
+
+The account below preserves the original 0.12 investigation; its report-draft discussion is
+historical and should be read alongside the later replication outcome above.
+
 The 0.12 investigation follows the GPT-2 accuracy boundary found in 0.11: the November 4
 and November 5, 2026 CPU nightly wheels. It compares numerical evidence and generated code.
 It does not change Faultline's primary statuses, tolerances, signatures, reducer predicates,

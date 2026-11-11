@@ -1,0 +1,53 @@
+name: Model upgrade check
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: sudo apt-get update && sudo apt-get install -y g++ python3-dev
+      - run: python -m pip install torch==2.15.0 --index-url https://download.pytorch.org/whl/cpu
+      - run: python -m pip install .
+      - name: Create isolated environments
+        id: environments
+        continue-on-error: true
+        run: |
+          faultline env create --torch 2.15.0 --minimal --output environments/baseline
+          faultline env create --torch nightly --minimal --output environments/candidate
+      - name: Check ten frozen input batches
+        if: steps.environments.outcome == 'success'
+        shell: bash
+        run: |
+          baseline=$(python -c "import json; print(json.load(open('environments/baseline/ready.json'))['python'])")
+          candidate=$(python -c "import json; print(json.load(open('environments/candidate/ready.json'))['python'])")
+          set +e
+          faultline check examples/input_batches.py:factory --baseline "$baseline" --candidate "$candidate" --output check-report
+          result=$?
+          set -e
+          if [ -f check-report/verdict.json ]; then
+            python -c "import json; d=json.load(open('check-report/verdict.json')); print('### '+d['verdict']); print('\n'.join(r['message'] for r in d['reasons']))" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'INCONCLUSIVE: check produced no verdict; inspect logs.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+          if [ "$result" -eq 1 ]; then exit 1; fi
+          if [ "$result" -ne 0 ]; then echo '::warning::Check requires review or did not complete. Read the report.'; fi
+      - name: Record incomplete environment setup
+        if: steps.environments.outcome != 'success'
+        run: echo 'INCONCLUSIVE — environment creation failed; inspect installation logs.' >> "$GITHUB_STEP_SUMMARY"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: model-upgrade-evidence
+          path: |
+            check-report/report.html
+            check-report/verdict.json
+            check-report/evidence.json
+            check-report/**/outcome.json
+            check-report/**/result.json
+            check-report/**/*.log
+            environments/**/ready.json
+            environments/**/*.log

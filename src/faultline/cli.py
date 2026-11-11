@@ -1,6 +1,5 @@
 """Commands for generation, execution, reduction, export, and capability discovery."""
 
-import argparse
 import json
 import sys
 import webbrowser
@@ -107,14 +106,22 @@ def exit_status(summary):
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(
-        description="Faultline — differential testing for tensor compilers"
-    )
+    from .check_cli import CheckAwareParser
+
+    parser = CheckAwareParser(description="Faultline — differential testing for tensor compilers")
+    arguments = sys.argv[1:] if argv is None else argv
+    parser.check_invocation = bool(arguments and arguments[0] == "check")
     parser.add_argument("--version", action="version", version=f"Faultline {__version__}")
     commands = parser.add_subparsers(dest="command", required=True)
     from .model_cli import add_model_commands, model_command, native_options
 
     add_model_commands(commands, execution_options)
+    from .check_cli import add_check_command, check_command
+
+    add_check_command(commands)
+    from .environments import add_env_command, env_command
+
+    add_env_command(commands)
     benchmark = commands.add_parser(
         "benchmark", help="measure historical-issue detection and reduction"
     )
@@ -239,6 +246,10 @@ def main(argv=None):
     add_bisect_command(commands)
     args = parser.parse_args(argv)
     try:
+        if args.command == "check":
+            return check_command(args)
+        if args.command == "env":
+            return env_command(args)
         if args.command == "bisect":
             return bisect_command(args)
         if args.command == "sweep":

@@ -121,6 +121,7 @@ def accuracy_shift(baseline, candidate):
         if paired
         else "unavailable",
         "accuracy_shift": flagged,
+        "interpretation": "single_input, descriptive only",
         "labels": ["accuracy_shift"] if flagged else [],
         "paired": paired,
         "total": total,

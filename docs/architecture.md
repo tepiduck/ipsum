@@ -181,6 +181,13 @@ that the old finding survived an environment change.
 
 ## Execution and persistence
 
+Cross-interpreter workers load the coordinator's Faultline package explicitly through an
+importlib package specification. They do not add the coordinator's package parent to the
+dependency search path: in a wheel installation that parent is an entire `site-packages`
+directory and could otherwise shadow the selected interpreter's PyTorch. Worker environment
+records identify the runtime actually imported. Model dependencies remain the selected
+interpreter's responsibility.
+
 The coordinator starts one worker at a time to avoid resource interference. Worker subprocesses
 and compiler descendants have a wall deadline and sampled aggregate RSS budget. Shared pages
 can be counted more than once, so the RSS budget is conservative. Sampling cannot prevent a
@@ -320,3 +327,21 @@ each build's fp64 reference for a frozen input batch. `scripts/summarize_input_a
 validates paired identities and reduces correlated targets to one score per batch before
 counting batch signs. These investigation tools do not feed the runtime oracle or reducer.
 See [input accuracy](input-accuracy.md) for the fixed 0.15 policy and limits.
+
+Version 0.16 adds `batches.py` for frozen input collections and resumable paired execution,
+`replication.py` for the batch-level advisory, and batch coordinators for sweeps and bisection.
+The existing native worker still computes every primary result. Replicated comparisons keep
+prepared bundles once and reference their verified hashes, avoiding redundant checkpoint exports.
+Their commits retain per-environment outcomes and jobs. A collection is not a stateful request
+trace: each batch starts a fresh worker and model state, with its own saved VJP probe.
+The batch advisory does not feed the primary oracle or any reducer predicate.
+
+`check.py` coordinates immutable primary executions and separately supervised advisory replays.
+`check_diagnostics.py` releases the eager/compiled model instances before constructing fp64 state,
+and drops state/input-after copies only after validating the primary replay. Controls and masks
+are scheduled lazily at standard level; a completed contrary control does not need a mask explanation.
+Thorough retains the existing full AOT path. A diagnostic resource limit cannot replace the
+saved primary outcome. `verdict.py` summarizes this evidence under the versioned policy;
+its exit codes belong only to `check`. `check_prepare.py` handles trusted factory/catalog preparation
+in the selected model interpreter. `environments.py` shares supervised installation and identity
+probing with the nightly installer and records dependency constraints and resolved device support.

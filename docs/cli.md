@@ -278,3 +278,37 @@ faultline ui --workspace experiments
 
 There is no silent fallback to CPU or eager execution. Use fresh output directories. Findings
 are symptom families for investigation, not counts of confirmed or unique upstream bugs.
+
+### Independent input batches (0.16)
+
+`sweep prepare --input-batches N` freezes N disjoint deterministic batches per model.
+`model capture factory.py:factory --input-batches N` expects the factory to return a model
+and a sequence of N batch inputs. This mode uses fixed VJP probes and cannot be a trace.
+Preparation errors stay visible; an incomplete multi-input capture returns existing exit code 2.
+`sweep run` and `model compare` recognize the resulting collections and evaluate every prepared
+batch in both environments. Both support `--resume`; missing batches remain planned.
+The reports add `accuracy_shift_replicated` without changing individual primary outcomes or gates.
+See [sweeps](sweeps.md) for sampling, the fixed policy, and how to retain shared bundle evidence.
+
+`bisect --predicate replicated` uses that same batch-level rule. The default remains the
+historical `single-input` predicate. Nondefault `--growth` and `--observations` arguments are
+rejected in replicated mode, since its thresholds are predeclared rather than per-run choices.
+
+## Upgrade checks (0.16)
+
+```bash
+faultline check --torchvision resnet18 --level quick --output report
+faultline check --hf openai-community/gpt2 --baseline /old/python --candidate /new/python --output upgrade
+faultline check model.py:factory --include weights.pt --level standard --output model-check
+faultline check frozen-batches --baseline /old/python --candidate /new/python --resume --output existing-check
+faultline env create --torch 2.15.0 --device cpu --output environments/stable
+faultline env create --torch nightly --minimal --output environments/nightly
+```
+
+Only `check` uses SAFE/0, REGRESSION/1, NEEDS_REVIEW/2, INCONCLUSIVE/3.
+Argument/setup failures use 3; malformed arguments may not create report files.
+See the [user guide](user-guide.md), [fixed verdict policy](verdict-policy.md), and
+[JSON contract](verdict-schema.md). Model source options are mutually exclusive.
+`--baseline-backend`/`--backend` and `--baseline-compile-mode`/`--compile-mode`
+allow explicit setting comparisons. `--batches` never lowers the replication threshold.
+`env create --resume` verifies the installed identity; GPU indexes are explicit.

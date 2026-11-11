@@ -34,6 +34,7 @@ def add_model_commands(commands, execution_options):
     capture = sub.add_parser("capture", help="freeze a trusted factory's state and nested inputs")
     capture.add_argument("factory", help="model.py:factory returning (eval model, inputs)")
     capture.add_argument("--trace", action="store_true")
+    capture.add_argument("--input-batches", type=int, default=1)
     capture.add_argument("--backward-probe", choices=("vjp", "loss"), default="vjp")
     capture.add_argument(
         "--include", action="append", default=[], help="explicit local source or checkpoint asset"
@@ -53,6 +54,7 @@ def add_model_commands(commands, execution_options):
         if name == "run":
             command.add_argument("--python", default=sys.executable)
         else:
+            command.add_argument("--resume", action="store_true")
             command.add_argument("--baseline-python", required=True)
             command.add_argument("--candidate-python", default=sys.executable)
             command.add_argument("--candidate-backend")
@@ -132,8 +134,14 @@ def model_command(args, settings_from):
             include=args.include,
             python=args.python,
             backward_probe=args.backward_probe,
+            input_batches=args.input_batches,
         )
         print(f"Captured workload: {path}")
+        if args.input_batches > 1:
+            from .storage import read_json
+
+            manifest = read_json(path / "batches.json")
+            return 0 if len(manifest["batches"]) == manifest["planned"] else 2
         return 0
     if args.model_command == "run":
         result = run_native(
@@ -142,6 +150,25 @@ def model_command(args, settings_from):
     elif args.model_command == "compare":
         settings = settings_from(args)
         candidate = replace(settings, backend=args.candidate_backend or settings.backend)
+        if (args.bundle / "batches.json").exists():
+            from .batches import compare_batches
+
+            result = compare_batches(
+                args.bundle,
+                args.output,
+                args.baseline_python,
+                args.candidate_python,
+                settings,
+                candidate,
+                args.reduce,
+                args.max_evaluations,
+                aot=args.aot,
+                resume=args.resume,
+            )
+            print(json.dumps(result["accuracy_shift_replicated"], indent=2))
+            return result["exit_code"]
+        if args.resume:
+            raise ValueError("model compare --resume requires a prepared batch collection")
         result = compare_native_environments(
             args.bundle,
             args.output,

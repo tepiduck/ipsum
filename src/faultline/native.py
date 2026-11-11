@@ -139,10 +139,37 @@ class NativeJob:
 
 
 def capture_workload(
-    factory, output, settings, *, trace=False, include=(), python=None, backward_probe="vjp"
+    factory,
+    output,
+    settings,
+    *,
+    trace=False,
+    include=(),
+    python=None,
+    backward_probe="vjp",
+    input_batches=1,
+    batch_index=None,
+    seeded_factory=False,
 ):
     from .compare_envs import interpreter
     from .runner import run_case
+
+    if type(input_batches) is not int or input_batches < 1:
+        raise ValueError("input_batches must be positive")
+    if input_batches > 1 and batch_index is None:
+        from .batches import capture_batches
+
+        if trace or backward_probe != "vjp":
+            raise ValueError("Independent input batches require VJP probes and are not a trace")
+        return capture_batches(
+            factory,
+            output,
+            settings,
+            input_batches,
+            include=include,
+            python=python,
+            seeded_factory=seeded_factory,
+        )
 
     if backward_probe not in {"loss", "vjp"}:
         raise ValueError("Backward probe must be loss or vjp")
@@ -184,6 +211,12 @@ def capture_workload(
             "sources": sources,
             "trace": trace,
             "seed": 0,
+            **({"factory_seed": batch_index or 0} if seeded_factory else {}),
+            **(
+                {"batch_index": batch_index, "input_batches": input_batches}
+                if batch_index is not None
+                else {}
+            ),
         },
     )
     job = NativeJob.create(output, operation="capture")
@@ -199,7 +232,18 @@ def capture_native(job):
     directory = Path(job.bundle)
     manifest = verify_native(directory)
     torch.manual_seed(job.seed)
-    model, inputs = load_native_factory(directory, manifest["factory"])
+    if "batch_index" in manifest:
+        import numpy as np
+
+        random.seed(job.seed)
+        np.random.seed(job.seed)
+    model, inputs = load_native_factory(
+        directory, manifest["factory"], seed=manifest.get("factory_seed")
+    )
+    if "batch_index" in manifest and "factory_seed" not in manifest:
+        if not isinstance(inputs, (tuple, list)) or len(inputs) != manifest["input_batches"]:
+            raise ValueError("Multi-input factory must return (model, sequence of N input batches)")
+        inputs = inputs[manifest["batch_index"]]
     if not isinstance(model, torch.nn.Module) or any(m.training for m in model.modules()):
         raise ValueError("Native factories must return an eval() torch.nn.Module")
     requests = (
@@ -234,7 +278,7 @@ def capture_native(job):
     torch.save(payload, directory / "snapshot.pt")
     if manifest.get("backward_probe") == "vjp":
         with workload_imports(directory):
-            probes = capture_cotangents(model, requests, job.seed)
+            probes = capture_cotangents(model, requests, job.seed + manifest.get("batch_index", 0))
         # Probe execution can mutate buffers and inputs. Reload the untouched snapshot.
         payload = torch.load(directory / "snapshot.pt", weights_only=True)
         for request, probe in zip(payload["requests"], probes, strict=True):

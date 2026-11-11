@@ -35,6 +35,8 @@ include docs/gelu-exp-grid-014.csv docs/gelu-block12-014.csv examples/gelu_range
 include docs/upstream-report-draft-014.md docs/v015-policy.json docs/input-accuracy.md
 include docs/input-batches-015.json docs/input-accuracy-015.csv docs/input-accuracy-015.json
 include examples/input_batch_accuracy.py scripts/summarize_input_accuracy.py
+include docs/v016-policy.json
+include examples/input_batches.py
 global-exclude __pycache__ *.py[cod] AGENTS.md CLAUDE.md
 exclude tests/test_*.py
 prune reports
@@ -45,3 +47,9 @@ prune infra
 prune native
 prune research
 prune experiments
+
+include docs/verdict-policy.md docs/verdict-schema.md docs/verdict.schema.json
+include docs/user-guide.md docs/troubleshooting.md
+recursive-include docs/research *.md *.json *.csv
+include examples/ci/upgrade-check.yml
+include scripts/summarize_check_calibration.py

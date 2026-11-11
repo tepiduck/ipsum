@@ -136,7 +136,7 @@ def write_native_report(output, summary):
         if not evidence:
             return "not requested"
         return html.escape(
-            f"{'accuracy_shift' if evidence.get('accuracy_shift') else 'not flagged'}; "
+            f"{'accuracy_shift' if evidence.get('accuracy_shift') else 'not flagged'}; single_input, descriptive only; "
             f"worse {evidence.get('worsened')}/{evidence.get('paired')}; "
             f"median log2 growth {evidence.get('median_log2_growth')} "
             f"({evidence.get('median_status')}); sign p={evidence.get('sign_test_p')}; "
@@ -186,6 +186,26 @@ def write_native_report(output, summary):
             + shift_cell(summary["accuracy_shift"])
             + "</p>"
         )
+    replicated = summary.get("accuracy_shift_replicated")
+    models = summary.get("models", [])
+    if replicated or models:
+        table += "<h2>Replicated input-batch accuracy (advisory)</h2>"
+        for name, evidence in (
+            [("workload", replicated)]
+            if replicated
+            else [(row["id"], row["accuracy_shift_replicated"]) for row in models]
+        ):
+            table += (
+                "<p>"
+                + html.escape(
+                    f"{name}: accuracy_shift_replicated={evidence['accuracy_shift_replicated']}; "
+                    f"completed {evidence['completed']}/{evidence['planned']}; "
+                    f"worse/better/ties {evidence['worsened']}/{evidence['improved']}/{evidence['ties']}; "
+                    f"median log2 growth {evidence['median_log2_growth']} ({evidence['median_status']}); "
+                    f"exact binomial p={evidence['sign_test_p']}. Full distribution below."
+                )
+                + "</p>"
+            )
     (output / "report.html").write_text(
         '<!doctype html><meta charset="utf-8"><title>Faultline model comparison</title>'
         "<style>body{font:16px system-ui;max-width:1000px;margin:40px auto;padding:0 20px}"
@@ -303,6 +323,7 @@ def compare_native_environments(
     reduce=False,
     max_evaluations=32,
     aot=False,
+    shared_bundle=False,
 ):
     candidate_settings = candidate_settings or settings
     a, b = settings.to_dict(), candidate_settings.to_dict()
@@ -313,7 +334,9 @@ def compare_native_environments(
     baseline_python, candidate_python = interpreter(baseline_python), interpreter(candidate_python)
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
-    job = NativeJob.create(copy_workload(bundle, output / "workload"), aot=aot)
+    job = NativeJob.create(
+        bundle if shared_bundle else copy_workload(bundle, output / "workload"), aot=aot
+    )
     baseline = run_case(job, settings, output / "baseline", python=baseline_python)
     candidate = run_case(job, candidate_settings, output / "candidate", python=candidate_python)
     label = classification(baseline, candidate)
@@ -331,8 +354,17 @@ def compare_native_environments(
         summary["accuracy_comparison"] = accuracy_comparison(baseline, candidate)
     if settings.numerics or settings.fp64_advisory:
         summary["accuracy_shift"] = accuracy_shift(baseline, candidate)
-    export_native(job, candidate_settings, output / "candidate-reproducer", candidate)
-    export_native(job, settings, output / "baseline-reproducer", baseline)
+    if shared_bundle:
+        # Batch collections retain one frozen bundle instead of copying large weights
+        # into two reproducer exports for every observation. The bundle is verified
+        # again by each worker; all original single-input export behavior is unchanged.
+        summary["shared_workload"] = {
+            "bundle": str(Path(bundle).resolve()),
+            "bundle_hash": job.bundle_hash,
+        }
+    else:
+        export_native(job, candidate_settings, output / "candidate-reproducer", candidate)
+        export_native(job, settings, output / "baseline-reproducer", baseline)
     write_native_report(output, summary)
     if reduce and label == "regression":
         from .native_reduce import reduce_native

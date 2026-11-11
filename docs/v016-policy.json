@@ -1,0 +1,17 @@
+{
+  "version": "0.16.0",
+  "unit": "disjoint frozen input batch",
+  "minimum_completed_batches": 10,
+  "fraction_worsened_gte": 0.8,
+  "median_growth_gte": 1.25,
+  "batch_score": "median log2(candidate compiled/fp64 RMSE / baseline compiled/fp64 RMSE) across paired present parameter gradients",
+  "zero_errors": "both zero: tie; baseline zero: positive infinity; candidate zero: negative infinity; indeterminate median: incomplete",
+  "missing": "retain in planned denominator; flag rule uses completed batches; report coverage separately",
+  "sign_test": "exact one-sided binomial tail on worse versus better batches, excluding ties; descriptive, not another threshold",
+  "single_input": "single_input, descriptive only",
+  "sampling": "fixed deterministic disjoint inputs, frozen before execution; no replacement of failed batches",
+  "text_sampling": "pairs of consecutive disjoint 200-word chunks after the original two paragraphs; 64-token pinned tokenizer inputs",
+  "vision_sampling": "nonoverlapping equal-width vertical strips of each of the two original photographs; shared source-image dependence is explicit",
+  "vjp": "individually frozen probe per batch, seed equals zero-based batch index",
+  "scope": "advisory only; no changes to primary outcomes, tolerances, signatures, reducers or exit codes"
+}

@@ -169,6 +169,7 @@ def run_bisect(
     resume=False,
     retry_installations=False,
     progress=print,
+    predicate="single-input",
 ):
     if not math.isfinite(growth) or growth <= 1 or not 2 <= observations <= 10:
         raise ValueError("Choose a growth threshold above one and 2..10 fresh worker observations")
@@ -189,6 +190,28 @@ def run_bisect(
             "Accuracy bisection requires CPU Inductor gradients and fp64 advisory only"
         )
     output, bundle = Path(output).resolve(), Path(bundle).resolve()
+    if predicate == "replicated":
+        from .batch_bisect import run_replicated_bisect
+
+        if growth != 1.4 or observations != 3:
+            raise ValueError(
+                "Replicated bisection uses the fixed batch policy; omit --growth and --observations"
+            )
+        return run_replicated_bisect(
+            bundle,
+            output,
+            baseline_python,
+            start,
+            end,
+            settings=settings,
+            requirements=requirements,
+            install_timeout=install_timeout,
+            resume=resume,
+            retry_installations=retry_installations,
+            progress=progress,
+        )
+    if predicate != "single-input":
+        raise ValueError("Unknown accuracy predicate")
     baseline_python = interpreter(baseline_python)
     verify_native(bundle)
     lock = dependency_lock(Path(requirements).read_text(encoding="utf-8") if requirements else None)
@@ -416,6 +439,9 @@ def add_bisect_command(commands):
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--requirements", type=Path, help="exact pinned non-PyTorch dependencies")
     parser.add_argument("--growth", type=float, default=1.4)
+    parser.add_argument(
+        "--predicate", choices=("single-input", "replicated"), default="single-input"
+    )
     parser.add_argument("--observations", type=int, default=3)
     parser.add_argument("--timeout", type=float, default=600)
     parser.add_argument("--max-rss-mb", type=int, default=12288)
@@ -440,6 +466,7 @@ def bisect_command(args):
         requirements=args.requirements,
         growth=args.growth,
         observations=args.observations,
+        predicate=args.predicate,
         settings=Settings(
             gradients=True,
             fp64_advisory=True,

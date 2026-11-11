@@ -116,7 +116,9 @@ def download(url, path):
     return {"url": url, "sha256": digest(path), "bytes": len(data)}
 
 
-def real_inputs(directory):
+def real_inputs(directory, input_batches=1):
+    if type(input_batches) is not int or input_batches < 1:
+        raise ValueError("input_batches must be positive")
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=False)
     sources = []
@@ -136,6 +138,48 @@ def real_inputs(directory):
         "texts": texts,
         "scope": "Two real photographs and two public-domain prose paragraphs; not a representative accuracy dataset.",
     }
+    if input_batches > 1:
+        # Nonoverlapping source regions, not stochastic augmentations of the same pixels.
+        # These are disjoint crops of two photographs, not independent photographs.
+        from PIL import Image
+
+        words = " ".join(paragraphs[2:]).split()
+        if 400 * input_batches > len(words):
+            raise ValueError("Insufficient disjoint source text for requested input batches")
+        manifest["batches"] = []
+        for batch in range(input_batches):
+            images = []
+            for index in range(2):
+                with Image.open(directory / f"image-{index}.jpg") as image:
+                    left = image.width * batch // input_batches
+                    right = image.width * (batch + 1) // input_batches
+                    if right <= left:
+                        raise ValueError("Insufficient disjoint source pixels")
+                    name = f"batch-{batch:04d}-image-{index}.png"
+                    image.crop((left, 0, right, image.height)).save(directory / name)
+                    images.append(
+                        {
+                            "file": name,
+                            "sha256": digest(directory / name),
+                            "source_image": index,
+                            "box": [left, 0, right, image.height],
+                        }
+                    )
+            start = batch * 400
+            manifest["batches"].append(
+                {
+                    "batch": batch,
+                    "images": images,
+                    "word_range": [start, start + 400],
+                    "texts": [
+                        " ".join(words[start : start + 200]),
+                        " ".join(words[start + 200 : start + 400]),
+                    ],
+                }
+            )
+        manifest["scope"] = (
+            "Disjoint deterministic image strips from two photos and disjoint 200-word passages from one book; source dependence remains. Original full images/paragraphs are retained separately, not counted as replicates."
+        )
     (directory / "inputs.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     return manifest
 
@@ -163,6 +207,18 @@ def prepare_model(name, directory, inputs_directory):
                 ]
             ),
         )
+        if "batches" in input_meta:
+            inputs = [
+                (
+                    torch.stack(
+                        [
+                            transform(Image.open(inputs_directory / image["file"]).convert("RGB"))
+                            for image in batch["images"]
+                        ]
+                    ),
+                )
+                for batch in input_meta["batches"]
+            ]
         spec = {
             "provider": "torchvision",
             "architecture": name,
@@ -197,6 +253,19 @@ def prepare_model(name, directory, inputs_directory):
                 return_tensors="pt",
             )
         )
+        if "batches" in input_meta:
+            inputs = [
+                dict(
+                    tokenizer(
+                        batch["texts"],
+                        padding="max_length",
+                        truncation=True,
+                        max_length=64,
+                        return_tensors="pt",
+                    )
+                )
+                for batch in input_meta["batches"]
+            ]
         loader = AutoModel
         if name == "t5_small_encoder":
             from transformers import T5EncoderModel
@@ -256,7 +325,11 @@ def prepare_model(name, directory, inputs_directory):
         storage_dtype="float32",
         batch_size=2,
         input_sources=input_meta["sources"],
-        catalog_set="held-out" if name in HELD_OUT_MODELS else "original",
+        catalog_set="held-out"
+        if name in HELD_OUT_MODELS
+        else "original"
+        if name in ORIGINAL_MODELS
+        else "custom",
         parameter_count=sum(p.numel() for p in model.parameters()),
     )
     torch.save(model.state_dict(), directory / "weights.pt")

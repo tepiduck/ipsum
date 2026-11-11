@@ -1454,3 +1454,49 @@ weights, logs and caches remain local. License files and license metadata remain
 
 The Git-normalized packaged source hash is
 `9324cff1ca078196fe7c03075996963fdf90d11273d9140cae37a33789cd694f`.
+
+## 0.16 usability workflow (validation in progress)
+
+`faultline check` adds a terminal verdict, HTML report and versioned JSON contract over
+the existing primary evidence. It accepts trusted factories, captured bundles, torchvision
+models and Hugging Face model IDs. The fixed summary policy distinguishes candidate-only
+failures, replicated accuracy degradation, contrary diagnostics and incomplete execution.
+Existing statuses, tolerances, signatures, reducer predicates and command exit codes are
+unchanged. The new command alone uses SAFE/0, REGRESSION/1, NEEDS_REVIEW/2 and INCONCLUSIVE/3.
+
+Input replication uses frozen batches and individually frozen backward probes; targets
+within one batch are not independent replicates. The replicated advisory requires at least
+ten completed batches, at least 80% worsening and median growth of at least 1.25x. The old
+target-level flag is explicitly descriptive, with its earlier values preserved. Replicated
+nightly bisection uses the same fixed rule. Environment creation reuses supervised installer
+primitives, and a small-model CI workflow gates only on REGRESSION.
+
+Quick, standard and thorough presets separate primary workers from optional diagnostics.
+Memory-limited diagnostics retain primary evidence. The completed SmolLM2-135M standard
+check uses 8,027.7 MiB peak worker-tree RSS over ten batches, finishes in 34.5 minutes and
+returns NEEDS_REVIEW with contrary evidence retained. This meets the 12-GiB worker target;
+it is not a claim that every standard check finishes within 30 minutes.
+
+A wheel-install check found and fixed cross-environment dependency shadowing. Workers now
+load only the harness package, leaving dependency resolution to the selected interpreter.
+Actual installed-wheel baseline/candidate workers report 2.15.0+cpu and
+2.16.0.dev20261105+cpu respectively. Three-batch quick and ten-batch standard checks of the
+small example both return SAFE. The fresh-wheel pretrained ResNet-18 quickstart also returns
+SAFE for three forward batches. Calibration source-directory runs were not affected by the
+wheel-specific path problem.
+
+The full 29-model same-version/upgrade calibration and nine preset-cost cells are still in
+progress. No full-catalog result is claimed in this development entry. The frozen policy,
+cohort distinctions and completed controls are recorded in the
+[usability validation record](docs/research/usability-016.md), with the
+[fresh-user transcript](docs/research/quickstart-test.md). Earlier evidence and the license
+situation are preserved. Nothing was filed upstream; no compiler defect is claimed.
+
+Completed 0.16 checks so far: Windows portable suite 353 passed, one skipped; Linux
+portable suite 354 passed; actual CPU Inductor suite 12 passed; compiler validation
+campaign all 14 checks passed (17 passes and one unconfirmed numerical discrepancy);
+legacy suite 31 passed; Ruff lint and formatting passed. Installed-wheel quick and
+standard verdicts validate against the published JSON schema. The current publication
+audit accepts 185 index paths, 68 wheel members and 187 source-archive members, excluding
+internal instructions, local notes, environments and run artifacts. Full-catalog calibration
+remains distinct from these completed implementation checks.
