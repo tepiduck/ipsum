@@ -40,6 +40,8 @@ only. Download and compilation time depend on the machine; see the
 
 Use a new output directory for a new check. Use `--resume` to continue an interrupted
 check with exactly the same source, frozen inputs, settings, and environments.
+Resume covers execution after capture finishes; interrupted preparation needs a new
+output directory.
 Factories and captured bundles contain executable Python: run code you trust.
 
 ## Read the verdict

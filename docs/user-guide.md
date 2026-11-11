@@ -98,3 +98,5 @@ signature. `check` does not relax that predicate or claim to extend PyTorch's mi
 
 Keep completed artifacts. `--resume` verifies identity before reusing completed batches; use a new
 output directory after changing the model, source, environment, settings, or inputs.
+Resume requires completed preparation. If download or capture was interrupted before the
+prepared bundle was committed, retain that attempt and choose a new output directory.

@@ -66,6 +66,7 @@ def diagnostic(job, settings, primary, directory, python, *, control=False):
             "--output",
             str(directory / "result.json"),
         ],
+        watch_parent=True,
     )
     observed = supervise(
         command,

@@ -201,6 +201,7 @@ def check_command(args):
                         "--output",
                         str(preparation),
                     ],
+                    watch_parent=True,
                 )
                 observed = supervise(
                     command,
@@ -246,14 +247,27 @@ def check_command(args):
                 file=sys.stderr,
             )
             return 3
-        output.mkdir(parents=True, exist_ok=True)
+        planned = (
+            args.batches
+            if args.batches is not None and 1 <= args.batches <= 100
+            else PRESETS[args.level]["batches"]
+        )
         verdict = summarize(
             [],
-            args.batches or PRESETS[args.level]["batches"],
+            planned,
             mode="environment_comparison" if args.baseline else "single_environment",
             level=args.level,
         )
         verdict["reasons"] = [{"code": "setup_error", "batch": None, "message": setup_help(exc)}]
-        report(output, verdict, {"setup_error": str(exc)})
+        try:
+            output.mkdir(parents=True, exist_ok=True)
+            report(output, verdict, {"setup_error": str(exc)})
+        except OSError as report_error:
+            print(
+                f"INCONCLUSIVE - {setup_help(exc)}\nReport could not be written: {report_error}\n"
+                "Next: choose a writable output directory and rerun.",
+                file=sys.stderr,
+            )
+            return 3
     print(terminal(verdict, output))
     return verdict["exit_code"]

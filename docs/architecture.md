@@ -187,6 +187,8 @@ dependency search path: in a wheel installation that parent is an entire `site-p
 directory and could otherwise shadow the selected interpreter's PyTorch. Worker environment
 records identify the runtime actually imported. Model dependencies remain the selected
 interpreter's responsibility.
+The preparation and compact-diagnostic subprocesses use the same parent-identity watchdog
+as primary workers, including Linux start ticks that survive wall-clock corrections.
 
 The coordinator starts one worker at a time to avoid resource interference. Worker subprocesses
 and compiler descendants have a wall deadline and sampled aggregate RSS budget. Shared pages

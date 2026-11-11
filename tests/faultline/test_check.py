@@ -132,6 +132,30 @@ def test_argument_errors_use_new_codes_only_for_check(args, code):
     assert error.value.code == code
 
 
+@pytest.mark.parametrize("count", [-1, 0, 101])
+def test_invalid_batch_count_keeps_inconclusive_exit_and_valid_report(tmp_path, count):
+    from faultline.cli import main
+
+    output = tmp_path / "report"
+    assert (
+        main(["check", "model.py:factory", "--batches", str(count), "--output", str(output)]) == 3
+    )
+    verdict = read_json(output / "verdict.json")
+    assert verdict["verdict"] == "INCONCLUSIVE"
+    assert verdict["reasons"][0]["code"] == "setup_error"
+    jsonschema.validate(verdict, read_json(Path(__file__).parents[2] / "docs/verdict.schema.json"))
+
+
+def test_unwritable_report_keeps_inconclusive_exit_and_existing_file(tmp_path, capsys):
+    from faultline.cli import main
+
+    output = tmp_path / "existing-file"
+    output.write_text("retain this file", encoding="utf-8")
+    assert main(["check", "--output", str(output)]) == 3
+    assert output.read_text(encoding="utf-8") == "retain this file"
+    assert "writable output directory" in capsys.readouterr().err
+
+
 def test_diagnostic_memory_failure_preserves_primary(monkeypatch, tmp_path):
     primary = outcome("gradient_mismatch")
     saved = copy.deepcopy(primary)
