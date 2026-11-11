@@ -33,6 +33,11 @@ an observation with itself. The two cohorts share those baseline measurements an
 counts are therefore correlated. This scheduling change was declared before starting
 the fresh same-version workers and does not change the verdict or replication policy.
 
+Large text-model upgrade outputs and fresh same-version outputs are allocated on a
+Windows-mounted evidence volume to avoid filling the WSL disk. Completed evidence was
+not moved or deleted. Input bundles and all preset-cost output directories stay on the
+Linux filesystem. Storage placement does not change the frozen tensors or worker settings.
+
 Historical-issue fixtures reuse the preserved 0.6 evidence. Controlled injected faults
 are new executions with explicit mutant labels. The exp_u20 control reuses the 20-batch
 measurements from 0.15: that script recorded accuracy errors, not full primary oracle
@@ -72,3 +77,13 @@ in candidate workers. Calibration uses isolated source directories and was not a
 The [fresh-user transcript](quickstart-test.md) records install and quickstart timing.
 Earlier investigation evidence and license metadata are unchanged. No upstream report
 was filed and no numerical finding is presented as a confirmed compiler defect.
+
+## CI execution
+
+The [model-upgrade workflow](https://github.com/tepiduck/ipsum/actions/runs/43118691494)
+at `4021008` created CPU environments with 2.15.0+cpu and 2.16.0.dev20261111+cpu and
+returned SAFE for all ten standard batches of the small example. This is a real workflow
+execution, not just a YAML syntax check; the gate fails only on REGRESSION and uploads
+the report for other verdicts. Its current-nightly date differs from the fixed November 5
+wheel used for catalog calibration. The example tests integration, not pretrained-model
+accuracy or general upgrade safety.

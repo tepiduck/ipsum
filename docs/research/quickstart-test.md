@@ -1,7 +1,7 @@
 # Fresh-user installation test
 
 The README quickstart was run from its public GitHub clone at commit
-[`ae22c21`](https://github.com/tepiduck/ipsum/commit/ae22c21696d236eeb14bb1910c051633b4a00a6d),
+[`4021008`](https://github.com/tepiduck/ipsum/commit/4021008dcdc32f5bf30fda14af5a736cbabe18ca),
 in a new directory and clean venv. Every command below exited successfully. Faultline
 was installed from the built wheel; an import-location check confirms `site-packages`,
 not an editable source install. No `PYTHONPATH` override was inherited.
@@ -13,17 +13,17 @@ Other validation work was active on the host.
 
 | Command | Wall seconds | Exit |
 |---|---:|---:|
-| `git clone https://github.com/tepiduck/ipsum.git` | 1.44 | 0 |
+| `git clone https://github.com/tepiduck/ipsum.git` | 2.25 | 0 |
 | `cd ipsum` | 0.002 | 0 |
-| `python3 -m venv .venv` | 2.64 | 0 |
-| `. .venv/bin/activate` | 0.003 | 0 |
-| `python -m pip install build` | 0.73 | 0 |
-| `python -m build --wheel` | 1.76 | 0 |
-| `python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu` | 23.21 | 0 |
-| `python -m pip install 'dist/faultline_ml-0.16.0-py3-none-any.whl[sweep]'` | 14.47 | 0 |
-| `faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart` | 72.31 | 0 |
+| `python3 -m venv .venv` | 2.04 | 0 |
+| `. .venv/bin/activate` | 0.002 | 0 |
+| `python -m pip install build` | 0.64 | 0 |
+| `python -m build --wheel` | 1.42 | 0 |
+| `python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu` | 22.69 | 0 |
+| `python -m pip install 'dist/faultline_ml-0.16.0-py3-none-any.whl[sweep]'` | 12.17 | 0 |
+| `faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart` | 73.62 | 0 |
 
-Total measured commands: 116.56 seconds. ResNet-18 reports SAFE for three
+Total measured commands: 114.84 seconds. ResNet-18 reports SAFE for three
 forward batches. The terminal output, with the temporary checkout path shortened, is:
 
 ```text

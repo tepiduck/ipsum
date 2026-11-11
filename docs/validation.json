@@ -31458,12 +31458,12 @@
     "replication_policy": "docs/v016-policy.json",
     "implementation_checks": {
       "windows_portable": {
-        "passed": 353,
+        "passed": 359,
         "skipped": 1,
         "compiler_deselected": 12
       },
       "linux_portable": {
-        "passed": 354,
+        "passed": 360,
         "compiler_deselected": 12
       },
       "linux_inductor": {
@@ -31484,7 +31484,29 @@
       "ruff_format": true,
       "installed_wheel_quick_and_standard": "SAFE with independent 2.15 and 2.16 nightly workers; JSON schema validated"
     },
-    "tested_source_sha256": "bee2a0327db058bc20878762df3f7e03dde6fa5d30c7096220f441e5419ee713",
+    "tested_source_sha256": "812ad3daf3de6a5e8c0f6b6f5fe45dc503aab5304090461334c742ded8d58e82",
+    "ci": {
+      "commit": "4021008dcdc32f5bf30fda14af5a736cbabe18ca",
+      "all_six_jobs_passed": true,
+      "validation_run": "https://github.com/tepiduck/ipsum/actions/runs/43118692354",
+      "model_check_run": "https://github.com/tepiduck/ipsum/actions/runs/43118691494",
+      "model_check_verdict": "SAFE",
+      "model_check_batches": 10,
+      "baseline_torch": "2.15.0+cpu",
+      "candidate_torch": "2.16.0.dev20261111+cpu"
+    },
+    "fresh_install": {
+      "commit": "4021008dcdc32f5bf30fda14af5a736cbabe18ca",
+      "commands": 9,
+      "all_exit_zero": true,
+      "total_command_wall_s": 114.84211960200082,
+      "check_wall_s": 73.62271686500026,
+      "verdict": "SAFE",
+      "batches": 3,
+      "installed_from_wheel": true,
+      "global_download_caches_warm": true,
+      "transcript": "docs/research/quickstart-test.md"
+    },
     "memory_control": {
       "model": "SmolLM2-135M",
       "level": "standard",
@@ -31495,7 +31517,7 @@
     },
     "limitations": [
       "Full 29-model calibration and preset table still running.",
-      "Prepublication fresh-wheel test used candidate files; published-commit clone test is pending.",
+      "Fresh venv used populated global pip/model caches; timings are not cold-network measurements.",
       "No new GPU execution is claimed."
     ],
     "license_unchanged": true,

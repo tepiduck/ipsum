@@ -1492,11 +1492,54 @@ cohort distinctions and completed controls are recorded in the
 [fresh-user transcript](docs/research/quickstart-test.md). Earlier evidence and the license
 situation are preserved. Nothing was filed upstream; no compiler defect is claimed.
 
-Completed 0.16 checks so far: Windows portable suite 353 passed, one skipped; Linux
-portable suite 354 passed; actual CPU Inductor suite 12 passed; compiler validation
+Completed 0.16 checks so far: Windows portable suite 359 passed, one skipped; Linux
+portable suite 360 passed; actual CPU Inductor suite 12 passed; compiler validation
 campaign all 14 checks passed (17 passes and one unconfirmed numerical discrepancy);
 legacy suite 31 passed; Ruff lint and formatting passed. Installed-wheel quick and
 standard verdicts validate against the published JSON schema. The current publication
-audit accepts 185 index paths, 68 wheel members and 187 source-archive members, excluding
+audit accepts 186 index paths, 69 wheel members and 188 source-archive members, excluding
 internal instructions, local notes, environments and run artifacts. Full-catalog calibration
 remains distinct from these completed implementation checks.
+
+All six CI jobs passed at `4021008`, including the new environment-creation/upgrade
+workflow. Its small model returned SAFE for ten standard batches against the November 11
+nightly. A fresh public clone and clean-venv wheel install also completed the README's nine
+commands in 114.84 seconds, including a 73.62-second ResNet-18 quick check. Global download
+caches were populated; these are not cold-network timings.
+
+## 0.16 replicated CPU sweep (in progress)
+
+The original and held-out catalogs have been prepared as 29 models with ten
+fixed input batches each. Every batch has frozen inputs, weights and its own
+VJP probe. The thresholds in `docs/v016-policy.json` were saved before preparation
+and execution: at least ten usable batches, at least 80% worsening, and median
+batch error growth of at least 1.25x. Missing results remain in planned coverage.
+The existing single-input labels are retained as descriptive evidence.
+
+The CPU comparison uses isolated copies of PyTorch 2.15.0+cpu and
+2.16.0.dev20261105+cpu, two repeats, one thread, a 600-second worker timeout and
+a 12,288-MiB worker RSS limit. Its source is frozen independently of subsequent
+usability-workflow edits. Raw weights, environments, caches and worker evidence remain
+local; the campaign is still running, so no
+full-catalog replicated conclusion is recorded yet. The ten image batches are
+disjoint strips from two photographs, not ten independent source photographs.
+The text batches also share one source book. Binomial p-values are descriptive.
+
+Completed checks on the frozen experimental implementation: 326 portable tests,
+12 actual CPU Inductor tests, all 14 compiler-validation checks, and 31 legacy
+tests passed. The validation campaign retained 17 passes and one unconfirmed
+numerical discrepancy. Lint and formatting passed. Controlled tests cover a
+uniform planted degradation, a one-batch-only degradation, threshold boundaries,
+missing coverage, and the replicated bisection predicate.
+
+A separate real ten-batch same-version CPU comparison completed with ten ties,
+median log2 growth zero, p-value one and no replicated flag. Resuming it preserved
+all committed evidence hashes and launched no replacement workers. This control
+uses the small example workload; it is not a same-version full-catalog sweep.
+
+The combined checkout was also frozen at commit
+`ae22c21` for an additional check after the usability changes arrived. That
+snapshot passed 355 portable tests, all 12 CPU Inductor tests and all 14
+compiler-validation checks. Ruff lint passed and all 110 files in the requested
+format scope were already formatted. These checks are separate from the source
+used by the still-running replicated sweep.
