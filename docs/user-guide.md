@@ -69,6 +69,10 @@ Start with the reasons in `report.html`; `verdict.json` is the stable CI-facing 
 Use `evidence.json` and individual worker logs for detailed review. SAFE is scoped to the
 selected level. A forward-only SAFE says nothing about backward execution.
 
+During execution, the HTML and JSON reports update after each committed batch. Refresh
+the HTML to follow progress; `execution_state: running` identifies an unfinished check.
+Use the completed report and command exit code for an upgrade decision.
+
 NEEDS_REVIEW means the evidence is insufficient for the requested conclusion. Look for:
 
 - `contrary_evidence`: a completed diagnostic indicates a difference beyond the existing noise

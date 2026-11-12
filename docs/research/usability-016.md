@@ -11,13 +11,27 @@ The CPU measurements use Ubuntu under WSL2 on an AMD Ryzen 7 7700X (8 cores, 16 
 with 15.5 GiB available to WSL and 4 GiB swap. Each model worker uses one CPU thread,
 a 600-second deadline, and a 12-GiB sampled process-tree RSS budget. Separate compiler
 caches for baseline and candidate start empty and warm between batches. Downloads and
-capture are excluded from checks against prepared bundles. Other calibration/test work
-shares the host; these are operational costs, not isolated performance benchmarks.
+capture are excluded from checks against prepared bundles. The earlier series shared the
+host with calibration/test jobs. After a host OOM interruption, the final series runs one
+Faultline measurement coordinator at a time. The host is otherwise uncontrolled; these
+are operational costs, not isolated performance benchmarks.
 
 The catalog retains all 20 original and nine held-out pretrained models. Ten frozen
 batches per model use disjoint source-text chunks or disjoint vertical strips of two
 photographs. Samples share model weights and source material; they are not an independent
 population sample. No failed model or input is removed from the planned denominator.
+
+The cost study uses pretrained float32 models. Each ResNet-50 batch contains two
+224-by-224 RGB images. BERT, GPT-2 and SmolLM2 use two sequences of 64 tokens, returning
+`last_hidden_state`; gradient checks use the frozen VJP vectors. Quick selects the first
+three prepared batches, while standard and thorough use all ten. These sizes define the
+scope of the reported costs.
+
+The paired cost command is `faultline check PREPARED_MODEL_BUNDLE --baseline PYTHON
+--candidate PYTHON --level LEVEL --output NEW_DIRECTORY`, with the same 2.15 CPU
+interpreter selected for both sides. The two workers execute independently. The SmolLM2
+cell omits `--baseline`. Each cell uses a new output directory and its own empty compiler
+caches; frozen preparation is shared between levels.
 
 Same-version calibration executes separate 2.15.0+cpu baseline and candidate workers.
 The upgrade cohort uses 2.15.0+cpu and 2.16.0.dev20261105+cpu. Its recorded full-diagnostic
@@ -32,18 +46,19 @@ before execution. This avoids rerunning an existing baseline; it is not a compar
 an observation with itself. The two cohorts share those baseline measurements and their
 counts are therefore correlated. This scheduling change was declared before starting
 the fresh same-version workers and does not change the verdict or replication policy.
-Fresh controls wait until the timing study finishes. While the upgrade sweep is still
-active, only models whose ten recorded baseline workers stayed at or below 2 GiB RSS
-are eligible, with at least 3 GiB currently available RAM. Larger controls wait for the
-upgrade sweep to finish. This resource-only admission rule does not remove any model.
+Fresh controls run after both the timing study and upgrade sweep finish. The earlier
+plan to overlap small controls was superseded before any control workers started.
+This resource-only scheduling change does not remove any model.
 
-Large text-model upgrade outputs and fresh same-version outputs are allocated on a
-Windows-mounted evidence volume to avoid filling the WSL disk. Completed evidence was
-not moved or deleted. Input bundles and all preset-cost output directories stay on the
-Linux filesystem. Storage placement does not change the frozen tensors or worker settings.
-The Windows upgrade output directories use transparent NTFS compression. The fresh
-same-version output directory is uncompressed. Neither changes tensor contents; the
-preset-cost measurements remain on the Linux filesystem without NTFS compression.
+Text models and seven not-yet-started vision models write upgrade evidence to a
+Windows-mounted volume to avoid filling the WSL disk. Fresh same-version outputs use
+that volume too. Existing evidence, including the interrupted ViT attempt, was not moved
+or deleted. Input bundles and all preset-cost output directories stay on the Linux
+filesystem. Storage placement does not change the frozen tensors or worker settings.
+The Windows upgrade and fresh same-version output directories use transparent NTFS
+compression. The latter inherits compression from the existing evidence storage pool;
+this placement was set before those controls began. Tensor contents are unchanged, and
+the preset-cost measurements remain on the Linux filesystem without NTFS compression.
 
 Historical-issue fixtures reuse the preserved 0.6 evidence. Controlled injected faults
 are new executions with explicit mutant labels. The exp_u20 control reuses the 20-batch
@@ -53,8 +68,8 @@ These cohorts must not be pooled into a false-positive rate.
 
 ## Calibration status
 
-The full catalog and preset measurements are in progress. This document is a development
-record until the final tables are present; no completed 29-model calibration is claimed.
+The preset measurements are complete. Full-catalog calibration remains in progress;
+no completed 29-model calibration is claimed yet.
 
 Completed controls: all three injected faults produce REGRESSION. Of four retained
 historical fixtures, two produce REGRESSION and two NEEDS_REVIEW. One missed historical
@@ -64,6 +79,35 @@ evidence; the other fails in both. The policy is not retuned to turn these into 
 The retained exp_u20 data do not trigger the replicated rule for any of its four model
 variants. The full verdict for this accuracy-only replay is INCONCLUSIVE because primary
 observations are absent. This is distinct from a successful full-model SAFE check.
+
+## Measured costs
+
+All ten timing cells completed their planned primary batches within the 12-GiB worker
+budget. These wall times include interpreter startup and exclude frozen-input preparation.
+The [machine-readable evidence](cost-016.json) records settings, workload shapes, source
+and verdict hashes, diagnostic counts, and both internal and external wall clocks.
+
+| Model | Level | Batches | Verdict | Wall minutes | Peak worker-tree RSS (MiB) |
+|---|---|---:|---|---:|---:|
+| ResNet-50 | quick | 3 | SAFE | 1.46 | 1,145.5 |
+| ResNet-50 | standard | 10 | NEEDS_REVIEW | 15.00 | 1,945.2 |
+| ResNet-50 | thorough | 10 | NEEDS_REVIEW | 27.42 | 3,149.4 |
+| BERT | quick | 3 | NEEDS_REVIEW | 2.28 | 3,449.4 |
+| BERT | standard | 10 | NEEDS_REVIEW | 33.67 | 6,743.6 |
+| BERT | thorough | 10 | NEEDS_REVIEW | 78.43 | 10,252.3 |
+| GPT-2 | quick | 3 | SAFE | 2.51 | 3,881.5 |
+| GPT-2 | standard | 10 | NEEDS_REVIEW | 36.44 | 7,428.1 |
+| GPT-2 | thorough | 10 | NEEDS_REVIEW | 85.86 | 11,466.1 |
+| SmolLM2-135M | standard | 10 | NEEDS_REVIEW | 17.86 | 8,015.6 |
+
+The approximate 30-minute standard target is met for the measured ResNet-50 and SmolLM2
+workloads. BERT and GPT-2 miss it. Thorough takes over an hour for both text models;
+it is an investigation preset, not a short CI check. RSS is sampled worker-tree memory,
+not the coordinator, other host processes, or total system memory.
+
+These paired timings compare the same PyTorch version in independent workers. BERT quick
+retains forward mismatches in both environments. Matching failures do not establish SAFE,
+and contrary diagnostics remain NEEDS_REVIEW. The timings do not imply upgrade safety.
 
 ## Measurements before the performance changes
 
@@ -91,8 +135,20 @@ RSS excludes the coordinator and other active jobs. BERT's quick result contains
 mismatches in both environments; matching failures do not establish SAFE. The longer
 presets are not represented as meeting a universal 30-minute target.
 
-BERT standard misses that target. Its separate fp64 and eager-control workers repeat
-primary verification before using their diagnostics. Those verified replays are retained.
+The replacement SmolLM2-135M standard check completed all ten batches in 1,071.87 seconds
+from process launch to exit (17.86 minutes), with 8,015.6 MiB peak worker-tree RSS. The
+CLI's internal command timer recorded 1,067.71 seconds. It returned NEEDS_REVIEW, retained
+all contrary evidence and exported the first unexplained workload. All ten primary
+comparisons, statuses, signatures, fp64 advisories and numerical contexts exactly match
+the preoptimization check. This satisfies the tested 12-GiB memory and approximately
+30-minute targets for this workload. This is not a universal latency bound or an isolated
+optimization speedup estimate.
+
+The replacement BERT standard check took 2,020.22 seconds (33.67 minutes), at 6,743.6 MiB
+peak worker-tree RSS, and returned NEEDS_REVIEW. It still misses the approximate
+30-minute goal. Its separate fp64 and eager-control workers repeat primary verification
+before using their diagnostics. All primary comparisons and numerical diagnostics agree
+with the earlier ten-batch BERT result.
 
 ## Performance changes and equivalence checks
 
@@ -118,7 +174,19 @@ The diagnostic directory decreased from 439,112,174 to 654,167 bytes. Concurrent
 work differed between runs; these checks establish result parity and are not full-preset
 speedup measurements. A separate one-million-element exact-match microbenchmark decreased
 from 59.02 to 2.22 milliseconds median over seven calls, including the input clone.
-The complete preset timing series is still running.
+The complete preset timing series uses the external process wall clock, including
+interpreter startup; both time fields are retained.
+The six cells with completed before/after measurements contain 82 worker observations.
+Their statuses, workload hashes, signatures, full comparisons, fp64 advisories and numerical
+contexts are identical. Timing and resource fields are measured separately.
+
+The first optimized timing attempt was interrupted by a kernel global OOM while it
+overlapped the upgrade sweep. Hash verification retained all 130 committed upgrade
+pairs and nine completed SmolLM2 batches. The interrupted SmolLM2 attempt is not a
+completed timing cell. A new ten-cell timing series starts with empty caches and runs
+sequentially; the original upgrade campaign then resumes with its original source,
+settings and committed evidence. The same-version controls follow. No result is
+reclassified as a model/compiler failure because its host environment was interrupted.
 
 The changed implementation passed 366 Linux portable tests, 365 Windows tests with one
 skip, all 12 CPU Inductor tests, and all 14 compiler-validation checks. Six new behavior

@@ -1,0 +1,2004 @@
+{
+  "schema_version": 1,
+  "advisory_only": true,
+  "host": {
+    "cpu": "AMD Ryzen 7 7700X, 8 cores / 16 threads",
+    "system": "Ubuntu under WSL2",
+    "wsl_ram_gib": 15.5,
+    "swap_gib": 4
+  },
+  "method": "One command per cell; two independent same-version workers for ResNet-50/BERT/GPT-2, one interpreter for SmolLM2. Pre-frozen inputs exclude download/capture. Separate per-side compiler caches start empty and warm across batches. This final series runs sequentially without another Faultline measurement campaign, following a host OOM in the previous overlapping series. The host is otherwise uncontrolled; wall times are operational measurements, not isolated performance benchmarks. RSS is the maximum sampled worker process-tree RSS, not total system memory or VRAM.",
+  "planned_cells": 10,
+  "completed_cells": 10,
+  "measurements": [
+    {
+      "model": "smollm2",
+      "level": "standard",
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "single_environment",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "NEEDS_REVIEW",
+      "command_wall_s": 1067.711193444,
+      "invocation_wall_s": 1052.771175933,
+      "peak_worker_rss_mb": 8015.60546875,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "9c8973305ea7d5062752af13fb7d8d631391ed282f188df5d10ed8f47e0f58ed",
+      "verdict_sha256": "045412466134e77656b2f4e3572ffeff7b1af959f508f929013bdb2c545ce2c4",
+      "diagnostic_counts": {
+        "complete": 14
+      },
+      "primary_counts": {
+        "baseline": {},
+        "candidate": {
+          "gradient_mismatch": 7,
+          "numerical_mismatch": 3
+        }
+      },
+      "reason_counts": {
+        "contrary_evidence": 7
+      },
+      "workload": "smollm2",
+      "outer_wall_s": 1071.86790107
+    },
+    {
+      "model": "resnet50",
+      "level": "quick",
+      "scope": {
+        "completed_batches": 3,
+        "gradients": false,
+        "level": "quick",
+        "mode": "environment_comparison",
+        "planned_batches": 3,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "SAFE",
+      "command_wall_s": 86.51593970299996,
+      "invocation_wall_s": 81.91700380499992,
+      "peak_worker_rss_mb": 1145.5078125,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "4733a67801d4cab165f677bdf31473544f7c0a80a1e7936b001a2a0abd51658a",
+      "verdict_sha256": "5aeeb70b9c4da7d3ff01964a49341cec4afb7c132d6fd5e3dfebe8a35715eaf6",
+      "diagnostic_counts": {},
+      "primary_counts": {
+        "baseline": {
+          "pass": 3
+        },
+        "candidate": {
+          "pass": 3
+        }
+      },
+      "reason_counts": {},
+      "workload": "resnet50",
+      "outer_wall_s": 87.53317149899999
+    },
+    {
+      "model": "resnet50",
+      "level": "standard",
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "NEEDS_REVIEW",
+      "command_wall_s": 897.9710367720002,
+      "invocation_wall_s": 892.7111314259998,
+      "peak_worker_rss_mb": 1945.1875,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "0d1fcfa35c008c2235e5d0a40d29359cc2b8a451f0a9d8d6dc85fd397ae03c34",
+      "verdict_sha256": "94d421f9315d980aa6129df3e390d283e8f1f6d9df2107ed56fc7bf1eef0168a",
+      "diagnostic_counts": {
+        "complete": 36
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {
+        "contrary_evidence": 8
+      },
+      "workload": "resnet50",
+      "outer_wall_s": 899.9231021069997
+    },
+    {
+      "model": "resnet50",
+      "level": "thorough",
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "thorough",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "NEEDS_REVIEW",
+      "command_wall_s": 1643.299520998,
+      "invocation_wall_s": 1637.759632071,
+      "peak_worker_rss_mb": 3149.3828125,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 3,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "e2298035b4042d7a274e7320e17619d0d5848a95f43e6d082f450c177e315a76",
+      "verdict_sha256": "e745659a230c9a8df4b4928a530a28a774812a556d049ecb7728d5cec19c8f26",
+      "diagnostic_counts": {
+        "complete": 40
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {
+        "contrary_evidence": 8
+      },
+      "workload": "resnet50",
+      "outer_wall_s": 1645.363267185
+    },
+    {
+      "model": "bert",
+      "level": "quick",
+      "scope": {
+        "completed_batches": 3,
+        "gradients": false,
+        "level": "quick",
+        "mode": "environment_comparison",
+        "planned_batches": 3,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "NEEDS_REVIEW",
+      "command_wall_s": 134.88210303100004,
+      "invocation_wall_s": 122.13098383400029,
+      "peak_worker_rss_mb": 3449.4296875,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "3a90b18a8806d4af29f1efb0bd1cc0243aa31f60d7ca5358f952c22fbd12da49",
+      "verdict_sha256": "0e71e0cc5a18f6603191c46abf112a5a6431e082bdbea6574718ef6c1eda2186",
+      "diagnostic_counts": {},
+      "primary_counts": {
+        "baseline": {
+          "pass": 2,
+          "numerical_mismatch": 1
+        },
+        "candidate": {
+          "pass": 2,
+          "numerical_mismatch": 1
+        }
+      },
+      "reason_counts": {
+        "unexplained_failure": 2
+      },
+      "workload": "bert",
+      "outer_wall_s": 137.0770759760003
+    },
+    {
+      "model": "bert",
+      "level": "standard",
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "NEEDS_REVIEW",
+      "command_wall_s": 2016.6876572519996,
+      "invocation_wall_s": 2003.6210540240004,
+      "peak_worker_rss_mb": 6743.59375,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "7738f28a5681cd91d7172a23aa76a8a38e5a833100464c078f3bb1edc5178d72",
+      "verdict_sha256": "94de344e5d927f986cd6d4938c013838cc71b5d133572b82e7ff06c5898ea1dc",
+      "diagnostic_counts": {
+        "complete": 32
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 8,
+          "numerical_mismatch": 2
+        },
+        "candidate": {
+          "gradient_mismatch": 8,
+          "numerical_mismatch": 2
+        }
+      },
+      "reason_counts": {
+        "unexplained_failure": 4
+      },
+      "workload": "bert",
+      "outer_wall_s": 2020.2167324849997
+    },
+    {
+      "model": "bert",
+      "level": "thorough",
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "thorough",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "NEEDS_REVIEW",
+      "command_wall_s": 4700.444548158,
+      "invocation_wall_s": 4685.60846543,
+      "peak_worker_rss_mb": 10252.328125,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 3,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "5d153e3eb370a559d2a18844ca5534d990180b86e23f25e0e3d918754cbdafe6",
+      "verdict_sha256": "4ee22c1be35e55968a1bec36d8a191427df3b8f9add61acf1c0264afd3da291a",
+      "diagnostic_counts": {
+        "complete": 40
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 8,
+          "numerical_mismatch": 2
+        },
+        "candidate": {
+          "gradient_mismatch": 8,
+          "numerical_mismatch": 2
+        }
+      },
+      "reason_counts": {
+        "unexplained_failure": 4
+      },
+      "workload": "bert",
+      "outer_wall_s": 4705.884022128
+    },
+    {
+      "model": "gpt2",
+      "level": "quick",
+      "scope": {
+        "completed_batches": 3,
+        "gradients": false,
+        "level": "quick",
+        "mode": "environment_comparison",
+        "planned_batches": 3,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "SAFE",
+      "command_wall_s": 148.37058039899966,
+      "invocation_wall_s": 133.73967233799885,
+      "peak_worker_rss_mb": 3881.49609375,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "bc4f2350d65efdbd32de8c2b4519acc21765adda126d4b432f1b3f225e3ccd54",
+      "verdict_sha256": "2bc697cd3df6e9c4e8c7656448991e2cd1d0417b5dc9ad36587f46011ed27457",
+      "diagnostic_counts": {},
+      "primary_counts": {
+        "baseline": {
+          "pass": 3
+        },
+        "candidate": {
+          "pass": 3
+        }
+      },
+      "reason_counts": {},
+      "workload": "gpt2",
+      "outer_wall_s": 150.52627725999992
+    },
+    {
+      "model": "gpt2",
+      "level": "standard",
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "NEEDS_REVIEW",
+      "command_wall_s": 2181.4328647019993,
+      "invocation_wall_s": 2167.7810877459997,
+      "peak_worker_rss_mb": 7428.125,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "b64ba864b402091ae9c260184ce04290716e7be8a50bc4fec72299bf197a8b4f",
+      "verdict_sha256": "be6afee79f2ea04419a2a80d5030dabf43d417ca763e1c98f1fdaf9e4d9f5883",
+      "diagnostic_counts": {
+        "complete": 32
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {
+        "contrary_evidence": 12
+      },
+      "workload": "gpt2",
+      "outer_wall_s": 2186.294577286999
+    },
+    {
+      "model": "gpt2",
+      "level": "thorough",
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "thorough",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "verdict": "NEEDS_REVIEW",
+      "command_wall_s": 5148.449553488999,
+      "invocation_wall_s": 5133.201498463999,
+      "peak_worker_rss_mb": 11466.09375,
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 3,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "torch": "2.15.0+cpu",
+      "configuration_sha256": "35fa264dc5c3a54ad7bc58e8d884878826e630a2c728c6c6189354d3aef1b744",
+      "verdict_sha256": "64c8f66042795872bd87f7a8d4e6302e0d537ba50459f7a7ddf96cffdea3ad4f",
+      "diagnostic_counts": {
+        "complete": 40
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {
+        "contrary_evidence": 12
+      },
+      "workload": "gpt2",
+      "outer_wall_s": 5151.469421742999
+    }
+  ],
+  "optimization_checks": {
+    "comparator": {
+      "checked_pairs": 2238,
+      "all_fields_and_exceptions_equal": true,
+      "timing_scope": "One million equal float32 values, CPU, one thread, seven calls; not a model-level speedup claim.",
+      "timings": {
+        "before": {
+          "samples_s": [
+            0.059015426000769367,
+            0.06773937999969348,
+            0.06322422799894412,
+            0.057162827000865946,
+            0.06335978300012357,
+            0.05569101299988688,
+            0.05405686399899423
+          ],
+          "median_s": 0.059015426000769367
+        },
+        "after": {
+          "samples_s": [
+            0.006373160000293865,
+            0.0019972240006609354,
+            0.00195942800019111,
+            0.001941345999512123,
+            0.002280470998812234,
+            0.0022992979993432527,
+            0.0022179840016178787
+          ],
+          "median_s": 0.0022179840016178787
+        }
+      },
+      "source_sha256": {
+        "before": "ee98a3ba571153ed91548d8cd0f3924b6f68713176510dfad0102a19b6e1d496",
+        "after": "0a96b52e6a27139f5ae84211888849612533bf1fc4b330065ee3d1b24e7527e9"
+      }
+    },
+    "bert_primary": {
+      "all_primary_fields_equal": true,
+      "batch": 1,
+      "model": "BERT",
+      "new_peak_rss_mib": 6160.03515625,
+      "new_wall_s": 37.27310733900049,
+      "note": "New fresh worker; copied warm compiler cache, same frozen batch/settings/interpreter. Concurrent host workloads differ. This is not a full-preset cost measurement.",
+      "old_peak_rss_mib": 6225.9609375,
+      "old_wall_s": 58.5675321359995,
+      "parity": {
+        "atol": true,
+        "case_hash": true,
+        "comparison": true,
+        "fingerprint": true,
+        "gradients": true,
+        "repeats": true,
+        "rtol": true,
+        "status": true
+      },
+      "source_sha256": "e6b3a37184f66bb4df7ab3e19414e50190a51a696ce63377d2a2e4350e462102"
+    },
+    "bert_diagnostic": {
+      "all_diagnostic_fields_equal": true,
+      "batch": 1,
+      "model": "BERT",
+      "new_directory_bytes": 654167,
+      "new_peak_rss_mib": 6146.54296875,
+      "new_wall_s": 43.62938748899978,
+      "note": "Fresh diagnostic worker; same frozen batch/settings/interpreter, copied warm compiler cache. Concurrent host workloads differ; not a full-preset cost measurement.",
+      "old_directory_bytes": 439112174,
+      "old_peak_rss_mib": 6234.6171875,
+      "old_wall_s": 69.10459325699958,
+      "parity": {
+        "control_requested": true,
+        "fp64_advisory": true,
+        "numerical_context": true,
+        "replay_matches_primary": true,
+        "status": true
+      },
+      "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f"
+    },
+    "smollm2_full_check": {
+      "model": "SmolLM2-135M",
+      "batches": [
+        {
+          "batch": 0,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 1,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 2,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 3,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 4,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 5,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 6,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 7,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 8,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        },
+        {
+          "batch": 9,
+          "equal": {
+            "status": true,
+            "case_hash": true,
+            "fingerprint": true,
+            "comparison": true,
+            "fp64_advisory": true,
+            "numerical_context": true
+          }
+        }
+      ],
+      "all_selected_fields_equal": true,
+      "scope": "Before and after optimization, same frozen ten batches and interpreter. Timing and source provenance differ and are not asserted equal."
+    },
+    "completed_case_equivalence": [
+      {
+        "case": "bert-quick",
+        "checked_observations": 6,
+        "fields": [
+          "status",
+          "case_hash",
+          "fingerprint",
+          "comparison",
+          "fp64_advisory",
+          "numerical_context"
+        ],
+        "all_selected_fields_equal": true,
+        "differences": []
+      },
+      {
+        "case": "bert-standard",
+        "checked_observations": 20,
+        "fields": [
+          "status",
+          "case_hash",
+          "fingerprint",
+          "comparison",
+          "fp64_advisory",
+          "numerical_context"
+        ],
+        "all_selected_fields_equal": true,
+        "differences": []
+      },
+      {
+        "case": "resnet50-quick",
+        "checked_observations": 6,
+        "fields": [
+          "status",
+          "case_hash",
+          "fingerprint",
+          "comparison",
+          "fp64_advisory",
+          "numerical_context"
+        ],
+        "all_selected_fields_equal": true,
+        "differences": []
+      },
+      {
+        "case": "resnet50-standard",
+        "checked_observations": 20,
+        "fields": [
+          "status",
+          "case_hash",
+          "fingerprint",
+          "comparison",
+          "fp64_advisory",
+          "numerical_context"
+        ],
+        "all_selected_fields_equal": true,
+        "differences": []
+      },
+      {
+        "case": "resnet50-thorough",
+        "checked_observations": 20,
+        "fields": [
+          "status",
+          "case_hash",
+          "fingerprint",
+          "comparison",
+          "fp64_advisory",
+          "numerical_context"
+        ],
+        "all_selected_fields_equal": true,
+        "differences": []
+      },
+      {
+        "case": "smollm2-standard",
+        "checked_observations": 10,
+        "fields": [
+          "status",
+          "case_hash",
+          "fingerprint",
+          "comparison",
+          "fp64_advisory",
+          "numerical_context"
+        ],
+        "all_selected_fields_equal": true,
+        "differences": []
+      }
+    ]
+  },
+  "preoptimization": {
+    "scope": "Six completed cells from the preceding implementation. BERT thorough was stopped after two committed batches once equivalence checks supported restarting the full cost study. All 48 prior batch commits and incomplete artifacts were retained. These cells are not pooled with the final ten.",
+    "completed_cells": 6,
+    "measurements": [
+      {
+        "model": "bert",
+        "level": "quick",
+        "scope": {
+          "completed_batches": 3,
+          "gradients": false,
+          "level": "quick",
+          "mode": "environment_comparison",
+          "planned_batches": 3,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "verdict": "NEEDS_REVIEW",
+        "command_wall_s": 283.91192026299905,
+        "invocation_wall_s": 268.6322629819988,
+        "peak_worker_rss_mb": 4526.2109375,
+        "source_sha256": "db8d2647f6abb4e94105a74eee41955e2b6422765e9124bf4c1962c5c489a560",
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cpu",
+          "max_rss_mb": 12288,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        },
+        "torch": "2.15.0+cpu",
+        "verdict_sha256": "2dc2b22d786975a23bda2de326f81b5e5bed1c01f0924d8cd12d421fc04040e5"
+      },
+      {
+        "model": "bert",
+        "level": "standard",
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "verdict": "NEEDS_REVIEW",
+        "command_wall_s": 3711.532038448,
+        "invocation_wall_s": 3697.446084590001,
+        "peak_worker_rss_mb": 6721.39453125,
+        "source_sha256": "db8d2647f6abb4e94105a74eee41955e2b6422765e9124bf4c1962c5c489a560",
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cpu",
+          "gradients": true,
+          "max_rss_mb": 12288,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        },
+        "torch": "2.15.0+cpu",
+        "verdict_sha256": "e8b8c4917e060c745038fc5aef2ec059fd20abe32ad5c74d7f6426dc25cc7414"
+      },
+      {
+        "model": "resnet50",
+        "level": "quick",
+        "scope": {
+          "completed_batches": 3,
+          "gradients": false,
+          "level": "quick",
+          "mode": "environment_comparison",
+          "planned_batches": 3,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "verdict": "SAFE",
+        "command_wall_s": 125.11168349499985,
+        "invocation_wall_s": 119.91636144699987,
+        "peak_worker_rss_mb": 1271.359375,
+        "source_sha256": "db8d2647f6abb4e94105a74eee41955e2b6422765e9124bf4c1962c5c489a560",
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cpu",
+          "max_rss_mb": 12288,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        },
+        "torch": "2.15.0+cpu",
+        "verdict_sha256": "2f4830e1db35d6643a5b2d18f4a97b2fc11463b6c083a19cbb6045f3a56a150d"
+      },
+      {
+        "model": "resnet50",
+        "level": "standard",
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "verdict": "NEEDS_REVIEW",
+        "command_wall_s": 1469.4530929480006,
+        "invocation_wall_s": 1464.2307362400006,
+        "peak_worker_rss_mb": 1938.11328125,
+        "source_sha256": "db8d2647f6abb4e94105a74eee41955e2b6422765e9124bf4c1962c5c489a560",
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cpu",
+          "gradients": true,
+          "max_rss_mb": 12288,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        },
+        "torch": "2.15.0+cpu",
+        "verdict_sha256": "f5154a01a82b55d9e2a627679e7f7985ed589bd3ec6b0574fa17ee5d8b8d7770"
+      },
+      {
+        "model": "resnet50",
+        "level": "thorough",
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "thorough",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "verdict": "NEEDS_REVIEW",
+        "command_wall_s": 2704.007179271999,
+        "invocation_wall_s": 2698.3379234209997,
+        "peak_worker_rss_mb": 3140.484375,
+        "source_sha256": "db8d2647f6abb4e94105a74eee41955e2b6422765e9124bf4c1962c5c489a560",
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cpu",
+          "gradients": true,
+          "max_rss_mb": 12288,
+          "repeats": 3,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        },
+        "torch": "2.15.0+cpu",
+        "verdict_sha256": "3c1d70b58d3ea5aa69ba2bcd0957100cfe37ab234f47f1232367f836a0ec63f2"
+      },
+      {
+        "model": "smollm2",
+        "level": "standard",
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "single_environment",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "verdict": "NEEDS_REVIEW",
+        "command_wall_s": 2067.085246954,
+        "invocation_wall_s": 2049.8449952969995,
+        "peak_worker_rss_mb": 8027.6640625,
+        "source_sha256": "db8d2647f6abb4e94105a74eee41955e2b6422765e9124bf4c1962c5c489a560",
+        "settings": {
+          "atol": null,
+          "backend": "inductor",
+          "device": "cpu",
+          "gradients": true,
+          "max_rss_mb": 12288,
+          "repeats": 2,
+          "rtol": null,
+          "threads": 1,
+          "timeout_s": 600
+        },
+        "torch": "2.15.0+cpu",
+        "verdict_sha256": "9d93f4300bb274aafadfe7da611f8f077529242898ffb96172a9fbe4a79adaf7"
+      }
+    ]
+  },
+  "interrupted_optimized_series": {
+    "completed_full_cells": 0,
+    "committed_smollm2_batches": 9,
+    "cause": "Kernel global OOM during overlap with the full upgrade campaign; all 139 completed batch commits across the two campaigns verified unchanged.",
+    "timing": "The interrupted series is excluded from completed cell costs. Every final cost cell starts fresh; the original upgrade campaign resumes with unchanged identity."
+  },
+  "wall_time_fields": "outer_wall_s includes interpreter startup and is used for final cost tables. command_wall_s is the CLI measurement starting after imports. Both are retained. Preoptimization tables reported command_wall_s.",
+  "workloads": {
+    "resnet50": {
+      "parameter_count": 25557032,
+      "input_tensors": [
+        {
+          "name": "inputs[0][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[1][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[2][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[3][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[4][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[5][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[6][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[7][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[8][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        },
+        {
+          "name": "inputs[9][0]",
+          "shape": [
+            2,
+            3,
+            224,
+            224
+          ],
+          "stride": [
+            150528,
+            50176,
+            224,
+            1
+          ],
+          "dtype": "torch.float32"
+        }
+      ],
+      "pretrained": {
+        "provider": "torchvision",
+        "architecture": "resnet50",
+        "weights": "ResNet50_Weights.IMAGENET1K_V2"
+      }
+    },
+    "bert": {
+      "parameter_count": 109482240,
+      "input_tensors": [
+        {
+          "name": "inputs[0].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[0].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[0].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[1].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[1].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[1].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[2].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[2].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[2].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[3].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[3].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[3].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[4].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[4].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[4].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[5].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[5].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[5].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[6].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[6].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[6].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[7].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[7].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[7].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[8].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[8].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[8].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[9].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[9].token_type_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[9].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        }
+      ],
+      "pretrained": {
+        "provider": "huggingface",
+        "architecture": "bert",
+        "repository": "google-bert/bert-base-uncased",
+        "revision": "86b5e0934494bd15c9632b12f734a8a67f723594",
+        "sequence_length": 64,
+        "output": "last_hidden_state",
+        "attention": "sdpa"
+      }
+    },
+    "gpt2": {
+      "parameter_count": 124439808,
+      "input_tensors": [
+        {
+          "name": "inputs[0].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[0].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[1].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[1].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[2].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[2].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[3].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[3].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[4].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[4].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[5].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[5].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[6].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[6].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[7].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[7].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[8].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[8].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[9].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[9].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        }
+      ],
+      "pretrained": {
+        "provider": "huggingface",
+        "architecture": "gpt2",
+        "repository": "openai-community/gpt2",
+        "revision": "607a30d783dfa663caf39e06633721c8d4cfcd7e",
+        "sequence_length": 64,
+        "output": "last_hidden_state",
+        "attention": "sdpa"
+      }
+    },
+    "smollm2": {
+      "parameter_count": 134515008,
+      "input_tensors": [
+        {
+          "name": "inputs[0].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[0].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[1].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[1].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[2].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[2].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[3].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[3].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[4].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[4].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[5].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[5].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[6].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[6].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[7].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[7].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[8].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[8].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[9].input_ids",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        },
+        {
+          "name": "inputs[9].attention_mask",
+          "shape": [
+            2,
+            64
+          ],
+          "stride": [
+            64,
+            1
+          ],
+          "dtype": "torch.int64"
+        }
+      ],
+      "pretrained": {
+        "provider": "huggingface",
+        "architecture": "smollm2",
+        "repository": "HuggingFaceTB/SmolLM2-135M",
+        "revision": "93efa2f097d58c2a74874c7e644dbc9b0cee75a2",
+        "sequence_length": 64,
+        "output": "last_hidden_state",
+        "attention": "sdpa"
+      }
+    }
+  },
+  "workload_scope": "Metadata describes the prepared ten-batch input collections. Quick uses their first three batches; standard and thorough use all ten. Text models return last_hidden_state. Model weights are float32."
+}

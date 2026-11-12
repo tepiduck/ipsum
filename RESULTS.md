@@ -1472,10 +1472,12 @@ nightly bisection uses the same fixed rule. Environment creation reuses supervis
 primitives, and a small-model CI workflow gates only on REGRESSION.
 
 Quick, standard and thorough presets separate primary workers from optional diagnostics.
-Memory-limited diagnostics retain primary evidence. The completed SmolLM2-135M standard
-check uses 8,027.7 MiB peak worker-tree RSS over ten batches, finishes in 34.5 minutes and
-returns NEEDS_REVIEW with contrary evidence retained. This meets the 12-GiB worker target;
-it is not a claim that every standard check finishes within 30 minutes.
+Memory-limited diagnostics retain primary evidence. All ten preset-cost cells completed
+their planned primary batches within the 12-GiB worker budget. Standard took 15.00 minutes
+for ResNet-50, 33.67 for BERT, 36.44 for GPT-2 and 17.86 for SmolLM2-135M. BERT and GPT-2
+miss the approximate 30-minute target; their thorough checks took 78.43 and 85.86 minutes.
+SmolLM2 peaked at 8,015.6 MiB and returned NEEDS_REVIEW with contrary evidence retained.
+The earlier 34.5-minute SmolLM2 measurement is preserved separately.
 
 A wheel-install check found and fixed cross-environment dependency shadowing. Workers now
 load only the harness package, leaving dependency resolution to the selected interpreter.
@@ -1485,9 +1487,9 @@ small example both return SAFE. The fresh-wheel pretrained ResNet-18 quickstart 
 SAFE for three forward batches. Calibration source-directory runs were not affected by the
 wheel-specific path problem.
 
-The full 29-model same-version/upgrade calibration and nine preset-cost cells are still in
-progress. No full-catalog result is claimed in this development entry. The frozen policy,
-cohort distinctions and completed controls are recorded in the
+The full 29-model same-version/upgrade calibration remains in progress. No full-catalog
+result is claimed in this development entry. The frozen policy, complete ten-cell cost
+table, cohort distinctions and completed controls are recorded in the
 [usability validation record](docs/research/usability-016.md), with the
 [fresh-user transcript](docs/research/quickstart-test.md). Earlier evidence and the license
 situation are preserved. Nothing was filed upstream; no compiler defect is claimed.
@@ -1496,16 +1498,18 @@ Completed 0.16 checks so far: Windows portable suite 365 passed, one skipped; Li
 portable suite 366 passed; actual CPU Inductor suite 12 passed; compiler validation
 campaign all 14 checks passed (17 passes and one unconfirmed numerical discrepancy);
 legacy suite 31 passed; Ruff lint and formatting passed. Installed-wheel quick and
-standard verdicts validate against the published JSON schema. The current publication
-audit accepts 186 index paths, 69 wheel members and 188 source-archive members, excluding
+standard verdicts validate against the published JSON schema. The implementation publication
+audit accepted 186 index paths, 69 wheel members and 188 source-archive members, excluding
 internal instructions, local notes, environments and run artifacts. Full-catalog calibration
 remains distinct from these completed implementation checks.
 
 The first timing series recorded a 61.86-minute BERT standard check. A subsequent exact-match
 comparison shortcut and removal of duplicate diagnostic tensor dumps preserve all fields
 in 2,238 comparator cases and fresh full BERT primary/fp64 replay comparisons. These changes
-passed the suites above. A new complete timing series is running; the earlier measurements
-and partial artifacts remain intact. Details are in the usability validation record.
+passed the suites above. The complete replacement timing series retains identical selected
+numerical fields across all 82 before/after worker observations in six comparable cells.
+Earlier measurements and partial artifacts remain intact. Details and cost evidence are
+in the usability validation record and `docs/research/cost-016.json`.
 
 All six CI jobs passed at `2f7874e`, including the new environment-creation/upgrade
 workflow. Its small model returned SAFE for ten standard batches against the November 11
@@ -1550,3 +1554,17 @@ snapshot passed 355 portable tests, all 12 CPU Inductor tests and all 14
 compiler-validation checks. Ruff lint passed and all 110 files in the requested
 format scope were already formatted. These checks are separate from the source
 used by the still-running replicated sweep.
+
+### Interruption and resume (November 11–12)
+
+The run above saved 130 batch pairs across thirteen complete models before WSL
+shut down. Each of those models has ten
+usable accuracy batches and no replicated flag. This partial result does not
+cover the remaining sixteen models. All 130 saved commit hashes passed
+verification after the interruption. Subsequent resume attempts encountered
+`Wsl/Service/E_UNEXPECTED`; separate logs and interrupted attempts are retained.
+No failed or missing batch was replaced or removed from planned coverage.
+An exclusive sequential queue completed all ten preset-cost cells and resumed the
+original sweep on November 12 with its original source, settings and frozen inputs.
+The final 29-model table and independent full-run audit remain pending completion.
+The additional legacy check on the `ae22c21` snapshot also passed all 31 tests.

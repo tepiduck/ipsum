@@ -31513,12 +31513,13 @@
       "level": "standard",
       "batches": 10,
       "verdict": "NEEDS_REVIEW",
-      "peak_worker_rss_mb": 8027.6640625,
-      "command_wall_s": 2067.085246954,
-      "stage": "Before exact-match and diagnostic-storage optimizations; retained measurement."
+      "peak_worker_rss_mb": 8015.60546875,
+      "command_wall_s": 1067.711193444,
+      "outer_wall_s": 1071.86790107,
+      "scope": "Fresh empty caches, frozen inputs, one interpreter, sequential after the host OOM. All ten primary comparisons and numerical contexts equal the retained preoptimization result."
     },
     "limitations": [
-      "Full 29-model calibration and preset table still running.",
+      "Full 29-model calibration still running; all ten preset-cost measurements complete.",
       "Fresh venv used populated global pip/model caches; timings are not cold-network measurements.",
       "No new GPU execution is claimed."
     ],
@@ -31529,7 +31530,10 @@
       "all_fields_and_exceptions_equal": true,
       "bert_primary_fields_equal": true,
       "bert_fp64_diagnostic_fields_equal": true,
-      "scope": "Finite exact-match shortcut and omission of redundant graph tensor dumps. Fresh workers, same frozen second BERT batch and copied warm compiler cache. Full preset costs are being rerun."
+      "scope": "Finite exact-match shortcut and omission of redundant graph tensor dumps. Comparator differential checks and real before/after workers preserve the selected full numerical evidence. Final preset costs are complete; host contention differs from earlier timings.",
+      "completed_before_after_cells": 6,
+      "worker_observations": 82,
+      "all_selected_numerical_fields_equal": true
     },
     "git_normalized_source_sha256": "9d07dfc043138e51979a3fba32fc47e964fb8f3821cc693c97283e980f64e31d",
     "source_hash_note": "Local test/cost source retains CRLF in five package files. Every normalized package file equals the public Git commit and installed wheel; raw source hashes remain recorded without rewriting evidence.",
@@ -31554,6 +31558,41 @@
       "model_check_batches": 10,
       "baseline_torch": "2.15.0+cpu",
       "candidate_torch": "2.16.0.dev20261111+cpu"
+    },
+    "earlier_memory_control": {
+      "model": "SmolLM2-135M",
+      "level": "standard",
+      "batches": 10,
+      "verdict": "NEEDS_REVIEW",
+      "peak_worker_rss_mb": 8027.6640625,
+      "command_wall_s": 2067.085246954,
+      "stage": "Before exact-match and diagnostic-storage optimizations; retained measurement."
+    },
+    "measurement_interruption": {
+      "upgrade_pairs_preserved": 130,
+      "optimized_cost_batches_preserved": 9,
+      "cause": "Kernel global OOM during overlapping experiments, followed by WSL service interruptions.",
+      "recovery": "Exclusive sequential queue: costs, upgrade resume, same-version controls. Interrupted timing attempts are excluded from completed full-command costs.",
+      "all_139_commit_hashes_verified": true
+    },
+    "cost_study": {
+      "status": "complete",
+      "planned_cells": 10,
+      "completed_cells": 10,
+      "evidence": "docs/research/cost-016.json",
+      "sha256": "0579ddfc9a09b70f23c8ec3caeb9206aa2db4d50d9d36a8e5638b2a509961ab3",
+      "all_primary_batches_conclusive": true,
+      "all_peak_worker_rss_below_12288_mib": true,
+      "standard_30_minute_target_met": [
+        "resnet50",
+        "smollm2"
+      ],
+      "standard_30_minute_target_missed": [
+        "bert",
+        "gpt2"
+      ],
+      "wall_time_field": "outer_wall_s",
+      "scope": "Pretrained float32 frozen workloads; paired 2.15.0 CPU workers except single-environment SmolLM2. Linux evidence storage, exclusive sequential timing queue, otherwise uncontrolled host."
     }
   }
 }
