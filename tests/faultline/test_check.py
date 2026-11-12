@@ -260,6 +260,32 @@ def bundle(tmp_path_factory):
     )
 
 
+def test_compact_diagnostics_verify_replay_without_duplicate_graph_tensors(
+    bundle, tmp_path, monkeypatch
+):
+    from faultline import native
+    from faultline.check_diagnostics import diagnose
+
+    settings = Settings(backend="mutant:gradient-scale", repeats=2, gradients=True)
+    primary = check.run_case(native.NativeJob.create(bundle), settings, tmp_path / "primary")
+    assert primary["status"] == "gradient_mismatch" and primary["injected_fault"]
+    retained = copy.deepcopy(primary)
+    saves = []
+    original = native.save_native_graph
+
+    def save(*args, **kwargs):
+        saves.append(args[0])
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(native, "save_native_graph", save)
+    result = diagnose(bundle, settings, primary, tmp_path / "diagnostic", control=True)
+    assert result["status"] == "complete" and result["replay_matches_primary"]
+    assert result["fp64_advisory"]["status"] == "complete"
+    assert result["fp64_advisory"]["outputs"] and result["control_requested"]
+    assert not saves and not list((tmp_path / "diagnostic").rglob("tensors.pt"))
+    assert primary == retained
+
+
 @pytest.mark.parametrize(
     "baseline,backend,expected,code",
     [

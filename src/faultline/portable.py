@@ -78,6 +78,38 @@ def compare(reference, candidate, rtol, atol):
         if ref.shape != actual.shape or ref.dtype != actual.dtype:
             reports.append({**base, "matches": False, "kind": "structure"})
             continue
+        # Frozen state and repeat checks often match exactly. Their finite errors
+        # are zero; avoid allocating full-sized error buffers for those tensors.
+        if (
+            type(ref) is torch.Tensor
+            and type(actual) is torch.Tensor
+            and ref.dtype in {torch.float16, torch.bfloat16, torch.float32, torch.float64}
+            and ref.device == actual.device
+            and ref.device.type in {"cpu", "cuda"}
+            and ref.numel()
+            and ref.layout == actual.layout == torch.strided
+            and math.isfinite(rtol)
+            and math.isfinite(atol)
+            and rtol >= 0
+            and atol >= 0
+            and torch.equal(ref, actual)
+            and bool(torch.isfinite(ref).all())
+        ):
+            reports.append(
+                {
+                    **base,
+                    "matches": True,
+                    "kind": "numeric",
+                    "elements": ref.numel(),
+                    "mismatched_elements": 0,
+                    "reference_nonfinite": 0,
+                    "candidate_nonfinite": 0,
+                    "max_abs_error": 0.0,
+                    "max_scaled_error": 0.0,
+                    "bitwise_equal": True,
+                }
+            )
+            continue
         ref, actual = ref.detach().cpu().double(), actual.detach().cpu().double()
         ref_finite, actual_finite = torch.isfinite(ref), torch.isfinite(actual)
         finite = ref_finite & actual_finite

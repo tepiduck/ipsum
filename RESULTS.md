@@ -1492,14 +1492,20 @@ cohort distinctions and completed controls are recorded in the
 [fresh-user transcript](docs/research/quickstart-test.md). Earlier evidence and the license
 situation are preserved. Nothing was filed upstream; no compiler defect is claimed.
 
-Completed 0.16 checks so far: Windows portable suite 359 passed, one skipped; Linux
-portable suite 360 passed; actual CPU Inductor suite 12 passed; compiler validation
+Completed 0.16 checks so far: Windows portable suite 365 passed, one skipped; Linux
+portable suite 366 passed; actual CPU Inductor suite 12 passed; compiler validation
 campaign all 14 checks passed (17 passes and one unconfirmed numerical discrepancy);
 legacy suite 31 passed; Ruff lint and formatting passed. Installed-wheel quick and
 standard verdicts validate against the published JSON schema. The current publication
 audit accepts 186 index paths, 69 wheel members and 188 source-archive members, excluding
 internal instructions, local notes, environments and run artifacts. Full-catalog calibration
 remains distinct from these completed implementation checks.
+
+The first timing series recorded a 61.86-minute BERT standard check. A subsequent exact-match
+comparison shortcut and removal of duplicate diagnostic tensor dumps preserve all fields
+in 2,238 comparator cases and fresh full BERT primary/fp64 replay comparisons. These changes
+passed the suites above. A new complete timing series is running; the earlier measurements
+and partial artifacts remain intact. Details are in the usability validation record.
 
 All six CI jobs passed at `4021008`, including the new environment-creation/upgrade
 workflow. Its small model returned SAFE for ten standard batches against the November 11

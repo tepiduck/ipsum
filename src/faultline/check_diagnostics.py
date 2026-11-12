@@ -73,7 +73,6 @@ def diagnose(bundle, settings, primary, directory, *, control=False):
             raw,
             load_native_graph,
             compiler,
-            before_run=(lambda n: setattr(recorder, "enabled", n == 0)) if compiler else None,
             precision=precision,
             request_transform=transform,
         )
@@ -93,6 +92,9 @@ def diagnose(bundle, settings, primary, directory, *, control=False):
     del eager_fn
     release()
     recorder = GraphRecorder(Path(directory) / "graphs", settings)
+    # These phases verify values; the primary worker already retained compiler
+    # inputs for export. Avoid serializing another full checkpoint per replay.
+    recorder.enabled = False
     candidate_fn = execution(
         compiler=lambda model, is_graph: torch.compile(
             model, backend=recorder.backend, dynamic=settings.dynamic

@@ -39,6 +39,45 @@ def test_extreme_finite_differences_serialize_without_nan():
     json.dumps(result, allow_nan=False)
 
 
+@pytest.mark.parametrize("dtype", [torch.float16, torch.bfloat16, torch.float32, torch.float64])
+def test_exact_finite_strided_matches_do_not_allocate_error_buffers(monkeypatch, dtype):
+    reference = torch.tensor([[0.0, -0.0], [2.0, -3.0]], dtype=dtype).t()
+    candidate = reference.clone()
+    before = reference.clone()
+
+    def no_error_buffers(*args, **kwargs):
+        raise AssertionError("Exact finite matches should not allocate per-element error buffers")
+
+    monkeypatch.setattr(torch, "where", no_error_buffers)
+    result = compare((reference,), (candidate,), 0, 0)
+    assert result["matches"] and result["kind"] == "numeric"
+    row = result["outputs"][0]
+    assert row["elements"] == 4 and row["bitwise_equal"]
+    assert (
+        row["mismatched_elements"] == row["reference_nonfinite"] == row["candidate_nonfinite"] == 0
+    )
+    assert row["max_abs_error"] == row["max_scaled_error"] == 0.0
+    assert reference.stride() == (1, 2) and torch.equal(reference, before)
+
+
+def test_exact_match_shortcut_preserves_nonfinite_counts_and_output_indices():
+    reference = (
+        torch.tensor([1e308, -0.0], dtype=torch.float64),
+        torch.tensor([float("inf"), float("nan")]),
+        torch.tensor([1.0, 2.0]),
+    )
+    candidate = (reference[0].clone(), reference[1].clone(), torch.tensor([1.0, 3.0]))
+    result = compare(reference, candidate, 0, 0)
+    assert not result["matches"]
+    first, nonfinite, changed = result["outputs"]
+    assert [row["index"] for row in result["outputs"]] == [0, 1, 2]
+    assert first["matches"] and first["max_abs_error"] == 0.0
+    assert nonfinite["matches"] and not nonfinite["bitwise_equal"]
+    assert nonfinite["reference_nonfinite"] == nonfinite["candidate_nonfinite"] == 2
+    assert changed["mismatched_elements"] == 1 and changed["max_abs_error"] == 1.0
+    json.dumps(result, allow_nan=False)
+
+
 def test_fp64_advisory_overflow_does_not_destroy_the_finding():
     from faultline.ir import Case, Input, Node
 

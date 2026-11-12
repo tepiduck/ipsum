@@ -31458,12 +31458,12 @@
     "replication_policy": "docs/v016-policy.json",
     "implementation_checks": {
       "windows_portable": {
-        "passed": 359,
+        "passed": 365,
         "skipped": 1,
         "compiler_deselected": 12
       },
       "linux_portable": {
-        "passed": 360,
+        "passed": 366,
         "compiler_deselected": 12
       },
       "linux_inductor": {
@@ -31484,7 +31484,7 @@
       "ruff_format": true,
       "installed_wheel_quick_and_standard": "SAFE with independent 2.15 and 2.16 nightly workers; JSON schema validated"
     },
-    "tested_source_sha256": "812ad3daf3de6a5e8c0f6b6f5fe45dc503aab5304090461334c742ded8d58e82",
+    "tested_source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
     "ci": {
       "commit": "4021008dcdc32f5bf30fda14af5a736cbabe18ca",
       "all_six_jobs_passed": true,
@@ -31513,7 +31513,8 @@
       "batches": 10,
       "verdict": "NEEDS_REVIEW",
       "peak_worker_rss_mb": 8027.6640625,
-      "command_wall_s": 2067.085246954
+      "command_wall_s": 2067.085246954,
+      "stage": "Before exact-match and diagnostic-storage optimizations; retained measurement."
     },
     "limitations": [
       "Full 29-model calibration and preset table still running.",
@@ -31521,6 +31522,13 @@
       "No new GPU execution is claimed."
     ],
     "license_unchanged": true,
-    "upstream_filed": false
+    "upstream_filed": false,
+    "optimization_equivalence": {
+      "comparator_cases": 2238,
+      "all_fields_and_exceptions_equal": true,
+      "bert_primary_fields_equal": true,
+      "bert_fp64_diagnostic_fields_equal": true,
+      "scope": "Finite exact-match shortcut and omission of redundant graph tensor dumps. Fresh workers, same frozen second BERT batch and copied warm compiler cache. Full preset costs are being rerun."
+    }
   }
 }

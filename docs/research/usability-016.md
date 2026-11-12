@@ -32,11 +32,18 @@ before execution. This avoids rerunning an existing baseline; it is not a compar
 an observation with itself. The two cohorts share those baseline measurements and their
 counts are therefore correlated. This scheduling change was declared before starting
 the fresh same-version workers and does not change the verdict or replication policy.
+Fresh controls wait until the timing study finishes. While the upgrade sweep is still
+active, only models whose ten recorded baseline workers stayed at or below 2 GiB RSS
+are eligible, with at least 3 GiB currently available RAM. Larger controls wait for the
+upgrade sweep to finish. This resource-only admission rule does not remove any model.
 
 Large text-model upgrade outputs and fresh same-version outputs are allocated on a
 Windows-mounted evidence volume to avoid filling the WSL disk. Completed evidence was
 not moved or deleted. Input bundles and all preset-cost output directories stay on the
 Linux filesystem. Storage placement does not change the frozen tensors or worker settings.
+The Windows upgrade output directories use transparent NTFS compression. The fresh
+same-version output directory is uncompressed. Neither changes tensor contents; the
+preset-cost measurements remain on the Linux filesystem without NTFS compression.
 
 Historical-issue fixtures reuse the preserved 0.6 evidence. Controlled injected faults
 are new executions with explicit mutant labels. The exp_u20 control reuses the 20-batch
@@ -58,12 +65,64 @@ The retained exp_u20 data do not trigger the replicated rule for any of its four
 variants. The full verdict for this accuracy-only replay is INCONCLUSIVE because primary
 observations are absent. This is distinct from a successful full-model SAFE check.
 
-## Completed memory check
+## Measurements before the performance changes
 
 SmolLM2-135M completed all ten single-environment standard batches in 2,067 seconds
 (34.5 minutes), at 8,027.7 MiB peak worker-tree RSS. Its verdict was NEEDS_REVIEW; contrary
 evidence remains visible and the first unexplained workload is exported. This meets the
 12-GiB worker-memory target, but does not establish a universal 30-minute bound.
+
+The six completed cells below precede the exact-match and diagnostic-storage changes
+described next. That timing series was stopped after two BERT thorough batches; all
+48 committed batches and the incomplete artifacts were preserved. A new series reruns
+all ten cost cells from separate empty caches. ResNet-50 and BERT use separate baseline
+and candidate workers in the same PyTorch version; SmolLM2 uses one environment.
+
+| Model | Level | Batches | Verdict | Wall minutes | Peak worker-tree RSS (MiB) |
+|---|---|---:|---|---:|---:|
+| ResNet-50 | quick | 3 | SAFE | 2.09 | 1,271.4 |
+| ResNet-50 | standard | 10 | NEEDS_REVIEW | 24.49 | 1,938.1 |
+| ResNet-50 | thorough | 10 | NEEDS_REVIEW | 45.07 | 3,140.5 |
+| BERT | quick | 3 | NEEDS_REVIEW | 4.73 | 4,526.2 |
+| BERT | standard | 10 | NEEDS_REVIEW | 61.86 | 6,721.4 |
+| SmolLM2-135M | standard | 10 | NEEDS_REVIEW | 34.45 | 8,027.7 |
+
+RSS excludes the coordinator and other active jobs. BERT's quick result contains forward
+mismatches in both environments; matching failures do not establish SAFE. The longer
+presets are not represented as meeting a universal 30-minute target.
+
+BERT standard misses that target. Its separate fp64 and eager-control workers repeat
+primary verification before using their diagnostics. Those verified replays are retained.
+
+## Performance changes and equivalence checks
+
+Exact finite floating-point matches now return the same zero-error comparison without
+allocating full-size error buffers or copying both tensors to CPU float64. Other cases
+use the existing comparison. A differential check against the earlier implementation
+matched every report field and exception in 2,238 cases, including strided tensors,
+nonfinites, empty tensors, structural mismatches and invalid tolerances.
+
+Compact fp64/control replays also stop writing redundant graph tensor dumps. The primary
+worker still retains compiler inputs for export, and thorough AOT capture is unchanged.
+These changes do not reuse primary observations, change tolerances or modify verdict rules.
+
+Two fresh BERT workers using the same frozen second batch and copied warm compiler caches
+verified the changes against the earlier artifacts:
+
+| Check | Before seconds | After seconds | Evidence equality |
+|---|---:|---:|---|
+| Primary worker | 58.57 | 37.27 | Full comparison, status, signature, workload and settings |
+| fp64 diagnostic | 69.10 | 43.63 | Full fp64 advisory, context and replay verification |
+
+The diagnostic directory decreased from 439,112,174 to 654,167 bytes. Concurrent host
+work differed between runs; these checks establish result parity and are not full-preset
+speedup measurements. A separate one-million-element exact-match microbenchmark decreased
+from 59.02 to 2.22 milliseconds median over seven calls, including the input clone.
+The complete preset timing series is still running.
+
+The changed implementation passed 366 Linux portable tests, 365 Windows tests with one
+skip, all 12 CPU Inductor tests, and all 14 compiler-validation checks. Six new behavior
+tests cover exact-match handling and diagnostic replay without duplicate tensor dumps.
 
 ## Installed-package isolation
 
