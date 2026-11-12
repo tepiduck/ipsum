@@ -31486,26 +31486,27 @@
     },
     "tested_source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
     "ci": {
-      "commit": "4021008dcdc32f5bf30fda14af5a736cbabe18ca",
+      "commit": "2f7874e79aea769092a8e2d337eeae1bfe8049ec",
       "all_six_jobs_passed": true,
-      "validation_run": "https://github.com/tepiduck/ipsum/actions/runs/43118692354",
-      "model_check_run": "https://github.com/tepiduck/ipsum/actions/runs/43118691494",
+      "validation_run": "https://github.com/tepiduck/ipsum/actions/runs/43132883301",
+      "model_check_run": "https://github.com/tepiduck/ipsum/actions/runs/43132883347",
       "model_check_verdict": "SAFE",
       "model_check_batches": 10,
       "baseline_torch": "2.15.0+cpu",
       "candidate_torch": "2.16.0.dev20261111+cpu"
     },
     "fresh_install": {
-      "commit": "4021008dcdc32f5bf30fda14af5a736cbabe18ca",
+      "commit": "2f7874e79aea769092a8e2d337eeae1bfe8049ec",
       "commands": 9,
       "all_exit_zero": true,
-      "total_command_wall_s": 114.84211960200082,
-      "check_wall_s": 73.62271686500026,
+      "total_command_wall_s": 107.77636674899804,
+      "check_wall_s": 67.29750225899988,
       "verdict": "SAFE",
       "batches": 3,
       "installed_from_wheel": true,
       "global_download_caches_warm": true,
-      "transcript": "docs/research/quickstart-test.md"
+      "transcript": "docs/research/quickstart-test.md",
+      "source_sha256": "9d07dfc043138e51979a3fba32fc47e964fb8f3821cc693c97283e980f64e31d"
     },
     "memory_control": {
       "model": "SmolLM2-135M",
@@ -31529,6 +31530,30 @@
       "bert_primary_fields_equal": true,
       "bert_fp64_diagnostic_fields_equal": true,
       "scope": "Finite exact-match shortcut and omission of redundant graph tensor dumps. Fresh workers, same frozen second BERT batch and copied warm compiler cache. Full preset costs are being rerun."
+    },
+    "git_normalized_source_sha256": "9d07dfc043138e51979a3fba32fc47e964fb8f3821cc693c97283e980f64e31d",
+    "source_hash_note": "Local test/cost source retains CRLF in five package files. Every normalized package file equals the public Git commit and installed wheel; raw source hashes remain recorded without rewriting evidence.",
+    "earlier_fresh_install": {
+      "commit": "4021008dcdc32f5bf30fda14af5a736cbabe18ca",
+      "commands": 9,
+      "all_exit_zero": true,
+      "total_command_wall_s": 114.84211960200082,
+      "check_wall_s": 73.62271686500026,
+      "verdict": "SAFE",
+      "batches": 3,
+      "installed_from_wheel": true,
+      "global_download_caches_warm": true,
+      "transcript": "docs/research/quickstart-test.md"
+    },
+    "earlier_ci": {
+      "commit": "4021008dcdc32f5bf30fda14af5a736cbabe18ca",
+      "all_six_jobs_passed": true,
+      "validation_run": "https://github.com/tepiduck/ipsum/actions/runs/43118692354",
+      "model_check_run": "https://github.com/tepiduck/ipsum/actions/runs/43118691494",
+      "model_check_verdict": "SAFE",
+      "model_check_batches": 10,
+      "baseline_torch": "2.15.0+cpu",
+      "candidate_torch": "2.16.0.dev20261111+cpu"
     }
   }
 }

@@ -139,10 +139,12 @@ was filed and no numerical finding is presented as a confirmed compiler defect.
 
 ## CI execution
 
-The [model-upgrade workflow](https://github.com/tepiduck/ipsum/actions/runs/43118691494)
-at `4021008` created CPU environments with 2.15.0+cpu and 2.16.0.dev20261111+cpu and
+The [model-upgrade workflow](https://github.com/tepiduck/ipsum/actions/runs/43132883347)
+at `2f7874e` created CPU environments with 2.15.0+cpu and 2.16.0.dev20261111+cpu and
 returned SAFE for all ten standard batches of the small example. This is a real workflow
 execution, not just a YAML syntax check; the gate fails only on REGRESSION and uploads
 the report for other verdicts. Its current-nightly date differs from the fixed November 5
 wheel used for catalog calibration. The example tests integration, not pretrained-model
 accuracy or general upgrade safety.
+All six jobs passed, including the [validation workflow](https://github.com/tepiduck/ipsum/actions/runs/43132883301).
+The earlier six-job run at `4021008` also passed and remains in the historical CI record.

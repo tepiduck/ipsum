@@ -1507,11 +1507,12 @@ in 2,238 comparator cases and fresh full BERT primary/fp64 replay comparisons. T
 passed the suites above. A new complete timing series is running; the earlier measurements
 and partial artifacts remain intact. Details are in the usability validation record.
 
-All six CI jobs passed at `4021008`, including the new environment-creation/upgrade
+All six CI jobs passed at `2f7874e`, including the new environment-creation/upgrade
 workflow. Its small model returned SAFE for ten standard batches against the November 11
 nightly. A fresh public clone and clean-venv wheel install also completed the README's nine
-commands in 114.84 seconds, including a 73.62-second ResNet-18 quick check. Global download
-caches were populated; these are not cold-network timings.
+commands in 107.78 seconds, including a 67.30-second ResNet-18 quick check. Global download
+caches were populated; these are not cold-network timings. The earlier successful CI and
+114.84-second walkthrough at `4021008` remain recorded separately.
 
 ## 0.16 replicated CPU sweep (in progress)
 
