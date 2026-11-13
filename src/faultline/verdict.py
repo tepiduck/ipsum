@@ -51,7 +51,15 @@ def assessment(outcome):
     }
 
 
-def summarize(rows, planned, *, mode, level, replication=None, artifacts=None):
+def summarize(rows, planned, *, mode, level, replication=None, artifacts=None, policy="v1"):
+    if policy not in {"v1", "v2"}:
+        raise ValueError("Unknown verdict policy")
+    if policy == "v2" and mode == "environment_comparison":
+        from .verdict_v2 import summarize_upgrade
+
+        return summarize_upgrade(
+            rows, planned, mode=mode, level=level, replication=replication, artifacts=artifacts
+        )
     if mode not in {"single_environment", "environment_comparison"}:
         raise ValueError("Unknown check mode")
     if level not in {"quick", "standard", "thorough"}:

@@ -1,0 +1,3949 @@
+{
+  "advisory_only": true,
+  "analysis_sha256": "f7f1dd6663bfb4cebc5579d44ceff1623317fe9ea55206ad10fcbd7fada1c397",
+  "controls": [
+    {
+      "accuracy_shift_replicated": {
+        "status": "not_applicable"
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "eager",
+        "device": "cpu",
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "deca551979b40f7b20878ef839ee24d3159d94f253019283baf3cd352dc64d2e",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "controlled_injection",
+      "commits_sha256": [
+        "ad54b02f2807a72cae75939d67e72e0b4fb57515770ed3c8fa9d781a4792d741",
+        "2ed2e1a8254aaf512e59ca567b88f9493a65cc48e92ede81b450ccc51f48a742"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "77f53329b93971c5db3cdf18b7f60712beb2a16a30e8433d7f4b3b2eeea2244c",
+        "evidence.json": "be81c9f512b942ff4f473821ecb3124ad8d87b48046a3b0ca95c40beeb776a41",
+        "verdict.json": "3ad020c22dbaedac98525801c133da87df29807c5f228790bfb227d5e2aec9eb"
+      },
+      "exit_code": 1,
+      "injected_fault": true,
+      "metrics": {
+        "invocation_wall_s": 4.797226328000761,
+        "peak_worker_rss_mb": 354.875
+      },
+      "model": "relu-as-neg",
+      "pre_existing_batches": 0,
+      "pre_existing_failed_targets": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "primary_counts": {
+        "baseline": {
+          "pass": 1
+        },
+        "candidate": {
+          "numerical_mismatch": 1
+        }
+      },
+      "reason_counts": {
+        "candidate_only_failure": 1
+      },
+      "scope": {
+        "completed_batches": 1,
+        "gradients": false,
+        "level": "quick",
+        "mode": "environment_comparison",
+        "planned_batches": 1,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "mutant:relu-as-neg",
+        "device": "cpu",
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "REGRESSION"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "status": "not_applicable"
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "eager",
+        "device": "cpu",
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "44b6bbd6052ae74e08dcf9ed9fe8cc5579b8f07c15b4c065b3c5ff67fa8595bf",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "controlled_injection",
+      "commits_sha256": [
+        "d006039f122801cd8f022b1ff219a5e69693804c94f41cf1cda1e405154ffcbb",
+        "7e9937546a8115f37769c611511aba6621762ef7b068b57ccf3acf77d312eb0b"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "9f5f1aec226eaa6e3a6bc42a96e4277202d039522e00c9dfbcf24e13c2f213c6",
+        "evidence.json": "ba74e5c62f7fe35c09a82b6b994237d40fb85f5effb6dbd13d59d2375404514e",
+        "verdict.json": "bda482b7273a4de8977c4df4e14e74e045cbb2e4df5d8f437cd233044b09e008"
+      },
+      "exit_code": 1,
+      "injected_fault": true,
+      "metrics": {
+        "invocation_wall_s": 4.934315948999938,
+        "peak_worker_rss_mb": 327.72265625
+      },
+      "model": "sum-as-mean",
+      "pre_existing_batches": 0,
+      "pre_existing_failed_targets": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "primary_counts": {
+        "baseline": {
+          "pass": 1
+        },
+        "candidate": {
+          "numerical_mismatch": 1
+        }
+      },
+      "reason_counts": {
+        "candidate_only_failure": 1
+      },
+      "scope": {
+        "completed_batches": 1,
+        "gradients": false,
+        "level": "quick",
+        "mode": "environment_comparison",
+        "planned_batches": 1,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "mutant:sum-as-mean",
+        "device": "cpu",
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "REGRESSION"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 1,
+        "completed": 1,
+        "coverage": 1.0,
+        "decision_complete": false,
+        "deliberately_skipped": 0,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 24.12204645837855,
+            "median_status": "finite",
+            "paired_targets": 6,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 1.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 24.12204645837855,
+        "median_status": "finite",
+        "missing": 0,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 1,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 0.5,
+        "stopping": null,
+        "ties": 0,
+        "worsened": 1
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "eager",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "10cd64b6a9bba6f2640df48f98668f97ed38d4a614aae1f65d75a49f361c38ba",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "controlled_injection",
+      "commits_sha256": [
+        "26fbd63426f0456265297efb3994b375e35faab7788e3df9467091f659d679bb",
+        "ed43fbeeebd40dc08189e9a2754ca73e1c4a3148f873ccaefbc61541f473fd7e"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "31e432ce43aa8a103374bcb2a27c0d0c2c4a9991df82c1a07acb8c8873e0e5fb",
+        "evidence.json": "23c317b8f02f3a397d7fccc89951e05e20c3447fe22fe529f15aaa535fbd0b9b",
+        "verdict.json": "d2a0e0fc96031623336c82c1fdf41f315d18554f180edb84393f859b069583d7"
+      },
+      "exit_code": 1,
+      "injected_fault": true,
+      "metrics": {
+        "invocation_wall_s": 12.972056365999379,
+        "peak_worker_rss_mb": 345.0546875
+      },
+      "model": "gradient-scale",
+      "pre_existing_batches": 0,
+      "pre_existing_failed_targets": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "primary_counts": {
+        "baseline": {
+          "pass": 1
+        },
+        "candidate": {
+          "gradient_mismatch": 1
+        }
+      },
+      "reason_counts": {
+        "candidate_only_failure": 1,
+        "replication_unavailable": 1
+      },
+      "scope": {
+        "completed_batches": 1,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 1,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "mutant:gradient-scale",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "REGRESSION"
+    }
+  ],
+  "costs": [
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 161,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 161,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 161,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 4,
+        "requested_jobs": 4
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 3072,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "b70c0b7749717fa7f01b36e2e96d025647d38ddb619acab6192a38eff185963a",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "cost",
+      "commits_sha256": [
+        "8cd58af5b4ddea51be711daabf8f0ba125cac6a6fa45b28db1b364e2033d8f02",
+        "9241aa66ec0859c8e36e60f99d309aa093049d2cec136b19166dbdc116ed2238",
+        "23018657dc4f49bd1b4d10b5f8108f5077c0917cba37f0bf08f262780d469132",
+        "ea66a74fbd06634f08f639760a3f8f305808f7f22a93f13efac3cc546a9a6e8c",
+        "259e63ff226d3e31f68f8b263c7e9d3c018f95fd7785fd2548ff3373bd16574b",
+        "56169e8e79e30b52bd3019b73eeab023996a2e6432a86f1cd3863cc799fff7f8",
+        "5c10de172b59a77aedbccae36d153d74fc87a32b8aae2814539c59ddda0cbb84",
+        "c01635725572bcb795bf576b1f0e316dfcbe500cfa75513c265c63ed725f0465",
+        "accbbbdc24a167dc516d934bd8b6b35a189de621273f7eeeb386376bae1ebc8f",
+        "967b09b95eedf339e1f7c0e2a4810021d1e9be20ae05afda76681d7f7788ffe5",
+        "5be76e976d0bef1f8d43065ca844325435cb50841cd5512e46aa8481f488ed69",
+        "4121a9a62eebe9c3b2549e818808349716a3950b83ba86697791d33ef1e209ab",
+        "f58979499cce58e792bc206c6de70f28069e276ac2cd80a428cbf2bddd9e9792",
+        "5c48b07f7a0981a2c3eeae0f4e12d8a7a4c8234414915403009158135aa8d125",
+        "dd36634263e835e2fe45266bbc68421a11c255005aabc3120b51cf7f2075d4ac",
+        "16e1bc8dd85384a96821c2ead99bcf774572a8e9e5883a7b2195730e44364fa2",
+        "2e1fb88f5ec46258901b02896757e8710c96b7dc30e9e6329c1b45549de85557",
+        "c0837e5762fed038d5185130aed718146365dd99b6337145e85d4e276da4cc03",
+        "c73848e3a56122d4e974c6c0f75cb82553c230bfcf61b6692fefc741aacaa46f",
+        "3249381b21ae795674db4abc4e2f09b346ebf37537e3945af0b8101e4a32bd38"
+      ],
+      "complete_comparison": true,
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "807ad3d79d924d174b3ac0fa0efb4d5485ef0d993c6b0bc88bf9cd53809fb32b",
+        "evidence.json": "1a76b6938a2a80eaceb7619162eace7abf322a5dc53f0d81b38cd016cbe3e001",
+        "verdict.json": "e282ce6385deb2c09763eb0ddc4c348ac781005ae4ca9371c1aa908764f9055e"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 277.9782206689997,
+        "invocation_wall_s": 272.272564377,
+        "peak_worker_rss_mb": 1865.9921875
+      },
+      "model": "resnet50",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 1252,
+        "candidate": 1252
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 3072,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "v016": {
+        "command_wall_s": 897.9710367720002,
+        "peak_worker_rss_mb": 1945.1875,
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+        "verdict": "NEEDS_REVIEW"
+      },
+      "verdict": "SAFE",
+      "wall_ratio_v016_over_v017": 3.2303647192606926
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 10,
+        "completed": 0,
+        "coverage": 0.0,
+        "decision_complete": false,
+        "deliberately_skipped": 0,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 3,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 4,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 5,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 6,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 7,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 8,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 9,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          }
+        ],
+        "fraction_worsened": null,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": null,
+        "median_status": "missing",
+        "missing": 10,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": null,
+        "ties": 0,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 4,
+        "requested_jobs": 4
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 3072,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "a3ba38d266bfe6467e89ea7b847e68091ad231e8b953700ca01a1c36a75069b7",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "cost",
+      "commits_sha256": [
+        "6c7eb8bb6275cf5f761db33901294c0e6b8c21f0d89dd3a6a3f4149502d82cfa",
+        "5327f87ba91ba2673519b7a2672fc7b138c6180f36f6f3d41ed230767edaab1f",
+        "175eaf41cf9cb19debf4c328e41eb48f2a2699b64b35b40747d39d47b83af76f",
+        "8ee10a0b125b836178b114ce7dfc83f0ccfea8c2e56a585975663c5e7f22eacd",
+        "a24995b38b78f55a56afa773f8818f17ee5ae9342deca6b3ceb8f20149240fde",
+        "0811e4c17381ff61c049b6dd8770429959226fdf4b547324bddf89a7583a8fdf",
+        "7572bf385a5d27b196c4d222d8cc6322ecc5af3b6066e07c19adddfb042245f3",
+        "791a071807d527e278cc8a7800e4613cc74a51226d86af6132d1fded58555eca",
+        "9636c58207f27337d1e95d5410fca950ba2989f80d02a75666a51d65546745a0",
+        "f979ce1ae6310d18798f6ac327b76df3ea9e4d76d3ae44eac908a073e1d5d10d",
+        "9ca431f8f3ac333ac0b2f2edc47ee5b375c861d1815762d1205d9acdb82c2f59",
+        "d4099d4b78938c1a7506f67053625bb89fd71b713971ecb881d5a7ef74cb6d59",
+        "efc54489db2eb2b9e7a731dc6d6f3ab04f098eb78b7248074767ac71b27f5fe0",
+        "8b47249b9d4d275da8895a213783504b219a1ac98b7d6a1725f78d0e73964105",
+        "9fd5a39830c0647c82aa94164dff2614df25ee8b83bf43650da2933182d2e560",
+        "ef54e1ebfc8f90f84827a661fb3956ecef5aee2e335dfd16b91a33f85e9480ba",
+        "d5b624f36afb5329074ca6942611bda112bfb0c9b42350f5ac062428472db01c",
+        "90cf61edc1f75b263b20c205c51a5bdfaba0c2510067818c364c0ff04474f9c4",
+        "5d90ff69f24f067b78c65dbd0eddfdb97c616d9b1facbf14bd649a955eaa27c3",
+        "36caf2075cfb92e94052c1b69f2fb0cd62735ea80ab4a474169efc5ba750da1f"
+      ],
+      "complete_comparison": false,
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "d92140c68380c4756efdc339e4dded67ea693d16c9914eb3c7295ec224fcade0",
+        "evidence.json": "664fac7b272c6920c996e6d3ec9c2f3c6c02f604d98752a72cb91181de0bab2c",
+        "verdict.json": "43d848f37f5dcebdd943626aa3eee15f1863b51cadeb26a1179c32b9ab17c5d5"
+      },
+      "exit_code": 3,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 92.44394952400035,
+        "invocation_wall_s": 79.01790037799947,
+        "peak_worker_rss_mb": 3152.234375
+      },
+      "model": "bert",
+      "pre_existing_batches": 0,
+      "pre_existing_failed_targets": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "primary_counts": {
+        "baseline": {
+          "resource_limit": 10
+        },
+        "candidate": {
+          "resource_limit": 10
+        }
+      },
+      "reason_counts": {
+        "baseline_resource_limit": 10,
+        "candidate_resource_limit": 10,
+        "replication_unavailable": 1
+      },
+      "scope": {
+        "completed_batches": 0,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 3072,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "v016": {
+        "command_wall_s": 2016.6876572519996,
+        "peak_worker_rss_mb": 6743.59375,
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+        "verdict": "NEEDS_REVIEW"
+      },
+      "verdict": "INCONCLUSIVE",
+      "wall_ratio_v016_over_v017": 21.8152477002124
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 10,
+        "completed": 0,
+        "coverage": 0.0,
+        "decision_complete": false,
+        "deliberately_skipped": 0,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 3,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 4,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 5,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 6,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 7,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 8,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          },
+          {
+            "batch": 9,
+            "median_log2_growth": null,
+            "median_status": "missing",
+            "status": "incomplete"
+          }
+        ],
+        "fraction_worsened": null,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": null,
+        "median_status": "missing",
+        "missing": 10,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": null,
+        "ties": 0,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 4,
+        "requested_jobs": 4
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 3072,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "cdcc8f9d64946ce1edc8404b553376b781a60c05e50e09b963bcddcebc1f2948",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "cost",
+      "commits_sha256": [
+        "db69f65c7659f07c3def40ceb6a47e980c44cd926bb10974f4725563eccaf9c9",
+        "07683a32f54535a959aa44e7338528f64fa0d886d90a114440800c00ba82b95a",
+        "060d28332041d6395b764a241bf929b8cd226bb0f31ba28f3bbf8f1aafb8b242",
+        "f0e5c715d525ae963ef0483ac930742db493581600bd80d4630401114b4d6e47",
+        "b010b5140164a7eca895c92d5d193aaeb016669c7f4860e7fe0535720447c0ed",
+        "fa9ae5f2b6905efe4dad5b42e1dba67d7f4c25cecde2e39c5a80d56cd786c773",
+        "6334582c6453c9436f1ee2a57af8bc00b21ae7d548ab31fa5af16153a0579bd3",
+        "9c975bf209dd86a7a9dfc9a0d278266273371bcb64c5d5340a5e0455962e1f0e",
+        "f899af40fd396c047026acaa96b167f639a7f340caadad429ebdcd9a68461e84",
+        "0da560c1a1871d204dd8629cde937923d6401763bf659b3543b50d2e6252afe3",
+        "fa2a9efc28e1374a1937bc43935952ff800974ff387cb30298cd01b78a7dfc8d",
+        "a100bc0871620354dbecfa2cde8d2c407a29c4dc264fa6097e25ab19e6f19a19",
+        "b1624fa373574e23bf5439601c3f3392ea884e2c242e77dcfe3f9190e13eab19",
+        "68c986a061a9f9bfbdc135b4972092af11d4919f5e560a837892bca47da1ac11",
+        "d1f1f8ef74de8073ad063df200b2f0279c0d33bafdfb5703993ef9edc4264c23",
+        "312f82667e55f9165f02051102ae1843a38c445d66809021aec2eb64b8aeb606",
+        "2eb7f3c1a28f6482084d1959f4b89975066e3113293df5e9a6f45312ecc2d3fe",
+        "496f9aa6b7aae629f28992595cfab716949a1ad317a86f0b68f619e2628cc6c0",
+        "c0064bf7508076c300c730f1fc92dac854524b8bd81ca9605c8da190f1b4619e",
+        "fba0ba74102314a9b9534ed26a8c02ccaec9742b46898e3459e65941bc994a30"
+      ],
+      "complete_comparison": false,
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "beb078d5369d9c851b8d82bf9604cc3f9261b85ecc3b69df9912881b19021464",
+        "evidence.json": "ce64ac6ccaa2355d7f9889e1d47990f7cd0ae818931d98ac1013afe19976cafb",
+        "verdict.json": "0c6926252da59af6c3ceabee4634d424fa4ae22ac1af736af8038330fe2b2651"
+      },
+      "exit_code": 3,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 99.43045153799994,
+        "invocation_wall_s": 82.64682573699974,
+        "peak_worker_rss_mb": 3149.6328125
+      },
+      "model": "gpt2",
+      "pre_existing_batches": 0,
+      "pre_existing_failed_targets": {
+        "baseline": 0,
+        "candidate": 0
+      },
+      "primary_counts": {
+        "baseline": {
+          "resource_limit": 10
+        },
+        "candidate": {
+          "resource_limit": 10
+        }
+      },
+      "reason_counts": {
+        "baseline_resource_limit": 10,
+        "candidate_resource_limit": 10,
+        "replication_unavailable": 1
+      },
+      "scope": {
+        "completed_batches": 0,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 3072,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "v016": {
+        "command_wall_s": 2181.4328647019993,
+        "peak_worker_rss_mb": 7428.125,
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+        "verdict": "NEEDS_REVIEW"
+      },
+      "verdict": "INCONCLUSIVE",
+      "wall_ratio_v016_over_v017": 21.939283498761018
+    }
+  ],
+  "counts": {
+    "same_version": {
+      "SAFE": 6
+    },
+    "upgrade": {
+      "SAFE": 6
+    }
+  },
+  "models": [
+    {
+      "architecture": "regnet_x_400mf",
+      "batch_size": 2,
+      "input_sources": [
+        {
+          "bytes": 661378,
+          "sha256": "f3f87bb8ab3c26c7ecfd3ac60421d7f32b0503d1d6c5baf8bac42ed93d86351a",
+          "url": "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
+        },
+        {
+          "bytes": 90796,
+          "sha256": "91c383f13fe7baf1c5306def5f50cc5bb0241e64065c081ad57671d33c503891",
+          "url": "https://raw.githubusercontent.com/pytorch/vision/main/gallery/assets/dog2.jpg"
+        },
+        {
+          "bytes": 174311,
+          "sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+          "url": "https://www.gutenberg.org/ebooks/11.txt.utf-8"
+        }
+      ],
+      "inputs_sha256": "2d85a6c07e062640209b8ff693771e87cba89e4302a257ec560b318058762cd9",
+      "name": "regnet_x_400mf",
+      "parameter_count": 5495976,
+      "provider": "torchvision",
+      "weights": "RegNet_X_400MF_Weights.IMAGENET1K_V2",
+      "weights_sha256": "3a657feab6437ddcdb924e54efe3395fdc39e6831efcac069b77a6f7e872a0f7",
+      "weights_url": "https://download.pytorch.org/models/regnet_x_400mf-62229a5f.pth"
+    },
+    {
+      "architecture": "shufflenet_v2_x0_5",
+      "batch_size": 2,
+      "input_sources": [
+        {
+          "bytes": 661378,
+          "sha256": "f3f87bb8ab3c26c7ecfd3ac60421d7f32b0503d1d6c5baf8bac42ed93d86351a",
+          "url": "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
+        },
+        {
+          "bytes": 90796,
+          "sha256": "91c383f13fe7baf1c5306def5f50cc5bb0241e64065c081ad57671d33c503891",
+          "url": "https://raw.githubusercontent.com/pytorch/vision/main/gallery/assets/dog2.jpg"
+        },
+        {
+          "bytes": 174311,
+          "sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+          "url": "https://www.gutenberg.org/ebooks/11.txt.utf-8"
+        }
+      ],
+      "inputs_sha256": "06b9f94bb0a4844134b7dd1f28b6469c2cadfe09afc566bd175dd5e31122e67c",
+      "name": "shufflenet_v2_x0_5",
+      "parameter_count": 1366792,
+      "provider": "torchvision",
+      "weights": "ShuffleNet_V2_X0_5_Weights.IMAGENET1K_V1",
+      "weights_sha256": "ce837b30a33faf536f929b55fef926bc57e974fb7c6e3ea69d54cd8d9114b0f2",
+      "weights_url": "https://download.pytorch.org/models/shufflenetv2_x0.5-f707e7126e.pth"
+    },
+    {
+      "architecture": "squeezenet1_0",
+      "batch_size": 2,
+      "input_sources": [
+        {
+          "bytes": 661378,
+          "sha256": "f3f87bb8ab3c26c7ecfd3ac60421d7f32b0503d1d6c5baf8bac42ed93d86351a",
+          "url": "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
+        },
+        {
+          "bytes": 90796,
+          "sha256": "91c383f13fe7baf1c5306def5f50cc5bb0241e64065c081ad57671d33c503891",
+          "url": "https://raw.githubusercontent.com/pytorch/vision/main/gallery/assets/dog2.jpg"
+        },
+        {
+          "bytes": 174311,
+          "sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+          "url": "https://www.gutenberg.org/ebooks/11.txt.utf-8"
+        }
+      ],
+      "inputs_sha256": "06b9f94bb0a4844134b7dd1f28b6469c2cadfe09afc566bd175dd5e31122e67c",
+      "name": "squeezenet1_0",
+      "parameter_count": 1248424,
+      "provider": "torchvision",
+      "weights": "SqueezeNet1_0_Weights.IMAGENET1K_V1",
+      "weights_sha256": "53d99c6bbb8db996c886b9bab1082e0d0f31689ddb20727036f74aec4f788635",
+      "weights_url": "https://download.pytorch.org/models/squeezenet1_0-b66bff10.pth"
+    },
+    {
+      "architecture": "custom_hf",
+      "batch_size": 2,
+      "input_sources": [
+        {
+          "bytes": 661378,
+          "sha256": "f3f87bb8ab3c26c7ecfd3ac60421d7f32b0503d1d6c5baf8bac42ed93d86351a",
+          "url": "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
+        },
+        {
+          "bytes": 90796,
+          "sha256": "91c383f13fe7baf1c5306def5f50cc5bb0241e64065c081ad57671d33c503891",
+          "url": "https://raw.githubusercontent.com/pytorch/vision/main/gallery/assets/dog2.jpg"
+        },
+        {
+          "bytes": 174311,
+          "sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+          "url": "https://www.gutenberg.org/ebooks/11.txt.utf-8"
+        }
+      ],
+      "inputs_sha256": "26cd76610483609ef776e953955455e111b52f340ee204d01e573e0975d09602",
+      "name": "bert_tiny",
+      "parameter_count": 4385920,
+      "provider": "huggingface",
+      "repository": "google/bert_uncased_L-2_H-128_A-2",
+      "revision": "30b0a37ccaaa32f332884b96992754e246e48c5f",
+      "sequence_length": 64,
+      "weights_sha256": "d11cd1c70b29fd45533fd8d9e3ddb3b2cf22203d05be1c103090a38f5170345d"
+    },
+    {
+      "architecture": "custom_hf",
+      "batch_size": 2,
+      "input_sources": [
+        {
+          "bytes": 661378,
+          "sha256": "f3f87bb8ab3c26c7ecfd3ac60421d7f32b0503d1d6c5baf8bac42ed93d86351a",
+          "url": "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
+        },
+        {
+          "bytes": 90796,
+          "sha256": "91c383f13fe7baf1c5306def5f50cc5bb0241e64065c081ad57671d33c503891",
+          "url": "https://raw.githubusercontent.com/pytorch/vision/main/gallery/assets/dog2.jpg"
+        },
+        {
+          "bytes": 174311,
+          "sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+          "url": "https://www.gutenberg.org/ebooks/11.txt.utf-8"
+        }
+      ],
+      "inputs_sha256": "8846b925df4bdb692faa8f87dc79087121b912067891a1f5962459d3210d1bff",
+      "name": "distilroberta",
+      "parameter_count": 81527808,
+      "provider": "huggingface",
+      "repository": "distilbert/distilroberta-base",
+      "revision": "fb53ab8802853c8e4fbdbcd0529f21fc6f459b2b",
+      "sequence_length": 64,
+      "weights_sha256": "3147d8bb44cc60ea952cccda4a5151b411e52e4fa1f5dc1a02ef11ed8e644c36"
+    },
+    {
+      "architecture": "custom_hf",
+      "batch_size": 2,
+      "input_sources": [
+        {
+          "bytes": 661378,
+          "sha256": "f3f87bb8ab3c26c7ecfd3ac60421d7f32b0503d1d6c5baf8bac42ed93d86351a",
+          "url": "https://raw.githubusercontent.com/pytorch/hub/master/images/dog.jpg"
+        },
+        {
+          "bytes": 90796,
+          "sha256": "91c383f13fe7baf1c5306def5f50cc5bb0241e64065c081ad57671d33c503891",
+          "url": "https://raw.githubusercontent.com/pytorch/vision/main/gallery/assets/dog2.jpg"
+        },
+        {
+          "bytes": 174311,
+          "sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+          "url": "https://www.gutenberg.org/ebooks/11.txt.utf-8"
+        }
+      ],
+      "inputs_sha256": "2dc4c8e0c2a24b1b4ad6ba42524894c5f55ff0644880c9b2b58a01ce6f453463",
+      "name": "pythia70m",
+      "parameter_count": 44670976,
+      "provider": "huggingface",
+      "repository": "EleutherAI/pythia-70m",
+      "revision": "a39f36b100fe8a5377810d56c3f4789b9c53ac42",
+      "sequence_length": 64,
+      "weights_sha256": "56e86c905f9487e50f33d8161848cf9d16a337f08b973aba764c8091ffcfc400"
+    }
+  ],
+  "note": "Fresh CPU checks on six new checkpoint variants, with fixed v2 policy. Ten primary batches per pair; ordered diagnostics may stop with a verified negative certificate. Common sources/weights limit independence. Not a false-positive rate. Historical and exp_u20 cohorts are separately identified as retained-evidence replay.",
+  "pairs": [
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 215,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 215,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 215,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "9f04f66461a8880d324e4b3c737fa524a7ecd106bb0e8176a08dbcf7ef49c6a8",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "same_version",
+      "commits_sha256": [
+        "385ee6a030a5a973ee2e3d901eefc1ff6ca0426b24c72befbdacbcdde2a2b62b",
+        "93e635ab9e79fa4bcccec8bc0c4fa6fc3ae8aa18cbf4ea943f02d48fc5871ff6",
+        "175671bb07a8b04082d045f92cff57317bd3b06e222f49b8bd468d9756df4536",
+        "84b83b1008de04682fba735a964ccdd4fa0a6a1de1ffdda5000af95170e6e8d9",
+        "3da8626e2a733d77b8ecd1ba5ac45f655fa30c3fa433e5cbef4d4752623cb4fe",
+        "9b833ad5b9c87102972a2e0ac0a71c98cf8fbc2632af5afb824ac0b6b4cf5bc3",
+        "93ccf1c4b61555016af1dbfe5e3a12567d10d1cfedc8b737b9554556137ed67f",
+        "20c9f1025eaa96ba16cf99235d7de0e7e74327df796ce166576d6f2e3531ab89",
+        "f74efe9c1c688d7cf7463b9a079dc9a2eebd02afd60e5077a2076820018bf931",
+        "4ea25d98113fbb404577758039da13f4c80d9a803f225126f88f8df8584e9945",
+        "a7660aa585abb4603711dfdb20741b669ee4291ec950e2f6c29c81a1a9259d9e",
+        "5493b2a42f6d028fd959e4896cc3f7a2927723d8c7f397c9a67ee6d98967605a",
+        "363d10cef3d66886f7968ff559595586ed4bf4fd870c942ea3231054d036c04d",
+        "de466188a10711aa249a451b7d3a35a84d0980c8de29ddcb68ae4b1595637efa",
+        "2d27e95d67aaf1e3af233d12f79f639c7f88594968509bbaa6944db9ff23e477",
+        "37fc0cfa1e8f2f877ae537a3d4d0e90981134600469a3b43e093b47804f2862b",
+        "e06a6691191f9e5aaa4546371189acf4ebd6dc385a5d9bd442494061eeaeccbc",
+        "62a8d3c0507dc87b2cd7699f56a6e3e19f13d6ea3ad6d024f6a97694eba91703",
+        "4208528760d05fe96d5cf098818a4c1e192eec49180d2c981b0918c48e63c5db",
+        "8b18441cfbf2498846649900e96f578f240a708ac774ddb462cd58e0e3611d11"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "a57615f28e3fe2a82b5b275b8e6b218100df212de18266738967422e2b9a47c1",
+        "evidence.json": "ba7623f4e5c371bda339df6122f8d5717d1d2f9a94379f18b1fe57652a12b6d5",
+        "verdict.json": "485f6ed301befdc8166fe66c2d57182fb94753a23473b28b5173022a95950e7f"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 286.502837463,
+        "invocation_wall_s": 282.5567804529999,
+        "peak_worker_rss_mb": 1112.73828125
+      },
+      "model": "regnet_x_400mf",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 1180,
+        "candidate": 1180
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 215,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 215,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 215,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "9f04f66461a8880d324e4b3c737fa524a7ecd106bb0e8176a08dbcf7ef49c6a8",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "upgrade",
+      "commits_sha256": [
+        "4e2a7be26178eafb7ffed166d16ed3d8e31c0c6dde2a215b0809e8704ccd6fe7",
+        "d0054f56eeb32a76c9de42e49c070adb8c43d831c7de2bce2c9f6b0300caf4bd",
+        "e98a9c378183f38111c6608c0109bc455061c97fb7baabc40158279958b5888d",
+        "8777e62f5ec0a32ea35b863edbfff502b782cc4f3b52eb4861ca4304da103803",
+        "6ff1fed73c27fcd7ca372032dc9d6159b22a437f721c0dccd0fbe9563b278ca5",
+        "096f8967d960ebe10c0d77c85db3070516057ede17cbe225f9ac2d2b14c19c80",
+        "abb45c78bb8c4712167bb0fbddfb193c814a6edaf4d8b020cc80c15d0e88d7dc",
+        "0edd46a8726f5c415d611db1904304f7556178803696ab35b5c07b2d83dacb15",
+        "b6b4ddfb04d814922be9ec2fd50df47edb5d21b9d60e0ecd319e12c38705f8ce",
+        "c1bc37b8defc6045bdd59cd564c4b64534795c4dea6b5b3fc56016626a3095d7",
+        "5056aefd16f64481b32e6df8b73779c6a3be625c0285103c3de1f1e63a9c61cb",
+        "7e1ff6746945cff98678f49c56d13645e467af67aee7f7dd8691d7a8898157cd",
+        "13b807edaa559e89b5db52d40a0ed088543192c37a3613ad06eb9fa9e9af3ca6",
+        "4ccbbc3ad9c9299c5001fe819712c6f2ddb3ec9c0d62613a81f3bb5f8ec2e735",
+        "c6d8d3ca52ff69587e022f3a5489f7d2d741f03be7bfdc52bf74e6d50b0c2402",
+        "905d4a5af533616943d945c8b6ac9b7964fc07d17f2a9cd7101f881e7fadab74",
+        "e8de50237e56d4ebbd62f3aae8277d7787f6fb3f5991a41084070b235f52590d",
+        "82d166c85b15b18be0f397cf57f782c99a7068951149ae46e36ce894ad0de503",
+        "403cd997d4a092a75a45efa12618b4677747950a52054b5cf2e792ff4f61b42d",
+        "badc1bc62bde3f36300d0452df18f608395a3d6e951d70db1578451f4c333d40"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.16.0.dev20261105+cpu",
+            "torchvision": "0.30.0.dev20261105+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "9c133337e48de8b8234e8347d41e83ad81bf01e11462d9e7d7f9510670678261",
+        "evidence.json": "44974185f34190aec635fbf24ecfd0048e8bd54f20c170697d89a1b0d00455fe",
+        "verdict.json": "2da3e9b49593e90f266b5fc117faaba300d3164dfbdffff64f5c15655b7d7e6d"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 273.86494783600006,
+        "invocation_wall_s": 270.09960443299997,
+        "peak_worker_rss_mb": 1126.484375
+      },
+      "model": "regnet_x_400mf",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 1180,
+        "candidate": 1180
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 170,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 170,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 170,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "ae5ebea0cc1c3b2320a0f36b45410313c2d71ae0b28cc14b9b0e8a8b713e6418",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "same_version",
+      "commits_sha256": [
+        "d410c7a5f4e566c91f2dce5b62a95148e7f06dd1f2191c2ceb334ff15d9ef053",
+        "88fd5d01e8b1695cbd9c294967eab040e9669ee136e11e34b4e0ea5aa8672f4f",
+        "baaf708d087d739eb79c2ee6083805128561e92cbc53a68834386d26dea49091",
+        "000987a4cca8b8165cee585aacd068a676434c580e723edb4eb74e00e7a6551b",
+        "457f11cdeab522e4bfc5dbb5cc02d26798289be7589da4fd7c842eeb280fe2b6",
+        "f538cabd1b3a6868ba0945d172e3ca312fa302444b4bc5ffa7c0dc746ca07c16",
+        "2d64264e48e77baf397a6fc69a561827db98978b54514d47871cd436ddc16648",
+        "995c283e8fa55db9cf4b05539c6688e99c7564bb566066b8171d9b5219b6eb96",
+        "63f84b3b22164c02cdd8c8d48b016481b7bbc1208b329cf21d9b35696a05f47c",
+        "571da0027640051397b6150023e31596ada82d85f978f47414f96ad4d6b0c2b1",
+        "ee720f0898e99869e5b9925965ba40ed0faaf5a8e9b95cb45d3aa4794c4f7feb",
+        "1f66e966507434f4bea8e6cf05dd200800937f79590e4c6241b6e513548193ed",
+        "f50bebe0894a99f12b8a989153e874f3e814174180da1cb96f3789646c1767e8",
+        "2b5ea7f5703b4472befdb9f67e3dce4f5dcfeddde122924e84ce107f72fba758",
+        "c10ed4509a257afb78048526014cdb6070d279a7b8e891a9384b2b589e42b0aa",
+        "ef134bd92e02b77039d53161e353801c539e3937e8027e87598ac12d5ef7f061",
+        "b5e0bf8878aa32583e8905f373d5d732bb558b79693af4825e3cb2ad297f729b",
+        "ceb2ec78591d8aa38f516ff91af49acf09c2031ba8525d68f375106afe109476",
+        "eaf9838987101c8158978b66fc2c9400860aa5ba3867de5953ced89aefaf5bc8",
+        "99f153bee4a7c002102b29cec2178388a78161e5dd886fa179f4641fd7877dd0"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "24e45a5ef690acc8f9c432481505272dd5a14f1edeadde4225239368f751292e",
+        "evidence.json": "a93b32c3c397d29ad0e6432ee1e36ddadb343da48e515c62961a3612a1bb6b08",
+        "verdict.json": "0cc9faabfe282130cdcc798eacf56c930dc38894d4290cd7bfc5b6e2afe27a06"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 247.23371990500004,
+        "invocation_wall_s": 244.51240885300012,
+        "peak_worker_rss_mb": 807.9765625
+      },
+      "model": "shufflenet_v2_x0_5",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 532,
+        "candidate": 532
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 1,
+          "numerical_mismatch": 9
+        },
+        "candidate": {
+          "gradient_mismatch": 1,
+          "numerical_mismatch": 9
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 170,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 170,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 170,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "ae5ebea0cc1c3b2320a0f36b45410313c2d71ae0b28cc14b9b0e8a8b713e6418",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "upgrade",
+      "commits_sha256": [
+        "b9d1f2e4540ec8d7a9325d7e5eecd653140b260cd5f80cee3c1d9b661db20ccf",
+        "5ded4c8b13b53d77f2c15309afe5d641485fb0d093c6fb69aa64f6c96809899c",
+        "86b12860c6c669fde1ee92f43ffb42878c4ef6c8cb79ebc135ca8295e560341d",
+        "f2defb2b784d77e0b82b53c8b5769cc1eca048ab5ab6e12961b482ae47d08113",
+        "965bba7a80e6cab23ec68fe31ef29f91c2487c643c8ca1151023d733443f7046",
+        "3b1ff31323ca250738488f40690e216b33a41f156a1678668ccd6e7715b3d77c",
+        "5b7ed0bf2065dc9c30518669019d2e93827e85a6255c6b983c4e0e01102e1b93",
+        "7fd1ce8d21643b4f56b7cccd97d98b2d6fe18af9f0893cad1584737c183eac1c",
+        "a19eb7f9af772948133a7803f3e1d7777aa28dda3d07b57d98bab2397503ef19",
+        "d073dd1b058394f1d9d1df792383a35e1fdb6db5541a6e916e3410f8a9aa4ba5",
+        "c438d41fc845637c91dace024a5d03c3659e3f54ecd687c1634c2f0969a399d0",
+        "48697f04d0b240d7763f6043eb1e8ec2d887d27884cdda11afd80e48406cd5ba",
+        "76f8e7baa664724df899da221e178313e2add7a8f2fc4bd10e252276f9fd9de2",
+        "4272c8b0369af6c91b0231f4864bbd3f891ee2a13f9a117d17ffdf600d4c8bb4",
+        "301d80bc29f03c590ebc4d95e3963d8b30ff57bae77ca500ccdc762916aa03fe",
+        "6f0192c513c723466d230fba36574b1a3ebb3acb88160b4dd3f96091327ef6cb",
+        "39190e6d64526d5658958dd1195d1c85c4201d29ca7e5165910eb60e26403cbb",
+        "0c7ee1ddaaf2b0eb393d08cd69b1e500f58034ca83e646a962880ca690313b83",
+        "03a7ef08532c96ae9ce3de130d9760238e0cca52750431d2e5b8fe92ac5d4f05",
+        "fe0845451f74fa9efcf81f68e1a3c11af62978433ac9c5ef632ec7e88a686e48"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.16.0.dev20261105+cpu",
+            "torchvision": "0.30.0.dev20261105+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "0ddd13e889b0029f2c198c7785b6a085e79c7ab6ab0155aadf6becf6b2a04627",
+        "evidence.json": "655578c37b1bf023212f3a46ad9258542c82107a890fcc22802019aaa2517f05",
+        "verdict.json": "76688ccfeaf31e942919229cab0f7ac1ecac294f70c6eef6b6de8ac8ab99bd49"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 232.451551719,
+        "invocation_wall_s": 229.822178914,
+        "peak_worker_rss_mb": 805.4375
+      },
+      "model": "shufflenet_v2_x0_5",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 532,
+        "candidate": 532
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 1,
+          "numerical_mismatch": 9
+        },
+        "candidate": {
+          "gradient_mismatch": 1,
+          "numerical_mismatch": 9
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 52,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 52,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 52,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "4f0ecb7391cec8e21883eb1bee6bcce2d04e69ca1d3085acf0ae97d5e5e80e98",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "same_version",
+      "commits_sha256": [
+        "c3e039df779a9a1b923bb0646813b97d6cce53ef20389caa648fb4a1ce87fcd4",
+        "fde18dd1145166e02b8b9dfbd370c339f0cac41749e4b7d33cc37c5b4847cd64",
+        "318880f7fccda1b619e28c749f77d764b03d49013dc566234d4add5dece0af6a",
+        "1039daf22d250b6733dfcdb423576ab4099c2bdf074d3611501b389df3aba8fb",
+        "dcd72df4c4c05085ff3e7731c8cf0583ad88dd841ef78e62080282ab3ea3ec9b",
+        "3c30ac20fdf57de1535001a5c21d9e4b353fb7e81808a1599a5515a51a6e91de",
+        "c813cd5726b1c168d08e43d572622a221563b28dc4e90e5b4bd9ed7efead75dd",
+        "5663f07f58f8658d0b50da6d1fabb81753ad4e653269a508c8b24c9331292606",
+        "dcf545dbab0aa59f9545b032906cfd85265fa6a844ba7db2375db5cad09c3a31",
+        "46e67da6e854f8780db56decbc58f73ebe600fcc795ec0c732219245d1dd6d2c",
+        "ce69de44fb4f501561b3ed7a12d5b631a30057169866db33aa798dd155dae0ce",
+        "975cc6757aa26bae31fbebaa69676ab7af4b966b4a35d4bc82302d4e3acabd2c",
+        "efeaeec98dd344f29ec4d05ff3a8065c0262a917fc0e1ead582d16d7ae0288ed",
+        "2699cb5308fc28b86f0cf5ab3ee2f15be28ce807a6a4a98b9c7c821a16607aca",
+        "781340034a2f2b3c427174c8a0be2937161a0ae12d709aebcc4a0cea597df03d",
+        "61965454022f1055854a18731ea75f9206e454cef1d370a90d407a053c49d3be",
+        "6b2f1b343bd4870d71b720bfefe53d6b3a03d88afcfe95cd1e3340f367ceb5b0",
+        "590acfc709e3fce71364d594c66827861256c9eea4a50d8409cfdc0fae8d18c1",
+        "8fde50e434ff1463fee8fd68e94084166176de1b579f6cf80b808bf7c5e3bdec",
+        "2489a3953aad74d0723765c2c38921288fcbb796d2f378680ba26347cf823acf"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "7936e4f0cabf09cb0a6a81c44e1b8cdfe1c19d2d51f067e98cda1436adc45457",
+        "evidence.json": "7f5c983cd0a40b06c0c8090134c2b7a4f3c3ea9676e31f9a713551d5de5efa01",
+        "verdict.json": "04abd86bec145e96885ebc10f9a59cb18cb6a619bb68d56ccfacd02b0237a0ad"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 194.65304705200015,
+        "invocation_wall_s": 192.47412013500002,
+        "peak_worker_rss_mb": 762.09375
+      },
+      "model": "squeezenet1_0",
+      "pre_existing_batches": 9,
+      "pre_existing_failed_targets": {
+        "baseline": 74,
+        "candidate": 74
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 9,
+          "pass": 1
+        },
+        "candidate": {
+          "gradient_mismatch": 9,
+          "pass": 1
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 52,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 52,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 52,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "4f0ecb7391cec8e21883eb1bee6bcce2d04e69ca1d3085acf0ae97d5e5e80e98",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "upgrade",
+      "commits_sha256": [
+        "86593db99db0b4e074ba8323d4fa3afa896298baa31f9dbc9326e1f2b669343f",
+        "35aaeb77db440de2dc3df8a666b2ee98d7fe0c86aa8829e21aa58c18c6e7fd07",
+        "1b68b908bef8965953be44cca95047cce525323912837a1225e8669c40fdcf18",
+        "98c1e53882fd37f32880b2f2bf8a50e0bc9df647239ac54f89c064cc403a69f8",
+        "b38f1e24619c032e4604beb523c8fb367ba3b4aaf2c4b5c4cb502fe34da46998",
+        "ebf504586739ce6de2dbe1d14b87745aaf9b99057c2eac92e9167c7db6e443a4",
+        "08e803c0ca0340707b26c990e348a732b007093a71c70857f77f3ed5ab1110e0",
+        "ca6c7a080800069ff2571c4f7aff0838403927351c0c96b4ecd26a2958cd701d",
+        "758c7ffa41177f6247e52f61d5442943b67df5048b1a662258a83ffe78d6b6b2",
+        "6256cbf8e48e0b04d3ba04f68858fb1f6948ec4e065f90fce60fa5ff2b832b75",
+        "ac9a2ae39282125ed6c990f52da9517235499244041c4c77e68b47dccb55c555",
+        "7419fe976b7c46452f7b793c2bc29d662029783621f57b05b7baeb27fe7191f5",
+        "b825a0a21c20f15969610cdf9c87a8f01b319e1daf337132a55f14a037454dd1",
+        "177edcb1df8c9786a454a17602506d41fac9b8fb5acbaf33b51d25c03f77af42",
+        "78049231611300ce3b684ff838af9c4f9e6dc764782c038e00cce9da476c6f02",
+        "fefd77c953b5170abef9e0aefc3f78d48c15ca2ac3adc07171e05f4feb83fce9",
+        "428230c84965206185f218b7dae0b78c22452d1294098751374e882805714b0a",
+        "1f41994c89bcbe5d104093419051f43030f83d5fb9490d8e799795a284192461",
+        "8b122a0c3c9c2ca02c141c4cf60a7e1974403216d2e4356edccc4a9ca9a89b6c",
+        "58d12670ea5b3f5d0fe027fd3176f32fe07d199263972b5a2c1e82c8112eb4e3"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.16.0.dev20261105+cpu",
+            "torchvision": "0.30.0.dev20261105+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "b0ad5626d454c77565ec62e4d509538096995d92ac0aff043d7866223f56c797",
+        "evidence.json": "b0ab919b29d338198a8a20219b8005c08c9d5981d6e77e98f196a66248aa5dc5",
+        "verdict.json": "14ceed868daf03a494cb061a4acceea94fbe35c6c18941d9749f2289d3078d85"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 206.1684437230001,
+        "invocation_wall_s": 203.85010567400013,
+        "peak_worker_rss_mb": 792.08984375
+      },
+      "model": "squeezenet1_0",
+      "pre_existing_batches": 9,
+      "pre_existing_failed_targets": {
+        "baseline": 74,
+        "candidate": 74
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 9,
+          "pass": 1
+        },
+        "candidate": {
+          "gradient_mismatch": 9,
+          "pass": 1
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 37,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 37,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 37,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "4d13c541915c00d11057b9cc771532939b29232d2579db2157f7206bea783461",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "same_version",
+      "commits_sha256": [
+        "602ebb5b972cce02edcbabb130acaefbbb79c581d58ba4fc95b58641f4316eb5",
+        "e71e9bfb99b5761aeaaa4d5dde68577aefffe4d5fb8bad42121c8fcc8e4233b1",
+        "55d21c38b382178f89a77235a1ac5a2f4927dc7722dd44cc36a4f30cf7502631",
+        "d777dd0ed774ba02f1897c64f3d90d133185be41027ff0cce53a586317eda130",
+        "c1d57b6327ed130154917233c02b16ec99c87d6d0a893b0e0ac32df28cac5d1e",
+        "db5a5dddf4562008329b4171189042d358668c31821fc262f5f835959adfc33f",
+        "e066c68330b17fdb3485962bf781195bd4b45ae5516fd34f72265e66392c8eb1",
+        "33cd70f2d7da5b287c7aa59fb10662087ea5756389c46555d61d46f55030ef5d",
+        "0443441ded33b0b9304c228fe24b5eb51b2e9737e8a59cda87ce7198499770d7",
+        "863c3806c3824c8ea2d860bb97abeaa723f07256b3a1d5347805fd6a670d9eb6",
+        "fdef4c521ed11ed13d0ec6fe68acfdec29a30c529da5e5088599fa1f54c3a18b",
+        "3e88a85aa0343ef13bf44cc44315e94e7a4497edd01447099c9ea1e501ffcdde",
+        "ae04d65700279e2f90cc3bef210df32790ba3f7bb7e037bcfbf205641d05f2b3",
+        "ead8d6f6a2596288aefc95288a890a87d2e96947ed34d9e447d60236d6470bb6",
+        "44ea6592065799fe6ac95a403e5ed298ff3238163ef2ab1fb4949b93c48b5355",
+        "1525832bb3bf70961838283126eb43f5a273a6fc487fb159bbe14636ebf1ed8b",
+        "f9209685fe724b5a4d175e1f94e850cfc5934fb2d46ab4adfe7e184517006376",
+        "6a749bf9ee1284dbe832ee9e2603ef2222d5a35146415ab30e19a6f7a1a8327f",
+        "938f622aa283079acac7c60bc5bcea9b4123b590a1e3c4927e3b1feb8ddc1b89",
+        "1a58141e292fa416934472145d64da9a06b7d2fd10da6a52e17865a40e293923"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "0f732ccc13a7285948c282078d6d15dc2491027d8d4f952e1998036221f54512",
+        "evidence.json": "7e986cc4ebfdabf0eb13bcf8f1677a52143acaa1e4ba627a73757a08b6dacb99",
+        "verdict.json": "0ca0af5429b49eea1303d2d0de3cd3b60d0802d8e01017cd5ca6d1a4fdb9f42f"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 190.61936747800019,
+        "invocation_wall_s": 187.91299774300023,
+        "peak_worker_rss_mb": 886.875
+      },
+      "model": "bert_tiny",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 173,
+        "candidate": 173
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 4,
+        "completed": 4,
+        "coverage": 0.4,
+        "decision_complete": true,
+        "deliberately_skipped": 6,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": -0.04723440474444884,
+            "median_status": "finite",
+            "paired_targets": 37,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": -0.10349416750049927,
+            "median_status": "finite",
+            "paired_targets": 37,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.04035363737498452,
+            "median_status": "finite",
+            "paired_targets": 37,
+            "status": "complete"
+          },
+          {
+            "batch": 3,
+            "median_log2_growth": -0.029996367496395407,
+            "median_status": "finite",
+            "paired_targets": 37,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.25,
+        "improved": 3,
+        "labels": [],
+        "median_log2_growth": -0.03861538612042212,
+        "median_status": "finite",
+        "missing": 6,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 0.9375,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 0,
+        "worsened": 1
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "4d13c541915c00d11057b9cc771532939b29232d2579db2157f7206bea783461",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "upgrade",
+      "commits_sha256": [
+        "4b2c94653ef6acf1761f3892d9ea6453100764bb4b305adc118b71f20bbedb84",
+        "c362f2cb4c67609c7eeb90f8921380e901804ea38e6abc646168fac6f3f26607",
+        "103f873a48d338a4bd1b7494136566c6e9164ee4ae51e597fc4c16b339764833",
+        "ee20b79345581e50d2e7ac286fa4a3ef61fd4d33dea8b4ab9f44bc830c64b491",
+        "b521db1480e81e265db1bc681729ec067425c404da9182dc89c8c63d36db6cf2",
+        "955ff3f5e2d37dc76745f83f2c146e054d73be9e6600bf184d2e35598c8511e5",
+        "32ce545e10813ee43b063e8a5959a55eb43b934dfd8d08801d20c98cecab9e26",
+        "7d2e98d5cb5590c10751393ffbccaad5c8b97619c0b3945252ca42153ee73bb6",
+        "d7467f317542edd5e5bbf22349ac8f70104256f4aea32fd0e3228c411055e5bc",
+        "5d10d7ed63bdeeed701d71f90ac0432ea17c288d5e5ec6d5fcb10c542527ada9",
+        "c0d8f774ff5d2ebb6ee45d008c638d04ab1b430465f3f1113c856a7c4d463ba8",
+        "dabdb67d82cddfd455f4bc2eae495ca4213a3d51dd01ae1c24933adb235858d7",
+        "4a713fefdd40900c23816c04b6e75b84105696d2d1304a7d22179bfcc93667aa",
+        "0d75f7ec98aa1d6e15b7ba541df8f68d78833fa94e20d23c97bfe2e4c8ac2f67",
+        "0dc4c98d428e804854b8bcf70f714c23714686703d3298478251c142c53415ad",
+        "2fa74f8c00a6a992c15020295284a8c38423c7a355c18f20e4a0a5139a4792e3",
+        "0cdf528e5556bb02c801f1a956dd27947929b3ee211d21ebcba6b91657502c86",
+        "9e8205143ad0d16d9ecbe75cd36f0e173a74b77330b2ebbf8cd1908335fd67cc",
+        "031e609c6b92d9fb49dd3925ffc14fb26bbbf4a693d29b0f466065f75282f41e",
+        "80c1170bbfbd451c25aad0467362ee1c2ab620ea5b3f96a6837076d86a52f50c"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.16.0.dev20261105+cpu",
+            "torchvision": "0.30.0.dev20261105+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "4eca2dbf0ee1896d0c7317a7682b5a628d02a5b9c468e047551c91c1a991600b",
+        "evidence.json": "b421037173529609c5ffeb76f3541c00dac86136008f4def63d99bb6272ce998",
+        "verdict.json": "a9e8ad1950e70556fdd34b797d11c9ac32568baac7df9fc6433c04e1ca42b1c0"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 203.00703915799977,
+        "invocation_wall_s": 200.79810847,
+        "peak_worker_rss_mb": 889.875
+      },
+      "model": "bert_tiny",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 173,
+        "candidate": 172
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 101,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 101,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 101,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "06a20b749b029860112a67600831a3ae4930ae49c493189f62b66381e380533e",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "same_version",
+      "commits_sha256": [
+        "dbb081a4a0e56f2b8e39b2bdefbe0eed377aedd2b88b1da30e2c12c97432ac1b",
+        "782c8103086e2b2f0b878e815a17382b194ff9955fc758b4ec5c0e6370a984ea",
+        "18a650141f13e1cf20684793e4e6f9cec529f0a2663d24abf8f88ccf40567bb9",
+        "3971d49919a2e537c37903089dee587ce7f32c50c22e179a757dd53009ecbdd3",
+        "cf69ddcb475382b64a3acda74d2996c2abe34e59c17e0a53e7a2bacbc76df173",
+        "60569b182d05a94fde4471b91dbbb04086261bb4a54c2732e098ea9bd98b0bc8",
+        "aab8c557c295c47f81ac00b16d3c0c739c5d0108d949090bd3781b8c13a2ede9",
+        "ddfc016dfd02acc8fd32420b2856c02af1fb48dc967be7087ab884c903d96ff0",
+        "ef5b83436008542dfa452fa1bd6fd4d4e7ce5834915a8d13263555e7beaa5a5d",
+        "1805ea1500e0683853be7a9fd6d584dba358214d4f322feda8a1817ae566f0b6",
+        "8545d4317dae5865fcc8cccf1cc3aa69db3c2b6560066b08fa6aa68ecd27fc7c",
+        "1c89ce18fdfeb7cad07bd95c0a1a91b91c60008588103729a947a85aba19f41f",
+        "8ad319de871c272f323b586e1941c6af9022737009a0dbf438e03e4746df3edb",
+        "6fe008c47597126e22077ebb95fcf988b718b863c4f4770c6d19952cc2e5f499",
+        "c4bef4daac67927b82d3279b645021bcbdebd1ef8e70c0afca1e337d3279b332",
+        "16c4b9d6e938a80cd9fee2f71a304d01175992c66da85d7f5aad3ec818b38bbe",
+        "8febd943c64ca87f6c292728e58cdf425757b0bdf9cf63b6e697c508fa9eac6b",
+        "7e68b33c3e2ec4c577dc869451c1eadc78ca46c49d0876d9bb3d23741ed16268",
+        "d4c09dc04d68ab3aaffcd67b8842b40b6cb57e6f2618fc87ebe3f888e9f87c67",
+        "54b8bc9e676f82bc5270a8d14083785d84eb8fc3bfab0d8a01d98f5dd6905571"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "b39270351c97ec973fb31cff79a9f3f1f2202949e037ff18788ae973bc0080b6",
+        "evidence.json": "e675724c6ec9a8b351802d1e3114e023dbecdfecde0f901ce043d3dd0efbd8e4",
+        "verdict.json": "470e467c34ab879ef4049e064122eb03c8e6820b9591f9278813f5f82ad95273"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 861.6989181580002,
+        "invocation_wall_s": 848.9219460709996,
+        "peak_worker_rss_mb": 5589.8828125
+      },
+      "model": "distilroberta",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 628,
+        "candidate": 628
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 5,
+        "completed": 5,
+        "coverage": 0.5,
+        "decision_complete": true,
+        "deliberately_skipped": 5,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.047791309892433756,
+            "median_status": "finite",
+            "paired_targets": 101,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": -0.0007938440018616972,
+            "median_status": "finite",
+            "paired_targets": 101,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.015296735641568393,
+            "median_status": "finite",
+            "paired_targets": 101,
+            "status": "complete"
+          },
+          {
+            "batch": 3,
+            "median_log2_growth": -0.1135488096428393,
+            "median_status": "finite",
+            "paired_targets": 101,
+            "status": "complete"
+          },
+          {
+            "batch": 4,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 101,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.4,
+        "improved": 2,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 5,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 0.6875,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 1,
+        "worsened": 2
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "06a20b749b029860112a67600831a3ae4930ae49c493189f62b66381e380533e",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "upgrade",
+      "commits_sha256": [
+        "9699f3ecdee260a85b513548a2036116c4f1ec9acb498be00a278fb551e40ca6",
+        "e4ddff0adc957ceded2f4ed2b581077699f2aaed45ece5a10a75611b4b78324b",
+        "ead3acc37f4d9631ab72c3d1856c0c5da01bd50af4879759e2521db6dcd33187",
+        "e11fcdf262a6af725aeecc2c1b90b93ae2346ecaf50e4a29d0074dd6cbc67293",
+        "52109506af8b9794e38d0bc8b2beadbb5a90e7045a35d64c8d49154192cac2e3",
+        "ede267fc55c6f48606036e2d2a5a64086767bf4b426419e0f272ddf46e692f06",
+        "83c869e6c99eb354109a8b184c82cf9f8cccb540894bd26c2241c650b0092b2d",
+        "339e59a6b49736e73a009417fd31965223cce00c938effcd68330b74a73fe3eb",
+        "9cd4bec20a420e22a598f1f0132966ca8cb0ec6014ab374aa16534960b6169d7",
+        "5ff8d0f33a7d93b462d1f68d302ddc6f6d34eec7e30933045f9728c6ab363503",
+        "d5ddae3e50d5579fb5807dace50e089a3fc0387491a4308a15673ff0c2514b5d",
+        "520e1aa18929a85f6da99f1eee68e55a9694d4e217737e4178e6b0b1c05a039e",
+        "61c351ce419cdd3d964ab38dcbe45d21f2f9465c4506b88d2c933db14a6feee2",
+        "bd8c5f8a2e35821ae0d44bce5f35faaa76652ba90df0e3c103ad6c2ac082a824",
+        "2c351491e441402d6b8289e4bf6001d917827513b47ea2b63ebf6a6759ff3870",
+        "e64b23307fbde099a2cab663ca58fc0638bd9de4383757f6fc203d13a03adb58",
+        "edc494ab2ae39923815a0f89496d455099fa861d68ebe1618dd06ae84c47a19c",
+        "49d9824f4a1693d5a5f954be6ec85240612bdb432bfe8dacd4a5e342c4a360b2",
+        "db9cb1c4655474d18cab03e231cd63607c6385ca1e4560c7fd4d1033d6292bce",
+        "cea7652d6e8c95513868d871ca85658cb36fe3b294175ccc920b519396b7cb82"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.16.0.dev20261105+cpu",
+            "torchvision": "0.30.0.dev20261105+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "e8f86fb858e5677aac065311b60c22151479b6a0fc2613b11140946bd5fe5181",
+        "evidence.json": "e911ff541bd88f4d073d342b734ec0ff5d13193c79cb038d136e6fd553d4373b",
+        "verdict.json": "a269bd50bda8552937b38b36e197d2f0c8a05d1ee256fc8c526c1a14eb4632d1"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 983.783190745,
+        "invocation_wall_s": 974.58805871,
+        "peak_worker_rss_mb": 5552.61328125
+      },
+      "model": "distilroberta",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 628,
+        "candidate": 593
+      },
+      "primary_counts": {
+        "baseline": {
+          "gradient_mismatch": 10
+        },
+        "candidate": {
+          "gradient_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 3,
+        "completed": 3,
+        "coverage": 0.3,
+        "decision_complete": true,
+        "deliberately_skipped": 7,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 75,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 75,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 75,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.0,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 7,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 1.0,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 7,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 0
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "d39f34b1e67603c162d1c9e2ce2d1b080a3bb47f8998777cc1749baae1982d02",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "same_version",
+      "commits_sha256": [
+        "f792224bffb28afb4342f83f7e9491278f1ac38657e94518bd44bb5910034fa6",
+        "3b471f4e6fb820f45b4a300d187c96405b2dd1e330c42be7d955a694ca71a114",
+        "f4b143e271dcdb8f37ab9080c9a25eface01f1ec4eb94df60f4801f2c2364ec0",
+        "7a53fb3e0e8d3d300a7446e5e95fbf318c2903f9f7d95de25ddb8bf760022225",
+        "da03a97b55d9f34c8ce63587849a05b8415be9c321ac663d4ae02a2feeab6a40",
+        "81c95fe5854049e4d4947d3bf2cdac5b3ba1391c7a3b2707242e472a64b4f071",
+        "32751b69a19584f6100ca71db49a607ff4e1b769462e9441be52ff4d7a7ed108",
+        "eb407a48495ceac4dc1b2dbf8e59e633a101af7070bbfb3a7fb1f790daefe91c",
+        "a0343a47c72d6bff5ab12990b86da3dc503c69414144e908df874daa51976759",
+        "3591aeed02977278467576eedb986660635b33c1cdab954683965a69732832d0",
+        "b44816f65a332a776d73da6e5633d9115a5dd13e85c6d0733aff3ea8032a49c2",
+        "005bc4994f8c7d99138865cfa881154f210e37be3758733c468e85d4d30705c9",
+        "5f47036aadeda55083b97abeae8031ca2a832e82a2fae690b4e576b9b9a42fff",
+        "93464f60af8e81e61ecbd65de3d4948d7530259b21c1840d0b33d60a2fbd51a5",
+        "8f22694b96a2a61c92962418cb126318e0a4f997357e2dc5158f3f162961a38f",
+        "a8bbfe1b86043184571db77a29ef5b7b091b7bcb7bd950132cc870e6469110e3",
+        "a0ce8e0e62cd254c03cbbec13269858f2e032cf1787f84b8c83d6a48ccbecd8a",
+        "34666ab0951fcda019479c5e26329e8382e7f619388357348e6c153eaea154bb",
+        "5d2916e9503060eaf840534f256e439130004f63294d0930295db05e6bdb0987",
+        "1a1544465324a44650798ef872932dcddd44a59c5eee1971bafb45330001af1e"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "897410f13567798cb9d8b1bcdac51b1b24ed40fcae4a2916a051c82769d2d193",
+        "evidence.json": "739fae03161d74ecb0f78c63b9da6e610ccf178d547fdcd46fca8e5e9fa50fa9",
+        "verdict.json": "93d90efb8a353dfb96d86bb3cf5a5db1af6989d16af864537784cfbd9008ee1b"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 564.9782148419999,
+        "invocation_wall_s": 557.6891474479999,
+        "peak_worker_rss_mb": 3594.0625
+      },
+      "model": "pythia70m",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 750,
+        "candidate": 750
+      },
+      "primary_counts": {
+        "baseline": {
+          "numerical_mismatch": 10
+        },
+        "candidate": {
+          "numerical_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    },
+    {
+      "accuracy_shift_replicated": {
+        "accuracy_shift_replicated": false,
+        "attempted": 4,
+        "completed": 4,
+        "coverage": 0.4,
+        "decision_complete": true,
+        "deliberately_skipped": 6,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": -0.018516528149368244,
+            "median_status": "finite",
+            "paired_targets": 75,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 0.029288493092612312,
+            "median_status": "finite",
+            "paired_targets": 75,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": -0.1807017678376463,
+            "median_status": "finite",
+            "paired_targets": 75,
+            "status": "complete"
+          },
+          {
+            "batch": 3,
+            "median_log2_growth": -0.34130754955975484,
+            "median_status": "finite",
+            "paired_targets": 75,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.25,
+        "improved": 3,
+        "labels": [],
+        "median_log2_growth": -0.09960914799350727,
+        "median_status": "finite",
+        "missing": 6,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 0.9375,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 6,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2,
+            3
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 0,
+        "worsened": 1
+      },
+      "allocation": {
+        "baseline_total_rss_mb": 12288,
+        "candidate_total_rss_mb": 12288,
+        "effective_jobs": 1,
+        "requested_jobs": 1
+      },
+      "baseline_settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "bundle_hash": "d39f34b1e67603c162d1c9e2ce2d1b080a3bb47f8998777cc1749baae1982d02",
+      "cache_policy": "exclusive_lane_v1",
+      "cohort": "upgrade",
+      "commits_sha256": [
+        "21f106a74674b4141989bf6c881cb156b4f987bcc08a9d866a8d29a2a9f32cb2",
+        "4a2640040be0f93b9e0bdc425af4d2a6db30cbfeeaa507b271bcd5925bf74ee3",
+        "7b1c230a012d6e46f485f76fa52c87efc2ba3676c06c955911c5e99010bf1b45",
+        "5065ac9ea49922f95c706acce4a81f0a0384b272202737d66585c5697a7cd715",
+        "449cb4b8ba677ae2a4ee76be5bc6e3d152b007ae44bc8f5918cb844d1dea8c37",
+        "1e84f485ee915da6d8e37bfda0c3df02d6272881b8fd4b87839aeac9ae4100a9",
+        "87cff81f1fce368f134bb7f2f6fc36b71be84514baf7847436de928f356a2f55",
+        "6c94d11d7eb74a51d56083ba0a15fe28d4dbe73d1b9146104ab6b7644ef2c4c5",
+        "8ba2d14e6f41e51a999cfc7f69e563b06bee2c83f8cdd6be21e98bbea7dce94b",
+        "208a2e742260486c470585c73ed0304d6082be163d5658782d35de5de5cff808",
+        "3bbf796f1cdb7ebf4be3bed0435c44f52abce0ff984a8c1acc0171f602e6fb71",
+        "6f0585edc14ebec01878ea087527d913608602050fc521bf8963b32a92f55b51",
+        "92ec5c9a90d76bc2fa14c4b79ac507643a8a46f65ba805c7e627f8efaee7a2c1",
+        "8f5fee96109e3f54e211ec0c2edc34a23f4d5586ac63537ec61cf9da91e53086",
+        "710d89fe8e92d937269dca0d92a1a30b0133a420bcb5977029c467465f751f7d",
+        "344c2a8229d994f40d44455b1f93a7eb20ae15d4ba09c9d3b5a03cb765adec29",
+        "bd86ec9412002e1b7443269a3de994cc292d694e4ddbb80a39eadff4aeff8429",
+        "7a005d889850a1cdc0d0fbed70770ceacc5877f88b596eb85566f01bca77b993",
+        "906ddbfc14accb6397b6b582137929ba8ab250156f5dd993f3062e4b04829957",
+        "f9984f43475688a26ef825371f27e0feaa96169559f47f2c6892c6116406cbf5"
+      ],
+      "environments": {
+        "baseline": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.15.0+cpu",
+            "torchvision": "0.29.2+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        },
+        "candidate": {
+          "packages": {
+            "faultline-ml": "0.10.0",
+            "numpy": "2.5.4",
+            "pillow": "13.0.0",
+            "psutil": "7.2.2",
+            "safetensors": "0.8.0",
+            "tokenizers": "0.23.3",
+            "torch": "2.16.0.dev20261105+cpu",
+            "torchvision": "0.30.0.dev20261105+cpu",
+            "transformers": "5.22.1",
+            "triton": null
+          },
+          "python": "3.12.3"
+        }
+      },
+      "evidence_sha256": {
+        "check.json": "9285bbb4b9ed34c8cec7b5cac67abcbbf31a804c4dd9d5e5085d5f642ace9474",
+        "evidence.json": "82cb6fd6e83d71d0063ae4e7ec6b9c1741578e1ae0d0e2bb708db63be985612f",
+        "verdict.json": "e5959803abd4e54d91387c437b76d5d55ef6a7038aeaf208e9addb675a360767"
+      },
+      "exit_code": 0,
+      "injected_fault": false,
+      "metrics": {
+        "command_wall_s": 600.5573955589998,
+        "invocation_wall_s": 594.821308816,
+        "peak_worker_rss_mb": 3586.80078125
+      },
+      "model": "pythia70m",
+      "pre_existing_batches": 10,
+      "pre_existing_failed_targets": {
+        "baseline": 750,
+        "candidate": 750
+      },
+      "primary_counts": {
+        "baseline": {
+          "numerical_mismatch": 10
+        },
+        "candidate": {
+          "numerical_mismatch": 10
+        }
+      },
+      "reason_counts": {},
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "settings": {
+        "atol": null,
+        "backend": "inductor",
+        "device": "cpu",
+        "gradients": true,
+        "max_rss_mb": 12288,
+        "repeats": 2,
+        "rtol": null,
+        "threads": 1,
+        "timeout_s": 600
+      },
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "verdict": "SAFE"
+    }
+  ],
+  "planned_pairs": 12,
+  "schema_version": 1
+}

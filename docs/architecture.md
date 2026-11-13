@@ -347,3 +347,11 @@ saved primary outcome. `verdict.py` summarizes this evidence under the versioned
 its exit codes belong only to `check`. `check_prepare.py` handles trusted factory/catalog preparation
 in the selected model interpreter. `environments.py` shares supervised installation and identity
 probing with the nightly installer and records dependency constraints and resolved device support.
+
+Version 0.17 separates orchestration into `check_execution.py`: independent primary batch
+pairs execute in a bounded thread pool, launching supervised, single-threaded subprocesses
+with explicit per-slot cache environments and one sequential owner per cache. Primary and diagnostic commits are verified
+separately on resume. `replication_stop.py` bounds the unchanged replicated rule over every
+possible remaining completed-score count; diagnostics consume an ordered prefix, while all
+planned primary comparisons still run. `verdict_v2.py` changes only paired change attribution;
+`verdict.py` retains the v1 single-environment and opt-in policy. No advisory feeds a reducer.

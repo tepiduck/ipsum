@@ -28,7 +28,7 @@ python3 -m venv .venv
 python -m pip install build
 python -m build --wheel
 python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu
-python -m pip install 'dist/faultline_ml-0.16.0-py3-none-any.whl[sweep]'
+python -m pip install 'dist/faultline_ml-0.17.0-py3-none-any.whl[sweep]'
 faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart
 ```
 
@@ -48,15 +48,19 @@ Factories and captured bundles contain executable Python: run code you trust.
 
 | Verdict | Exit code | Meaning and next action |
 |---|---:|---|
-| SAFE | 0 | No blocking evidence in the requested checks. Retain the report with the tested versions. |
+| SAFE | 0 | No measured regression attributable to this change; required executions and accuracy decision are complete. Retain the report. |
 | REGRESSION | 1 | Candidate-only stable failure or replicated accuracy degradation. Review the evidence before upgrading. |
-| NEEDS_REVIEW | 2 | Contrary evidence, unexplained mismatch, or insufficient accuracy coverage. Inspect the reasons and diagnostics. |
-| INCONCLUSIVE | 3 | Required execution did not finish reliably. Resolve setup, device, timeout, or memory problems and rerun. |
+| NEEDS_REVIEW | 2 | Change-specific evidence is undecided: an unstable candidate-only difference, or incomplete accuracy replication trending worse. |
+| INCONCLUSIVE | 3 | Required execution or accuracy evidence is unavailable. Resolve setup, device, timeout, memory, or coverage problems. |
 
-An explained gradient-only mismatch remains in the evidence but can be a nonblocking
-note. Matching failures in two environments do not establish SAFE. A single-environment
-check cannot establish an upgrade regression. The [verdict policy](docs/verdict-policy.md)
-defines precedence and coverage; the [JSON contract](docs/verdict-schema.md) is versioned.
+This table describes the default two-environment [v2 policy](docs/verdict-policy-v2.md).
+Differences present in both environments remain visible as **pre-existing compile/eager
+differences**, with counts and evidence links. They do not alone block SAFE, including
+when the failure signature changes; replicated accuracy degradation still does.
+SAFE assesses the change, not whether either environment meets strict eager fidelity.
+Use `--verdict-policy v1` for the [original policy](docs/verdict-policy.md).
+Single-environment checks retain v1: unexplained or contrary differences need review,
+and cannot establish an upgrade regression. The [JSON contract](docs/verdict-schema.md) is versioned.
 
 ## Check your model
 
@@ -76,7 +80,7 @@ def factory():
 
 ```bash
 faultline check model.py:factory --output faultline-runs/model
-faultline check --hf openai-community/gpt2 --output faultline-runs/gpt2
+faultline check --hf openai-community/gpt2 --jobs 1 --output faultline-runs/gpt2
 faultline check captured/bundle --level quick --output faultline-runs/replay
 ```
 
@@ -92,10 +96,15 @@ covered in the [user guide](docs/user-guide.md).
 | standard | 10 | Forward, gradients, paired accuracy; explanations run as needed |
 | thorough | 10 | Standard coverage plus full control and AOT/mask diagnostics |
 
-Each worker defaults to a 600-second timeout and a 12-GiB host-memory limit.
-Diagnostics have separate budgets; a skipped diagnostic does not erase a primary
-result. Missing required evidence can still prevent SAFE. [Measured costs](docs/research/usability-016.md)
-show the tested workload sizes and limitations.
+Primary batches run concurrently with `--jobs N` (default: up to four single-threaded
+workers). The default 12-GiB host-RSS budget is **divided across jobs**: four jobs get
+3 GiB each. Use `--jobs 1` for models needing the full budget. Each worker has a
+600-second timeout. Accuracy diagnostics run in batch order and stop once the replicated
+rule's outcome is mathematically fixed; all planned primary checks still run. A positive
+accuracy flag always needs at least ten completed batches. `--no-early-stop` requests
+every accuracy measurement. Missing required evidence can prevent SAFE; skipped optional
+diagnostics do not erase primary results. [0.16 costs](docs/research/usability-016.md)
+remain available under their original execution policy.
 
 ## Compare environments or settings
 

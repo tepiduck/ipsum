@@ -96,7 +96,7 @@ def compact(
     }
 
 
-def collect(args):
+def collect(args, *, summarize_pair=compact):
     rows = []
     same_entries = {}
     same_origins = {}
@@ -110,7 +110,7 @@ def collect(args):
         same = same_entries.get(model, args.same_version / "models" / model)
         observations, hashes = verified_attempts(same)
         rows.append(
-            compact(
+            summarize_pair(
                 "same_version",
                 model,
                 observations,
@@ -123,7 +123,7 @@ def collect(args):
         )
         observations, hashes = verified_attempts(args.cross_version / "cases" / model)
         rows.append(
-            compact(
+            summarize_pair(
                 "upgrade",
                 model,
                 observations,
@@ -144,7 +144,7 @@ def collect(args):
             },
         }
         rows.append(
-            compact(
+            summarize_pair(
                 "historical",
                 case["id"],
                 [observation],
@@ -158,7 +158,7 @@ def collect(args):
     for case in read_json(args.controls / "complete.json"):
         observations, hashes = verified_attempts(Path(case["evidence"]))
         rows.append(
-            compact(
+            summarize_pair(
                 "controlled_injection",
                 case["name"],
                 observations,
@@ -183,7 +183,7 @@ def collect(args):
         ]
         replicated = accuracy_shift_replicated(scores, 20)
         rows.append(
-            compact(
+            summarize_pair(
                 "exp_u20",
                 model,
                 [],

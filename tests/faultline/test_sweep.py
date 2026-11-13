@@ -11,11 +11,16 @@ from faultline.evaluate import Settings
 from faultline.storage import atomic_json
 
 
-@pytest.mark.parametrize("name", ["distilbert", "t5_small_encoder", "roberta_base", "opt_125m"])
+@pytest.mark.parametrize(
+    "name", ["distilbert", "t5_small_encoder", "roberta_base", "opt_125m", "custom_hf"]
+)
 def test_pretrained_loader_serializes_key_sets_and_rejects_missing_weights(
     tmp_path, monkeypatch, name
 ):
     import importlib.metadata
+
+    if name == "custom_hf":
+        monkeypatch.setitem(sweep_models.TEXT_MODELS, name, "fixture/roberta")
 
     inputs = tmp_path / "inputs"
     inputs.mkdir()
@@ -39,7 +44,9 @@ def test_pretrained_loader_serializes_key_sets_and_rejects_missing_weights(
         assert kwargs["output_loading_info"] and kwargs["use_safetensors"]
         assert kwargs["trust_remote_code"] is False
         assert kwargs["attn_implementation"] == "sdpa"
-        assert kwargs.get("add_pooling_layer") is (False if name == "roberta_base" else None)
+        assert kwargs.get("add_pooling_layer") is (
+            False if name in {"roberta_base", "custom_hf"} else None
+        )
         return (SimpleNamespace(base_model=inner) if name == "opt_125m" else inner), loading
 
     monkeypatch.setitem(
@@ -55,6 +62,9 @@ def test_pretrained_loader_serializes_key_sets_and_rejects_missing_weights(
         sys.modules,
         "transformers",
         SimpleNamespace(
+            AutoConfig=SimpleNamespace(
+                from_pretrained=lambda *a, **kw: SimpleNamespace(model_type="roberta")
+            ),
             AutoModel=SimpleNamespace(from_pretrained=load_model),
             AutoModelForCausalLM=SimpleNamespace(from_pretrained=load_model),
             T5EncoderModel=SimpleNamespace(from_pretrained=load_model),

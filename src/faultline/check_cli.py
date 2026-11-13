@@ -41,6 +41,20 @@ def add_check_command(commands):
     )
     parser.add_argument("--level", choices=tuple(PRESETS), default="standard")
     parser.add_argument("--batches", type=int)
+    parser.add_argument(
+        "--verdict-policy",
+        choices=("v1", "v2"),
+        default="v2",
+        help="Two-environment verdict policy; single-environment checks always use v1",
+    )
+    parser.add_argument(
+        "--jobs",
+        type=int,
+        help="Concurrent single-threaded batch workers (default: min(4, available cores/2)); RSS budget is divided across jobs",
+    )
+    parser.add_argument(
+        "--no-early-stop", action="store_true", help="Evaluate every requested accuracy batch"
+    )
     parser.add_argument("--backend", default="inductor")
     parser.add_argument("--baseline-backend", default="inductor")
     parser.add_argument("--compile-mode", default="default")
@@ -76,9 +90,13 @@ def terminal(verdict, output):
         lines.append(f"Reason: {compact[:197] + '...' if len(compact) > 200 else compact}")
     if not distinct:
         lines.append("No blocking evidence in the requested checks.")
+    if "pre_existing_differences" in verdict:
+        lines.append(
+            f"Pre-existing differences: {verdict['pre_existing_differences']['batches']} batches; see report for counts and links."
+        )
     if verdict["notes"]:
         lines.append(
-            f"Notes: {len(verdict['notes'])} explained findings or unavailable optional diagnostics; see report."
+            f"Notes: {len(verdict['notes'])} explanations, baseline-only differences or unavailable diagnostics; see report."
         )
     if any(note["code"] == "diagnostic_skipped_memory" for note in verdict["notes"]):
         lines.append("Diagnostics: skipped (memory); completed primary evidence retained.")
@@ -145,6 +163,8 @@ def check_command(args):
             )
         if args.batches is not None and not 1 <= args.batches <= 100:
             raise ValueError("--batches must be in [1, 100]")
+        if args.jobs is not None and args.jobs < 1:
+            raise ValueError("--jobs must be a positive integer")
         candidate = interpreter(args.candidate)
         baseline = interpreter(args.baseline) if args.baseline else None
         preset = PRESETS[args.level]
@@ -230,6 +250,9 @@ def check_command(args):
             level=args.level,
             batches=args.batches,
             resume=args.resume,
+            verdict_policy=args.verdict_policy,
+            jobs=args.jobs,
+            early_stop=not args.no_early_stop,
         )
         verdict.setdefault("metrics", {})["command_wall_s"] = time.monotonic() - started
         report(output, verdict, read_json(output / "evidence.json"))
@@ -257,6 +280,7 @@ def check_command(args):
             planned,
             mode="environment_comparison" if args.baseline else "single_environment",
             level=args.level,
+            policy=args.verdict_policy,
         )
         verdict["reasons"] = [{"code": "setup_error", "batch": None, "message": setup_help(exc)}]
         try:

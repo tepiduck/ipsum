@@ -39,6 +39,25 @@ def accuracy_html(evidence):
         ("Batch sign-test p-value (descriptive)", number(evidence.get("sign_test_p"))),
         ("Replicated rule flagged", "yes" if evidence.get("accuracy_shift_replicated") else "no"),
     ]
+    if "attempted" in evidence:
+        values.extend(
+            [
+                (
+                    "Attempted / deliberately skipped accuracy batches",
+                    f"{evidence['attempted']} / {evidence['deliberately_skipped']}",
+                ),
+                (
+                    "Accuracy decision complete",
+                    "yes" if evidence.get("decision_complete") else "no",
+                ),
+                (
+                    "Stop reason",
+                    (evidence.get("stopping") or {}).get(
+                        "reason", "All requested accuracy evaluations attempted or still running"
+                    ),
+                ),
+            ]
+        )
     table = "".join(
         f"<tr><th>{html.escape(name)}</th><td>{html.escape(value)}</td></tr>"
         for name, value in values

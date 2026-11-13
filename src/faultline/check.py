@@ -4,25 +4,17 @@ import contextlib
 import copy
 import html
 import os
-import sys
-import time
 from dataclasses import replace
 from pathlib import Path
 
-from .batches import verify_batches
 from .bisect_env import supervise
 from .bootstrap import python_command
 from .check_report import accuracy_html, finding_html
-from .compare_envs import interpreter
-from .evaluate import Settings
-from .native import NativeJob, file_hash
-from .native_artifacts import export_native
+from .native import NativeJob
 from .native_runtime import native_failure_key
-from .portable import REDUCIBLE
-from .replication import accuracy_shift_replicated, batch_score
 from .runner import run_case
-from .storage import atomic_json, campaign_lock, provenance, read_json
-from .verdict import assessment, summarize
+from .storage import atomic_json, read_json
+from .verdict import assessment
 
 PRESETS = {
     "quick": {"batches": 3, "gradients": False, "repeats": 2},
@@ -45,7 +37,7 @@ def compiler_cache(directory):
             os.environ[key] = previous
 
 
-def diagnostic(job, settings, primary, directory, python, *, control=False):
+def diagnostic(job, settings, primary, directory, python, *, control=False, env=None):
     directory.mkdir(parents=True, exist_ok=False)
     atomic_json(
         directory / "job.json",
@@ -73,6 +65,7 @@ def diagnostic(job, settings, primary, directory, python, *, control=False):
         directory / "supervision",
         timeout=settings.timeout_s,
         max_rss_mb=settings.max_rss_mb,
+        env=env,
     )
     if observed["status"] != "complete":
         status = (
@@ -104,37 +97,60 @@ def enriched(primary, diagnostic_result):
     return result
 
 
-def inspect_side(bundle, directory, settings, python, level, *, paired):
+def inspect_side(
+    bundle,
+    directory,
+    settings,
+    python,
+    level,
+    *,
+    paired,
+    primary=None,
+    env=None,
+    accuracy=True,
+    explain=True,
+):
     job = NativeJob.create(bundle)
-    primary = run_case(job, settings, directory / "primary", python=python)
+    if primary is None:
+        primary = run_case(job, settings, directory / "primary", python=python, env=env)
     result, phases = primary, []
     if level != "quick" and primary["status"] in {
         "pass",
         "gradient_mismatch",
         "numerical_mismatch",
     }:
-        if paired or primary["status"] != "pass" or level == "thorough":
+        if accuracy and (paired or primary["status"] != "pass" or level == "thorough"):
             evidence = diagnostic(
-                job, settings, primary, directory / "fp64", python, control=level == "thorough"
+                job,
+                settings,
+                primary,
+                directory / "fp64",
+                python,
+                control=level == "thorough",
+                env=env,
             )
             phases.append(evidence)
             result = enriched(primary, evidence)
         if (
-            level == "standard"
+            explain
+            and level == "standard"
             and primary["status"] == "gradient_mismatch"
             and not assessment(result)["acceptable"]
         ):
             evidence = diagnostic(
-                job, settings, primary, directory / "control", python, control=True
+                job, settings, primary, directory / "control", python, control=True, env=env
             )
             phases.append(evidence)
             # Preserve completed fp64 evidence if a later optional control is unavailable.
             if evidence.get("status") == "complete" and evidence.get("replay_matches_primary"):
                 result = enriched(result, evidence)
-        if level == "thorough" or (
-            primary["status"] == "gradient_mismatch"
-            and not assessment(result)["acceptable"]
-            and not assessment(result)["contrary"]
+        if explain and (
+            level == "thorough"
+            or (
+                primary["status"] == "gradient_mismatch"
+                and not assessment(result)["acceptable"]
+                and not assessment(result)["contrary"]
+            )
         ):
             mask_settings = replace(settings, numerics=True, fp64_advisory=True)
             mask = run_case(
@@ -142,6 +158,7 @@ def inspect_side(bundle, directory, settings, python, level, *, paired):
                 mask_settings,
                 directory / "masks",
                 python=python,
+                env=env,
             )
             if (
                 mask["status"] in {"pass", "gradient_mismatch", "numerical_mismatch"}
@@ -208,13 +225,27 @@ def report(output, verdict, evidence):
                 ", ".join(p.get("status", "unavailable") for p in phases) or "not requested",
             ]
             batches.append(
-                "<tr>" + "".join(f"<td>{html.escape(value)}</td>" for value in values) + "</tr>"
+                f'<tr id="batch-{row["batch"]}-{side}">'
+                + "".join(f"<td>{html.escape(value)}</td>" for value in values)
+                + "</tr>"
             )
     reproduction = "".join(
         f'<li><a href="{html.escape(path, quote=True)}">{html.escape(path)}</a></li>'
         for path in verdict["artifacts"]["reproducers"]
     )
     scope = verdict["scope"]
+    existing = verdict.get("pre_existing_differences")
+    existing_html = ""
+    if existing:
+        links = " ".join(
+            f'<a href="#batch-{item["batch"]}-candidate">Batch {item["batch"]}</a>'
+            for item in existing["details"]
+        )
+        existing_html = (
+            f"<h2>Pre-existing differences</h2><p>{html.escape(existing['message'])} "
+            f"{existing['batches']} batches; {existing['baseline_failed_targets']} baseline / "
+            f"{existing['candidate_failed_targets']} candidate failed targets (summed over batches).</p><p>{links}</p>"
+        )
     configuration = evidence.get("configuration", {})
     environments = []
     for side in ("baseline", "candidate"):
@@ -239,7 +270,7 @@ def report(output, verdict, evidence):
         f"Execution: {verdict.get('execution_state', 'complete')}.</p>"
         f"<p>{'<br>'.join(environments)}</p>"
         '<p><a href="verdict.json">Verdict JSON</a> · <a href="evidence.json">Full evidence</a></p>'
-        f"<h2>Reasons</h2><ul>{reasons or '<li>No blocking evidence in the requested checks.</li>'}</ul>"
+        f"{existing_html}<h2>Change-related findings / blocking evidence</h2><ul>{reasons or '<li>No blocking evidence in the requested checks.</li>'}</ul>"
         f"<h2>Notes</h2><ul>{notes}</ul>"
         f"{accuracy_html(verdict['accuracy_shift_replicated'])}"
         f"<h2>Batch evidence</h2><table><tr><th>Batch</th><th>Environment</th><th>Primary status</th><th>Explanation labels</th><th>Diagnostics</th></tr>{''.join(batches)}</table>"
@@ -261,145 +292,23 @@ def run_check(
     baseline_settings=None,
     batches=None,
     resume=False,
+    verdict_policy="v2",
+    jobs=None,
+    early_stop=True,
 ):
-    from .sweep import runtime_environment
+    from .check_execution import execute
 
-    bundle, output = Path(bundle).resolve(), Path(output).resolve()
-    preset = PRESETS[level]
-    settings = settings or Settings(
-        gradients=preset["gradients"], repeats=preset["repeats"], timeout_s=600, max_rss_mb=12288
+    return execute(
+        bundle,
+        output,
+        candidate_python=candidate_python,
+        baseline_python=baseline_python,
+        level=level,
+        settings=settings,
+        baseline_settings=baseline_settings,
+        batches=batches,
+        resume=resume,
+        verdict_policy=verdict_policy,
+        jobs=jobs,
+        early_stop=early_stop,
     )
-    baseline_settings = baseline_settings or settings
-    candidate_python = interpreter(candidate_python or sys.executable)
-    baseline_python = interpreter(baseline_python) if baseline_python else None
-    mode = "environment_comparison" if baseline_python else "single_environment"
-    manifest = verify_batches(bundle) if (bundle / "batches.json").exists() else None
-    planned = min(manifest["planned"], batches or preset["batches"]) if manifest else 1
-    entries = (
-        {r["batch"]: bundle / r["bundle"] for r in manifest["batches"] if r["batch"] < planned}
-        if manifest
-        else {0: bundle}
-    )
-    identity = {
-        "schema_version": 1,
-        "mode": mode,
-        "level": level,
-        "planned": planned,
-        "source_sha256": provenance()["faultline_source_sha256"],
-        "bundle_hash": file_hash(bundle / ("batches.json" if manifest else "workload.json")),
-        "candidate_python": candidate_python,
-        "baseline_python": baseline_python,
-        "candidate_environment": runtime_environment(candidate_python),
-        "baseline_environment": runtime_environment(baseline_python) if baseline_python else None,
-        "settings": settings.to_dict(),
-        "baseline_settings": baseline_settings.to_dict(),
-    }
-    started = time.monotonic()
-    with campaign_lock(output):
-        if (output / "check.json").exists():
-            if not resume or read_json(output / "check.json") != identity:
-                raise ValueError(
-                    "Check exists or its source, inputs, environments or settings changed; choose a new output directory."
-                )
-        else:
-            atomic_json(output / "check.json", identity)
-        rows = []
-        for index, source in sorted(entries.items()):
-            if provenance()["faultline_source_sha256"] != identity["source_sha256"]:
-                raise ValueError(
-                    "Source changed during check; retain this run and choose a new output directory."
-                )
-            root = output / f"batch-{index:04d}"
-            commits = sorted(root.glob("attempt-*/commit.json"))
-            if commits:
-                directory = commits[-1].parent
-                for name, digest in read_json(commits[-1])["files"].items():
-                    target = (directory / name).resolve()
-                    if not target.is_relative_to(directory) or file_hash(target) != digest:
-                        raise ValueError("Committed check evidence changed")
-                row = read_json(directory / "evidence.json")
-            else:
-                directory = root / f"attempt-{len(list(root.glob('attempt-*'))) + 1:04d}"
-                row = {"batch": index, "diagnostics": {}}
-                for side, python, config in (
-                    ("baseline", baseline_python, baseline_settings),
-                    ("candidate", candidate_python, settings),
-                ):
-                    if python:
-                        with compiler_cache(output / "compiler-cache" / side):
-                            row[side], row["diagnostics"][side] = inspect_side(
-                                source,
-                                directory / side,
-                                config,
-                                python,
-                                level,
-                                paired=bool(baseline_python),
-                            )
-                atomic_json(directory / "evidence.json", row)
-                files = {
-                    p.relative_to(directory).as_posix(): file_hash(p)
-                    for p in directory.rglob("*.json")
-                }
-                atomic_json(directory / "commit.json", {"files": files})
-            rows.append(row)
-            scores = (
-                [{"batch": r["batch"], **batch_score(r["baseline"], r["candidate"])} for r in rows]
-                if baseline_python
-                else []
-            )
-            replication = (
-                accuracy_shift_replicated(scores, planned)
-                if baseline_python and level != "quick"
-                else {"status": "not_applicable"}
-            )
-            reproducer = output / "reproducer"
-            if not reproducer.exists() and any(
-                not assessment(row.get(side, {}))["acceptable"]
-                and row.get(side, {}).get("status") in REDUCIBLE
-                for side in ("baseline", "candidate")
-            ):
-                side = next(
-                    side
-                    for side in ("candidate", "baseline")
-                    if row.get(side, {}).get("status") in REDUCIBLE
-                    and not assessment(row[side])["acceptable"]
-                )
-                export_native(
-                    NativeJob.create(source),
-                    settings if side == "candidate" else baseline_settings,
-                    reproducer,
-                    expected=read_json(directory / side / "primary/outcome.json"),
-                )
-            artifacts = {
-                "report": "report.html",
-                "evidence": "evidence.json",
-                "reproducers": ["reproducer/repro.py"]
-                if (reproducer / "reproducer.json").exists()
-                else [],
-            }
-            verdict = summarize(
-                rows, planned, mode=mode, level=level, replication=replication, artifacts=artifacts
-            )
-            peaks = [
-                s.get("peak_tree_rss_mb", 0)
-                for r in rows
-                for s in (r.get("baseline", {}), r["candidate"])
-            ]
-            peaks += [
-                p.get("peak_tree_rss_mb", p.get("supervision", {}).get("peak_tree_rss_mb", 0)) or 0
-                for r in rows
-                for phases in r["diagnostics"].values()
-                for p in phases
-            ]
-            verdict["metrics"] = {
-                "invocation_wall_s": time.monotonic() - started,
-                "peak_worker_rss_mb": max([0, *peaks]),
-            }
-            verdict["execution_state"] = "running"
-            report(output, verdict, {"configuration": identity, "batches": rows})
-        if not rows:
-            verdict = summarize([], planned, mode=mode, level=level)
-            report(output, verdict, {"configuration": identity, "batches": []})
-        verdict["execution_state"] = "complete"
-        report(output, verdict, {"configuration": identity, "batches": rows})
-    return verdict

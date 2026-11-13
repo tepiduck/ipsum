@@ -294,11 +294,11 @@ See [sweeps](sweeps.md) for sampling, the fixed policy, and how to retain shared
 historical `single-input` predicate. Nondefault `--growth` and `--observations` arguments are
 rejected in replicated mode, since its thresholds are predeclared rather than per-run choices.
 
-## Upgrade checks (0.16)
+## Upgrade checks
 
 ```bash
 faultline check --torchvision resnet18 --level quick --output report
-faultline check --hf openai-community/gpt2 --baseline /old/python --candidate /new/python --output upgrade
+faultline check --hf openai-community/gpt2 --baseline /old/python --candidate /new/python --jobs 1 --output upgrade
 faultline check model.py:factory --include weights.pt --level standard --output model-check
 faultline check frozen-batches --baseline /old/python --candidate /new/python --resume --output existing-check
 faultline env create --torch 2.15.0 --device cpu --output environments/stable
@@ -307,8 +307,12 @@ faultline env create --torch nightly --minimal --output environments/nightly
 
 Only `check` uses SAFE/0, REGRESSION/1, NEEDS_REVIEW/2, INCONCLUSIVE/3.
 Argument/setup failures use 3; malformed arguments may not create report files.
-See the [user guide](user-guide.md), [fixed verdict policy](verdict-policy.md), and
+See the [user guide](user-guide.md), [paired v2 policy](verdict-policy-v2.md), and
 [JSON contract](verdict-schema.md). Model source options are mutually exclusive.
 `--baseline-backend`/`--backend` and `--baseline-compile-mode`/`--compile-mode`
 allow explicit setting comparisons. `--batches` never lowers the replication threshold.
+`--verdict-policy v1` retains the original policy; single-environment checks always use v1.
+`--jobs N` selects concurrent single-threaded primary batch workers, with the total
+`--max-rss-mb` budget divided across jobs. Accuracy diagnostics consume batches in order;
+`--no-early-stop` disables mathematical stopping of those diagnostics. All planned primaries run.
 `env create --resume` verifies the installed identity; GPU indexes are explicit.

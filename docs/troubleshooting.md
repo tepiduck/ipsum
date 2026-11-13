@@ -8,13 +8,14 @@
 | Input batches share different weights | Keep initialization/checkpoint fixed. A factory seed must change input selection, not model parameters. |
 | Repeated sample / leading dimension error | Supply distinct samples in batch-major tensors. A scalar metadata field is allowed; independent tensor sample dimensions must agree. |
 | `replication_unavailable` | Supply ten or more distinct batches and resolve missing fp64 observations. Repeating the same batch does not count. |
-| `diagnostic_skipped_memory` | The primary evidence is retained. Use smaller real input shapes or a larger explicit budget if available; missing required evidence can still mean NEEDS_REVIEW. |
-| Primary `resource_limit` | Execution exceeded its budget. Reduce workload size or raise `--max-rss-mb` only when the machine has room; retain the incomplete run. |
+| `diagnostic_skipped_memory` | Primary evidence is retained. Use `--jobs 1` to allocate the full RSS budget to each worker, smaller real inputs, or a larger explicit budget if available. Missing required evidence can prevent SAFE. |
+| Primary `resource_limit` | Execution exceeded its share of the total budget. Use fewer `--jobs`, reduce workload size, or raise `--max-rss-mb` only when the machine has room; retain the incomplete run. |
 | Primary timeout | Inspect worker logs for compilation progress. Use a new output directory with a larger `--timeout` if compilation is the bottleneck. |
 | Missing GPU / unsupported backend | Install the correct runtime and verify hardware support; Faultline never substitutes CPU/eager. Use `faultline qualify` for a focused device check. |
 | Environment changed on resume | Use a new output directory. Resume requires the original source, inputs, settings, and environment identity. |
 | HTTPS/download failure | Check network access and model availability. Built-ins download weights and public inputs during preparation; captured bundles replay offline. |
-| NEEDS_REVIEW on both versions | Recurring numerical discrepancies are not upgrade regressions by themselves. Inspect explanation coverage and contrary evidence. |
+| Shared discrepancies in a SAFE report | Paired v2 assesses the change. Shared compile/eager differences remain in the pre-existing section; inspect them for absolute fidelity concerns. Use `--verdict-policy v1` for the original fidelity-oriented summary. |
+| NEEDS_REVIEW with v2 | Inspect candidate-only unstable differences or incomplete accuracy replication trending worse. v1 and single-environment checks also review unexplained compile/eager differences. |
 
 An environment may install successfully without a usable GPU: creation verifies the wheel's runtime
 type; execution checks device availability. CUDA/ROCm indexes must be chosen explicitly using the

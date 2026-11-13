@@ -31727,5 +31727,301 @@
         "e5c7ed0335b97c716214765aa8d6e2ced0cc645091aed3f78b51bd8e871e10f3"
       ]
     }
+  },
+  "upgrade_verdict_validation_017": {
+    "version": "0.17.0",
+    "advisory_only": true,
+    "policy_declared_commit": "aee7d34",
+    "policy": "docs/verdict-policy-v2.md",
+    "post_hoc_counts": {
+      "controlled_injection": {
+        "v1": {
+          "REGRESSION": 3
+        },
+        "v2": {
+          "REGRESSION": 3
+        }
+      },
+      "exp_u20": {
+        "v1": {
+          "INCONCLUSIVE": 4
+        },
+        "v2": {
+          "INCONCLUSIVE": 4
+        }
+      },
+      "historical": {
+        "v1": {
+          "NEEDS_REVIEW": 2,
+          "REGRESSION": 2
+        },
+        "v2": {
+          "INCONCLUSIVE": 1,
+          "REGRESSION": 2,
+          "SAFE": 1
+        }
+      },
+      "same_version": {
+        "v1": {
+          "NEEDS_REVIEW": 25,
+          "SAFE": 4
+        },
+        "v2": {
+          "INCONCLUSIVE": 1,
+          "SAFE": 28
+        }
+      },
+      "upgrade": {
+        "v1": {
+          "NEEDS_REVIEW": 25,
+          "SAFE": 4
+        },
+        "v2": {
+          "INCONCLUSIVE": 2,
+          "SAFE": 27
+        }
+      }
+    },
+    "fresh_counts": {
+      "same_version": {
+        "SAFE": 6
+      },
+      "upgrade": {
+        "SAFE": 6
+      }
+    },
+    "fresh_accuracy_flags": [],
+    "checks": {
+      "source_sha256": "43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8",
+      "linux_portable": {
+        "passed": 381,
+        "deselected": 13,
+        "seconds": 464.89
+      },
+      "windows_portable": {
+        "passed": 380,
+        "skipped": 1,
+        "deselected": 13,
+        "seconds": 479.91
+      },
+      "cpu_inductor": {
+        "passed": 13,
+        "deselected": 381,
+        "seconds": 150.81
+      },
+      "compiler_campaign": {
+        "passed": true,
+        "checks": 14,
+        "passes": 17,
+        "unconfirmed_numerical_discrepancies": 1
+      },
+      "legacy": {
+        "passed": 31,
+        "asyncio_mode": "auto",
+        "seconds": 0.67
+      },
+      "ruff_lint": "passed",
+      "ruff_format": "passed"
+    },
+    "installed_wheel": {
+      "installed_wheel": "0.17.0",
+      "v2_verdict": "SAFE",
+      "source_git_normalized_sha256": "72e84c2e13648d1bad721c3a89c7091995012a6d9a0c5b829566c910dbd914df",
+      "independent_torch_versions": {
+        "baseline": "2.15.0+cpu",
+        "candidate": "2.16.0.dev20261105+cpu"
+      },
+      "scope": {
+        "completed_batches": 10,
+        "gradients": true,
+        "level": "standard",
+        "mode": "environment_comparison",
+        "planned_batches": 10,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      },
+      "replication": {
+        "accuracy_shift_replicated": false,
+        "attempted": 5,
+        "completed": 5,
+        "coverage": 0.5,
+        "decision_complete": true,
+        "deliberately_skipped": 5,
+        "distribution": [
+          {
+            "batch": 0,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 4,
+            "status": "complete"
+          },
+          {
+            "batch": 1,
+            "median_log2_growth": 2.0702303951932023e-11,
+            "median_status": "finite",
+            "paired_targets": 4,
+            "status": "complete"
+          },
+          {
+            "batch": 2,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 4,
+            "status": "complete"
+          },
+          {
+            "batch": 3,
+            "median_log2_growth": 9.73458847626845e-11,
+            "median_status": "finite",
+            "paired_targets": 4,
+            "status": "complete"
+          },
+          {
+            "batch": 4,
+            "median_log2_growth": 0.0,
+            "median_status": "finite",
+            "paired_targets": 4,
+            "status": "complete"
+          }
+        ],
+        "fraction_worsened": 0.4,
+        "improved": 0,
+        "labels": [],
+        "median_log2_growth": 0.0,
+        "median_status": "finite",
+        "missing": 5,
+        "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+        "planned": 10,
+        "policy": {
+          "fraction_worsened_gte": 0.8,
+          "median_growth_gte": 1.25,
+          "minimum_completed_batches": 10
+        },
+        "sign_test_p": 0.25,
+        "stopping": {
+          "bounds": [
+            {
+              "additional_complete": 0,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 1,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 2,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 3,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 4,
+              "can_flag": false,
+              "must_flag": false
+            },
+            {
+              "additional_complete": 5,
+              "can_flag": false,
+              "must_flag": false
+            }
+          ],
+          "outcome": "not_flagged",
+          "prefix_batches": [
+            0,
+            1,
+            2,
+            3,
+            4
+          ],
+          "reason": "replicated_rule_fixed_for_every_remaining_completion",
+          "version": 1
+        },
+        "ties": 3,
+        "worsened": 2
+      },
+      "metrics": {
+        "command_wall_s": 99.5586534439999,
+        "invocation_wall_s": 85.75931771500018,
+        "peak_worker_rss_mb": 650.6328125
+      },
+      "v2_schema_valid": true,
+      "v1_verdict": "SAFE",
+      "v1_schema_valid": true,
+      "v1_scope": {
+        "completed_batches": 3,
+        "gradients": false,
+        "level": "quick",
+        "mode": "environment_comparison",
+        "planned_batches": 3,
+        "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+      }
+    },
+    "preservation": {
+      "baseline": "bdb572e269ae2b499a691eaa862d00ff1b8bc50c",
+      "prior_validation_entries": 24,
+      "preserved": {
+        "docs/research/calibration-016.json": "60e18672b4827c2e41a591e6cbdf3f00b689f3b8f6865380bf2d28445aaccdb8",
+        "docs/research/calibration-016.csv": "88d49d4df9c9d84455aff11ae28c963325eac1b52df064fdad43ca3695750e17",
+        "docs/research/cost-016.json": "0579ddfc9a09b70f23c8ec3caeb9206aa2db4d50d9d36a8e5638b2a509961ab3",
+        "docs/research/usability-016.md": "dec25996377addecb6efcbff5fa332c437a70ebda88a7dc1119a01c52f1c2d1a",
+        "docs/v016-policy.json": "bd64d7f493303765b7fc203914d97abe89d2a33d8f7be06c57d0b7d23c1750a4",
+        "docs/verdict-policy.md": "4602954e6428873754e214dcb299ac6914e24d7af4c99b35b070865b1611b095",
+        "docs/verdict.schema.json": "ca19e31cdd85988c382a64d9156ef5ba579f846013782b35090378f5892459d3",
+        "docs/input-accuracy-015.json": "5fee55b929757886f7042185ae9014d4b99394b4dbbb8cd20ff8421c5a073c79"
+      },
+      "results_prefix_preserved": true,
+      "historical_evidence_sha256": {
+        "docs/accuracy-investigation-012.csv": "848fbd8b0b357d7a353d2e539c88578d8dea0befe44cf8fd0c6d4cc97b8d27bb",
+        "docs/accuracy-shift-010.csv": "44070ab769346daae40cc6c4dde244394b58ea39e1afee41f518b1267a0c4e2b",
+        "docs/accuracy-shift-011.csv": "337ca7a5c7a93527ca428a1b188ad484ff49663802fed2fb4f5e7df4ee258868",
+        "docs/attention-association-013.csv": "8935924f8bc133580396e6a4f16ac690767b9b0f37b91ecff905037f3b33b2cc",
+        "docs/attention-capture-013.json": "b2216b816d47d35b6d77e06fadbf569e76baa01c03da859d410b7d5433c76e13",
+        "docs/attention-consistency-013.csv": "5a5b26c4efb7fb7cf626a1b6d5d0eee209fc172d76f5feed5ab7e4e73f3ed806",
+        "docs/attention-heads-013.csv": "819e9efc2662b8cd7de85a00b57a04b6e35b7635c9736cf8c10e7107c7b13da3",
+        "docs/attention-kernel-013.csv": "b9c232102e8c855cecef698719222cad2fca9f6d577b5ca3b5e35c3a27ea083e",
+        "docs/attention-rows-013.csv": "d35b704545b790c17b5834841fdede799a5ee47850a4510f8b464758a824b748",
+        "docs/attribution-013.csv": "76ae311ab3e76a51e32820f202fb16fde81eeef1bca72672ac9257eeef265f81",
+        "docs/bisection-011.csv": "80f472f9b85db70853b845dfc6c98aed830ce901995a209447c9caa05f90c0f9",
+        "docs/exp-accuracy-013.csv": "1beef360561efd65a2cd34ee5950b625a9df7a39a059ac24ca05efd7de51de00",
+        "docs/exp-timing-013.csv": "df2b24e0e9d5e786dde24ddb78431b7728bcdd672d5bf900664291ca086f5aa6",
+        "docs/gelu-block12-014.csv": "17cc0706b1da77d361020cecceb8872adef887a790634230f22da23f22e5831a",
+        "docs/gelu-capture-014.json": "387d588560d689728f99817cc730394373bc0c5e40b59cc59aa72b36a16eb1ea",
+        "docs/gelu-code-014.json": "7445752cc44cb9ea2f4db6a0c045d81dba9bd48dc7aebd400180c7c7ee06c0de",
+        "docs/gelu-exp-grid-014.csv": "8c02ce455138efe72945e454c6f40055b3b000ea272e5d3b9b91256e4b76e34d",
+        "docs/gelu-ranges-014.csv": "ad75353046668069903b7e376801d178c48a8e377ba6b504378d0035dc049fdd",
+        "docs/gpt2-accuracy.csv": "814e622da726f7330d0b69ed1d3940935acb26af2f48227813a9b447e04c2135",
+        "docs/gradient-scales-012.csv": "4bf5a63a3e3167c88707e3447eed38219bbe3efe99dd1a77a270e092b575e43e",
+        "docs/inductor-code-012.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "docs/inductor-code-012.json": "2e4e8a0dcec8952ba59e046fc7add1118a0db133caf6f0e21e7ae04aa307b1d8",
+        "docs/inductor-config-012.diff": "cb1613e51fd4ea97e61097e73a7a06d1b5bcfad65b0a70fecb32f4d73c1e4eb9",
+        "docs/inductor-fx-012.diff": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "docs/input-accuracy-015.csv": "64af07cd3f52aa515620936d8bb40f4b035307033ee13e3b1886a78bfe60f3bc",
+        "docs/input-accuracy-015.json": "5fee55b929757886f7042185ae9014d4b99394b4dbbb8cd20ff8421c5a073c79",
+        "docs/input-batches-015.json": "1eac30a967f7298d8f451727ae490946b5ffbcc8e67a87577885082847cbfb1d",
+        "docs/research/calibration-016.csv": "88d49d4df9c9d84455aff11ae28c963325eac1b52df064fdad43ca3695750e17",
+        "docs/research/calibration-016.json": "60e18672b4827c2e41a591e6cbdf3f00b689f3b8f6865380bf2d28445aaccdb8",
+        "docs/research/cost-016.json": "0579ddfc9a09b70f23c8ec3caeb9206aa2db4d50d9d36a8e5638b2a509961ab3",
+        "docs/v011-policy.json": "4a15461e835897b15086d83d54f00736235bd7e2a737b10a8bc0ab8425af8877",
+        "docs/v013-kernel-controls.json": "6bb2f9d66e413316999364f01499a6af7517db02f56527b3e9a4b27d5b688437",
+        "docs/v013-policy.json": "685400cf355486d8d124bc625b8b67bf60a8cfdda08336fd7e53b1f643f8e12d",
+        "docs/v014-policy.json": "25c85be42bc92595b9ba4aba4eac231ed63f90c7b3080928028334c8d04ea747",
+        "docs/v015-policy.json": "8fbb91b63d7a33d572fc75a8d4c586562545e0ef195aec6066eafeffe9dca770",
+        "docs/v016-policy.json": "bd64d7f493303765b7fc203914d97abe89d2a33d8f7be06c57d0b7d23c1750a4",
+        "docs/verdict.schema.json": "ca19e31cdd85988c382a64d9156ef5ba579f846013782b35090378f5892459d3"
+      }
+    },
+    "public_evidence_sha256": {
+      "docs/research/rescore-017.json": "4033749069146a592699a0eda0e7c9f0167dbfb53ccb0938c21a7199267a1cf0",
+      "docs/research/rescore-017.csv": "dcada378cc3a78485b7c554635548666be057d2505700517b7393a7272a3cbbc",
+      "docs/research/validation-017.json": "ed32d86f52ebb5ebe8a59d54de41ada20695dfbdb506a961ba525cd32fef4873",
+      "docs/research/usability-017.md": "ceeb7936f80686efad55f5bea85684653baa8659c2b294a24156015068469d57",
+      "docs/verdict-policy-v2.md": "797b9083c94146110cd7fa862cbf12edf66ee14eefd4dd6ec7d1ee488961283a"
+    },
+    "note": "Deliberate paired summary-policy change, not tolerance retuning. Original statuses/signatures/reducers/exit codes and all previous evidence remain unchanged. Counts are not false-positive rates; findings are not confirmed compiler defects."
   }
 }

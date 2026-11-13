@@ -53,3 +53,6 @@ include docs/user-guide.md docs/troubleshooting.md
 recursive-include docs/research *.md *.json *.csv
 include examples/ci/upgrade-check.yml
 include scripts/summarize_check_calibration.py
+include scripts/rescore_check_v2.py scripts/validate_check_v2.py
+include scripts/summarize_check_v2.py
+include docs/verdict-policy-v2.md docs/verdict-v2.schema.json

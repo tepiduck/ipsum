@@ -34,9 +34,16 @@ def prepare(specification, output):
     if specification.get("torchvision") or specification.get("hf"):
         name = specification.get("torchvision")
         if name and name not in sweep_models.VISION_MODELS:
-            raise ValueError(
-                "Unknown torchvision catalog model. Run faultline sweep list, or supply a model.py:factory."
-            )
+            from torchvision.models import list_models
+
+            if name not in list_models(
+                module=__import__("torchvision.models", fromlist=["models"])
+            ):
+                raise ValueError(
+                    "Unknown torchvision classification model; supply a model.py:factory for custom models."
+                )
+            # Extend only this preparation process, never the published validation catalog.
+            sweep_models.VISION_MODELS = (*sweep_models.VISION_MODELS, name)
         if specification.get("hf"):
             model_id = specification["hf"]
             name = next(

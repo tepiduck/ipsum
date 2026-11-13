@@ -121,7 +121,7 @@ def dependency_lock(text=None):
     return "\n".join(sorted(set(lines))) + "\n"
 
 
-def supervise(command, directory, *, timeout=900, max_rss_mb=4096):
+def supervise(command, directory, *, timeout=900, max_rss_mb=4096, env=None):
     if (
         not math.isfinite(timeout)
         or timeout <= 0
@@ -134,6 +134,7 @@ def supervise(command, directory, *, timeout=900, max_rss_mb=4096):
     environment = dict(
         os.environ, PIP_NO_INPUT="1", PIP_DISABLE_PIP_VERSION_CHECK="1", PYTHONNOUSERSITE="1"
     )
+    environment.update(env or {})
     environment.pop("PYTHONPATH", None)
     options = (
         {"creationflags": subprocess.CREATE_NO_WINDOW}

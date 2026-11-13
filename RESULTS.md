@@ -1570,3 +1570,86 @@ The tested Git-normalized runtime hash is
 `9d07dfc043138e51979a3fba32fc47e964fb8f3821cc693c97283e980f64e31d`.
 All pre-0.16 RESULTS content, historical evidence and the license situation are preserved.
 Nothing was filed upstream and no compiler defect is claimed.
+
+## 0.17 — upgrade change attribution
+
+Two-environment `check` defaults to the predeclared [v2 policy](docs/verdict-policy-v2.md).
+Shared compile/eager discrepancies, including changed signatures, are reported separately
+as pre-existing differences. Candidate-only stable failures and replicated accuracy shifts
+remain REGRESSION. Missing required execution/accuracy evidence still prevents SAFE.
+Single-environment checks and `--verdict-policy v1` retain the original policy. Primary
+statuses, tolerances, signatures, reducer predicates and exit codes are unchanged.
+
+Re-scoring all 69 retained 0.16 cohort entries changed only the advisory summary. Every
+old v1 verdict, reason count, primary count, accuracy distribution and evidence hash matched.
+The v2 results below are **post hoc**, with no model reruns or simulated early stopping:
+
+| Cohort | Planned | v1: SAFE / REGRESSION / NEEDS_REVIEW / INCONCLUSIVE | v2 (post hoc) |
+|---|---:|---|---|
+| same_version | 29 | 4 / 0 / 25 / 0 | 28 / 0 / 0 / 1 |
+| upgrade | 29 | 4 / 0 / 25 / 0 | 27 / 0 / 0 / 2 |
+| historical | 4 | 0 / 2 / 2 / 0 | 1 / 2 / 0 / 1 |
+| controlled_injection | 3 | 0 / 3 / 0 / 0 | 0 / 3 / 0 / 0 |
+| exp_u20 | 4 | 0 / 0 / 0 / 4 | 0 / 0 / 0 / 4 |
+
+SmolLM2 remains INCONCLUSIVE in both catalog cohorts because paired accuracy evidence
+is unavailable. Upgrade GPT-2 remains INCONCLUSIVE with nine of ten scores. Both
+baseline-confirmed historical regressions and all three injections retain REGRESSION.
+The other historical fixtures were not regressions under v1. The exp_u20 accuracy-only
+cohort lacks primary observations and remains INCONCLUSIVE without a replicated flag.
+The complete 0.16 evidence and verdict counts remain unchanged; these are not false-positive rates.
+
+Fresh fixed-policy validation covered six new checkpoint variants, three vision and
+three text, on ten real-input batches each. Each used one CPU job, two primary repeats
+and the retained 2.15.0+cpu / 2.16.0.dev20261105+cpu environments. The variants were absent
+from the 0.16 catalog but share architecture families and input sources with earlier work.
+
+| Cohort | Planned | SAFE / REGRESSION / NEEDS_REVIEW / INCONCLUSIVE |
+|---|---:|---|
+| same_version | 6 | 6 / 0 / 0 / 0 |
+| upgrade | 6 | 6 / 0 / 0 / 0 |
+
+Fresh replicated accuracy flags: none.
+Three fresh, explicitly injected control runs also returned REGRESSION.
+
+Primary batch workers now run in parallel with exclusive reusable per-slot caches and
+a divided total RSS budget. Accuracy diagnostics consume frozen batch order and stop
+only with a verified bound on every possible remaining completed-score count. Positive
+flags still require ten completed scores. All planned primary comparisons run, including
+after negative accuracy stopping; a test verifies detection of a last-batch failure.
+Primary and diagnostic commits are separate so interruption does not rerun completed primaries.
+
+The requested standard-level timing comparison used four jobs and a total 12-GiB budget
+(3072 MiB per worker), against 0.16's sequential 12-GiB workers:
+
+| Model | 0.16 minutes | 0.17 minutes | v2 verdict | Conclusive primary batches |
+|---|---:|---:|---|---:|
+| resnet50 | 14.97 | 4.63 | SAFE | 10/10 |
+| bert | 33.61 | 1.54 | INCONCLUSIVE | 0/10 |
+| gpt2 | 36.36 | 1.66 | INCONCLUSIVE | 0/10 |
+
+Elapsed-time comparisons include changed diagnostic coverage and concurrency; they do not
+isolate a parallelism speedup. Any resource-limited timing cell is incomplete, not a speedup.
+Use `--jobs 1` when a model needs the full budget. Per-batch coverage, memory observations,
+fixed stopping certificates and the preserved old costs are linked in the research record.
+
+Executed checks: Linux portable 381 passed; Windows 380 passed and one skipped; actual
+CPU Inductor 13 passed; all 14 compiler-validation checks passed; legacy 31 passed;
+Ruff lint and requested formatting passed. Actual eager and Inductor workers confirm
+serial/parallel primary-result parity. The installed 0.17 wheel passed paired standard v2
+and explicit quick v1 checks; both JSON schemas and independent worker versions were verified.
+
+Preservation checks verified all 24 prior validation entries, 37 prior data files and
+the complete preceding RESULTS content. The raw tested source hash is
+`43fc70267291fee131123c50b2135f0cdd1426c1ef66f64524b509918c7956d8`;
+the installed Git-normalized hash is
+`72e84c2e13648d1bad721c3a89c7091995012a6d9a0c5b829566c910dbd914df`.
+Five existing files differ only in line endings between those snapshots.
+
+See the [0.17 research record](docs/research/usability-017.md),
+[post hoc re-score JSON](docs/research/rescore-017.json),
+[re-score CSV](docs/research/rescore-017.csv) and
+[fresh evidence](docs/research/validation-017.json).
+The initial cold-per-batch-cache attempt remains retained; the final measurements use
+new directories and the same frozen inputs. No compiler defect or new GPU validation
+is claimed, and nothing was filed upstream.

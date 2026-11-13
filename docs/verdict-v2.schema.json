@@ -1,0 +1,269 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Faultline check verdict v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "policy_version",
+    "verdict",
+    "exit_code",
+    "advisory_only",
+    "scope",
+    "reasons",
+    "notes",
+    "accuracy_shift_replicated",
+    "injected_fault",
+    "artifacts",
+    "execution_state",
+    "pre_existing_differences"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 2
+    },
+    "policy_version": {
+      "const": 2
+    },
+    "advisory_only": {
+      "const": true
+    },
+    "verdict": {
+      "enum": [
+        "SAFE",
+        "REGRESSION",
+        "NEEDS_REVIEW",
+        "INCONCLUSIVE"
+      ]
+    },
+    "exit_code": {
+      "enum": [
+        0,
+        1,
+        2,
+        3
+      ]
+    },
+    "injected_fault": {
+      "type": "boolean"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mode",
+        "level",
+        "planned_batches",
+        "completed_batches",
+        "gradients",
+        "statement"
+      ],
+      "properties": {
+        "mode": {
+          "enum": [
+            "single_environment",
+            "environment_comparison"
+          ]
+        },
+        "level": {
+          "enum": [
+            "quick",
+            "standard",
+            "thorough"
+          ]
+        },
+        "planned_batches": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "completed_batches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "gradients": {
+          "type": "boolean"
+        },
+        "statement": {
+          "type": "string"
+        }
+      }
+    },
+    "reasons": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/message"
+      }
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/message"
+      }
+    },
+    "accuracy_shift_replicated": {
+      "type": "object",
+      "description": "Versioned advisory evidence. Consumers must tolerate additive evidence fields."
+    },
+    "artifacts": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report",
+        "evidence",
+        "reproducers"
+      ],
+      "properties": {
+        "report": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "string"
+        },
+        "reproducers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "invocation_wall_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "command_wall_s": {
+          "type": "number",
+          "minimum": 0
+        },
+        "peak_worker_rss_mb": {
+          "type": "number",
+          "minimum": 0
+        }
+      }
+    },
+    "execution_state": {
+      "enum": [
+        "running",
+        "complete"
+      ]
+    },
+    "pre_existing_differences": {
+      "type": "object",
+      "required": [
+        "message",
+        "batches",
+        "baseline_failed_targets",
+        "candidate_failed_targets",
+        "details"
+      ],
+      "properties": {
+        "message": {
+          "type": "string"
+        },
+        "batches": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "baseline_failed_targets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "candidate_failed_targets": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": [
+              "batch",
+              "links",
+              "baseline_status",
+              "candidate_status"
+            ]
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "$defs": {
+    "message": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "code",
+        "message",
+        "batch"
+      ],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "batch": {
+          "type": [
+            "integer",
+            "null"
+          ],
+          "minimum": 0
+        },
+        "side": {
+          "enum": [
+            "baseline",
+            "candidate"
+          ]
+        }
+      }
+    }
+  },
+  "oneOf": [
+    {
+      "properties": {
+        "verdict": {
+          "const": "SAFE"
+        },
+        "exit_code": {
+          "const": 0
+        }
+      }
+    },
+    {
+      "properties": {
+        "verdict": {
+          "const": "REGRESSION"
+        },
+        "exit_code": {
+          "const": 1
+        }
+      }
+    },
+    {
+      "properties": {
+        "verdict": {
+          "const": "NEEDS_REVIEW"
+        },
+        "exit_code": {
+          "const": 2
+        }
+      }
+    },
+    {
+      "properties": {
+        "verdict": {
+          "const": "INCONCLUSIVE"
+        },
+        "exit_code": {
+          "const": 3
+        }
+      }
+    }
+  ]
+}

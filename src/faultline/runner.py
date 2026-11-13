@@ -75,7 +75,7 @@ def tree_rss(pid, observed=None):
     return total
 
 
-def run_case(case, settings, directory, *, python=None):
+def run_case(case, settings, directory, *, python=None, env=None):
     case.validate()
     settings.validate()
     directory = Path(directory).resolve()
@@ -94,6 +94,7 @@ def run_case(case, settings, directory, *, python=None):
         },
     )
     environment = os.environ.copy()
+    environment.update(env or {})
     environment["OMP_NUM_THREADS"] = str(settings.threads)
     environment["TORCHINDUCTOR_COMPILE_THREADS"] = "1"
     environment["PYTHONHASHSEED"] = str(case.seed)

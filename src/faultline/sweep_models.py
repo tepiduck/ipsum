@@ -279,6 +279,17 @@ def prepare_model(name, directory, inputs_directory):
             loader = AutoModelForCausalLM
         attention = "sdpa"
         model_options = {"add_pooling_layer": False} if name == "roberta_base" else {}
+        if name == "custom_hf":
+            from transformers import AutoConfig
+
+            if (
+                AutoConfig.from_pretrained(
+                    repository, revision=revision, trust_remote_code=False
+                ).model_type
+                == "roberta"
+            ):
+                # MLM checkpoints omit the optional pooling head; the workload uses token states.
+                model_options = {"add_pooling_layer": False}
         inner, loading = loader.from_pretrained(
             repository,
             revision=revision,

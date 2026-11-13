@@ -31,11 +31,12 @@ def factory(seed=0):
 
 The default seeds are 0 through N-1. Frozen state hashes must agree across batches.
 A factory without a batch list or seed supplies one batch; `--batches` does not invent
-replication. Paired standard/thorough checks then report NEEDS_REVIEW for missing replication.
+replication. Paired standard/thorough checks then report INCONCLUSIVE for missing replication,
+or NEEDS_REVIEW if completed accuracy observations trend worse.
 A single-environment check can still be SAFE for that batch, without assessing an upgrade.
 
-Built-in `--torchvision NAME` and `--hf MODEL_ID` use catalog loaders. `faultline sweep list`
-lists the tested names. Other Hugging Face IDs use AutoModel and may have unsupported semantics;
+Built-in `--torchvision NAME` supports torchvision classification models with pretrained weights;
+`faultline sweep list` lists the previously tested subset. Other Hugging Face IDs use AutoModel and may have unsupported semantics;
 remote custom code is not enabled. Use `--revision COMMIT` to pin a Hub checkpoint. Built-in
 text batches are disjoint book excerpts; vision batches are disjoint strips from two photos.
 Shared photos/book and weights limit the statistical independence and domain coverage.
@@ -51,17 +52,32 @@ They do not need a second Faultline installation: the coordinator supplies its h
 while dependencies are imported from the selected interpreter.
 
 Quick uses three batches and forward only. Standard uses ten batches and gradients; paired
-checks also obtain fp64 errors. Fully explained findings avoid additional mask diagnostics.
+checks also obtain fp64 errors. Under v2, shared discrepancies do not require explanation;
+candidate-only gradient findings still receive the existing explanation checks.
 Thorough runs the existing eager controls and AOT/mask diagnostic path for every eligible batch.
 `--batches N` changes the requested batch count, but never lowers the ten-complete-batch threshold
 for an accuracy shift. Selecting a captured collection uses its existing batches in order.
 
-`--threads`, `--timeout`, and `--max-rss-mb` apply per worker, not to the entire check.
-The memory limit is host RSS including descendants, not a GPU VRAM limit or security sandbox.
+`--jobs N` runs independent primary batch pairs in parallel, capped at the planned batch
+count. The default is `max(1, min(4, available cores // 2))`. Parallel jobs require
+`--threads 1`; `--timeout` applies per supervised worker. `--max-rss-mb` is a total worker
+budget divided across effective jobs, including diagnostic workers. For example,
+`--jobs 4 --max-rss-mb 12288` gives each worker 3072 MiB. Use `--jobs 1` for a model
+needing the full budget; Faultline does not silently increase it after a memory limit.
+Coordinator memory and RSS sampling overshoot are outside this bound. The memory limit
+is host RSS including descendants, not a GPU VRAM limit or security sandbox.
 Use `--deterministic` to request the existing deterministic-algorithm and BLAS workspace policy,
 including for AMD/ROCm (`--device cuda:0`). Unsupported deterministic operations remain explicit failures.
-Compilation caches are separate for baseline and candidate and reused between batches.
+Compilation caches are isolated per execution slot and environment. A slot runs its
+batches sequentially and exclusively owns its caches; diagnostics reuse the same slot.
 Capture, first compilation, and optional diagnostics can dominate wall time.
+
+Accuracy diagnostics consume results in frozen batch order. With ten planned batches,
+three non-worsening scores make the 80% worsening condition impossible. Accuracy work
+can stop there, but all ten primary comparisons still execute. Reports distinguish
+planned, attempted, completed and deliberately skipped accuracy batches and retain the
+stopping proof. A positive flag still requires ten completed scores. An unavailable
+diagnostic is not intentional early stopping. Use `--no-early-stop` to measure all scores.
 
 ## Reviewing results
 
@@ -73,19 +89,28 @@ During execution, the HTML and JSON reports update after each committed batch. R
 the HTML to follow progress; `execution_state: running` identifies an unfinished check.
 Use the completed report and command exit code for an upgrade decision.
 
-NEEDS_REVIEW means the evidence is insufficient for the requested conclusion. Look for:
+Two-environment checks default to [policy v2](verdict-policy-v2.md), which asks whether
+the candidate made the tested workload worse. The report separates pre-existing differences
+from change-related evidence. Shared discrepancies, including changed signatures, do not
+block SAFE by themselves. A passing baseline with a stable candidate-only failure, or
+replicated accuracy degradation, remains REGRESSION. These are candidates for investigation.
 
-- `contrary_evidence`: a completed diagnostic indicates a difference beyond the existing noise
-  floor, disagreeing same-input backward, or selector coverage contrary to the explanation.
-- `unexplained_failure`: the mismatch lacks a complete supported explanation. Matching failures
-  in both environments belong here too.
-- `replication_unavailable`: fewer than ten complete paired batch scores, or missing required
-  fp64 evidence. Supply more representative inputs or resolve the diagnostic failure.
+NEEDS_REVIEW identifies undecided change-specific evidence:
+
+- `unstable_candidate_difference`: a passing baseline and recorded candidate-only numerical
+  differences that are unstable across repeats.
+- `replication_unavailable`: required accuracy evidence is incomplete and observed batch scores
+  trend worse. Without that trend, unavailable required evidence is INCONCLUSIVE.
+
+Single-environment checks keep [policy v1](verdict-policy.md), as does an explicit
+`--verdict-policy v1`. In that policy, contrary or incompletely explained compile/eager
+differences need review, even when both environments exhibit them. Primary statuses,
+tolerances, signatures and reducer predicates are unchanged in either policy.
 
 A numerical label is evidence, not a proof of correctness. `accuracy_shift` on one batch is
 descriptive only. `accuracy_shift_replicated` requires at least ten completed batches, at least
 80% worsening, and median growth of at least 1.25x. Targets within a batch are correlated.
-See [the fixed policy](verdict-policy.md); no tolerance changes are made to obtain SAFE.
+See [the v2 policy](verdict-policy-v2.md); no tolerance changes are made to obtain SAFE.
 
 ## Reproducers and existing workflows
 
@@ -101,6 +126,9 @@ available through `faultline model reduce`; reducer acceptance still preserves t
 signature. `check` does not relax that predicate or claim to extend PyTorch's minifier.
 
 Keep completed artifacts. `--resume` verifies identity before reusing completed batches; use a new
-output directory after changing the model, source, environment, settings, or inputs.
+output directory after changing the model, source, environment, settings, jobs, policy, or inputs.
+Primary commits and diagnostic commits are separate: an interrupted diagnostic does not
+rerun already committed primary workers. A pre-0.17 execution directory is retained as
+old evidence; its execution identity is incompatible with the new coordinator.
 Resume requires completed preparation. If download or capture was interrupted before the
 prepared bundle was committed, retain that attempt and choose a new output directory.
