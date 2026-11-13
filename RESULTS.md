@@ -1455,116 +1455,118 @@ weights, logs and caches remain local. License files and license metadata remain
 The Git-normalized packaged source hash is
 `9324cff1ca078196fe7c03075996963fdf90d11273d9140cae37a33789cd694f`.
 
-## 0.16 usability workflow (validation in progress)
+## 0.16 usability workflow
 
 `faultline check` adds a terminal verdict, HTML report and versioned JSON contract over
-the existing primary evidence. It accepts trusted factories, captured bundles, torchvision
-models and Hugging Face model IDs. The fixed summary policy distinguishes candidate-only
-failures, replicated accuracy degradation, contrary diagnostics and incomplete execution.
-Existing statuses, tolerances, signatures, reducer predicates and command exit codes are
-unchanged. The new command alone uses SAFE/0, REGRESSION/1, NEEDS_REVIEW/2 and INCONCLUSIVE/3.
+the recorded primary evidence. It accepts trusted factories, captured bundles, torchvision
+models and Hugging Face model IDs. Existing primary statuses, tolerances, signatures,
+reducer predicates and command exit codes remain unchanged. Only the new command uses
+SAFE/0, REGRESSION/1, NEEDS_REVIEW/2 and INCONCLUSIVE/3.
 
-Input replication uses frozen batches and individually frozen backward probes; targets
-within one batch are not independent replicates. The replicated advisory requires at least
-ten completed batches, at least 80% worsening and median growth of at least 1.25x. The old
-target-level flag is explicitly descriptive, with its earlier values preserved. Replicated
-nightly bisection uses the same fixed rule. Environment creation reuses supervised installer
-primitives, and a small-model CI workflow gates only on REGRESSION.
+The fixed policy requires candidate-only stable failure or input-replicated accuracy
+degradation for REGRESSION. Input batches, not correlated gradient tensors, are the unit
+of replication: at least ten completed scores, at least 80% worsening and median growth
+of at least 1.25x. Old single-input labels remain descriptive and unchanged. Replicated
+nightly bisection uses the same rule. Environment creation reuses supervised installers;
+the GitHub Actions example gates only on REGRESSION and retains all other verdicts.
 
-Quick, standard and thorough presets separate primary workers from optional diagnostics.
-Memory-limited diagnostics retain primary evidence. All ten preset-cost cells completed
-their planned primary batches within the 12-GiB worker budget. Standard took 15.00 minutes
-for ResNet-50, 33.67 for BERT, 36.44 for GPT-2 and 17.86 for SmolLM2-135M. BERT and GPT-2
-miss the approximate 30-minute target; their thorough checks took 78.43 and 85.86 minutes.
-SmolLM2 peaked at 8,015.6 MiB and returned NEEDS_REVIEW with contrary evidence retained.
-The earlier 34.5-minute SmolLM2 measurement is preserved separately.
+Quick, standard and thorough levels separate primary execution from diagnostics.
+Memory-limited diagnostics preserve completed primary observations. All ten cost cells
+completed their primary batches within the 12-GiB worker budget. Standard took 15.00
+minutes for ResNet-50, 33.67 for BERT, 36.44 for GPT-2 and 17.86 for SmolLM2-135M.
+BERT and GPT-2 miss the approximate 30-minute target; thorough took 78.43 and 85.86
+minutes respectively. SmolLM2 peaked at 8,015.6 MiB and returned NEEDS_REVIEW. These
+are CPU operational costs for the documented workload sizes, not universal bounds.
 
-A wheel-install check found and fixed cross-environment dependency shadowing. Workers now
-load only the harness package, leaving dependency resolution to the selected interpreter.
-Actual installed-wheel baseline/candidate workers report 2.15.0+cpu and
-2.16.0.dev20261105+cpu respectively. Three-batch quick and ten-batch standard checks of the
-small example both return SAFE. The fresh-wheel pretrained ResNet-18 quickstart also returns
-SAFE for three forward batches. Calibration source-directory runs were not affected by the
-wheel-specific path problem.
+The complete fixed-policy calibration follows. All 29 models and ten batches per model
+remain in both catalog denominators. The research record contains every pair, accuracy
+score, miss and cohort limitation.
 
-The full 29-model same-version/upgrade calibration remains in progress. No full-catalog
-result is claimed in this development entry. The frozen policy, complete ten-cell cost
-table, cohort distinctions and completed controls are recorded in the
-[usability validation record](docs/research/usability-016.md), with the
-[fresh-user transcript](docs/research/quickstart-test.md). Earlier evidence and the license
-situation are preserved. Nothing was filed upstream; no compiler defect is claimed.
+| Cohort | Planned | SAFE | REGRESSION | NEEDS_REVIEW | INCONCLUSIVE |
+|---|---:|---:|---:|---:|---:|
+| same_version | 29 | 4 | 0 | 25 | 0 |
+| upgrade | 29 | 4 | 0 | 25 | 0 |
+| historical | 4 | 0 | 2 | 2 | 0 |
+| controlled_injection | 3 | 0 | 3 | 0 | 0 |
+| exp_u20 | 4 | 0 | 0 | 0 | 4 |
 
-Completed 0.16 checks so far: Windows portable suite 365 passed, one skipped; Linux
-portable suite 366 passed; actual CPU Inductor suite 12 passed; compiler validation
-campaign all 14 checks passed (17 passes and one unconfirmed numerical discrepancy);
-legacy suite 31 passed; Ruff lint and formatting passed. Installed-wheel quick and
-standard verdicts validate against the published JSON schema. The implementation publication
-audit accepted 186 index paths, 69 wheel members and 188 source-archive members, excluding
-internal instructions, local notes, environments and run artifacts. Full-catalog calibration
-remains distinct from these completed implementation checks.
+Same-version SAFE target misses: 25/29. Upgrade replicated accuracy flags: none.
+The policy still requires manual review for most tested models in an unchanged
+environment; the automatic SAFE target was not met for this catalog.
+All three controlled injected faults were detected. Two of four historical fixtures
+meet the REGRESSION target; the other two remain NEEDS_REVIEW. No exp_u20 variant
+triggers the replicated rule; its accuracy-only historical data yield INCONCLUSIVE
+for the full verdict because primary observations are missing. None of these counts
+is a false-positive rate. The policy was not retuned after seeing calibration results.
+Incomplete accuracy coverage is shown in the per-model table. A false replicated flag
+with fewer than ten usable scores cannot establish that an accuracy shift is absent.
 
-The first timing series recorded a 61.86-minute BERT standard check. A subsequent exact-match
-comparison shortcut and removal of duplicate diagnostic tensor dumps preserve all fields
-in 2,238 comparator cases and fresh full BERT primary/fp64 replay comparisons. These changes
-passed the suites above. The complete replacement timing series retains identical selected
-numerical fields across all 82 before/after worker observations in six comparable cells.
-Earlier measurements and partial artifacts remain intact. Details and cost evidence are
-in the usability validation record and `docs/research/cost-016.json`.
+The full-diagnostic upgrade campaign retains its original frozen source, two repeats,
+one thread, 600-second deadline and 12,288-MiB RSS budget. Twenty-six same-version
+controls use fresh independent workers against the matching preserved upgrade baselines;
+three use independent paired standard-cost workers. Shared baselines and source material
+make cohort counts correlated. No new GPU validation is claimed.
 
-All six CI jobs passed at `2f7874e`, including the new environment-creation/upgrade
-workflow. Its small model returned SAFE for ten standard batches against the November 11
-nightly. A fresh public clone and clean-venv wheel install also completed the README's nine
-commands in 107.78 seconds, including a 67.30-second ResNet-18 quick check. Global download
-caches were populated; these are not cold-network timings. The earlier successful CI and
-114.84-second walkthrough at `4021008` remain recorded separately.
+A wheel-install check found and fixed cross-environment dependency shadowing. Workers
+now import only the harness package from the coordinator and resolve model dependencies
+in the selected interpreter. Actual installed-wheel workers record 2.15.0+cpu and
+2.16.0.dev20261105+cpu. Quick and standard small-model verdicts are SAFE and conform
+to the published schema. A fresh public clone and clean-venv wheel install completed
+the README's nine commands in 107.78 seconds, including a 67.30-second pretrained
+ResNet-18 quick check. Global download caches were warm; these are not cold-network
+timings. The earlier 114.84-second walkthrough is retained.
 
-## 0.16 replicated CPU sweep (in progress)
+The finite exact-match comparator shortcut and omission of redundant diagnostic tensor
+dumps preserve all fields and exceptions in 2,238 comparator cases. Fresh BERT workers
+and 82 before/after observations across six cost cells retain identical selected primary
+comparisons and numerical diagnostics. Earlier costs and incomplete attempts remain
+recorded; different host contention prevents an isolated optimization speedup claim.
 
-The original and held-out catalogs have been prepared as 29 models with ten
-fixed input batches each. Every batch has frozen inputs, weights and its own
-VJP probe. The thresholds in `docs/v016-policy.json` were saved before preparation
-and execution: at least ten usable batches, at least 80% worsening, and median
-batch error growth of at least 1.25x. Missing results remain in planned coverage.
-The existing single-input labels are retained as descriptive evidence.
+### Executed checks and preservation
 
-The CPU comparison uses isolated copies of PyTorch 2.15.0+cpu and
-2.16.0.dev20261105+cpu, two repeats, one thread, a 600-second worker timeout and
-a 12,288-MiB worker RSS limit. Its source is frozen independently of subsequent
-usability-workflow edits. Raw weights, environments, caches and worker evidence remain
-local; the campaign is still running, so no
-full-catalog replicated conclusion is recorded yet. The ten image batches are
-disjoint strips from two photographs, not ten independent source photographs.
-The text batches also share one source book. Binomial p-values are descriptive.
+| Check | Result |
+|---|---|
+| Linux portable suite | 366 passed; 12 compiler tests deselected |
+| Windows portable suite | 365 passed, one skipped; 12 compiler tests deselected |
+| Actual CPU Inductor suite | 12 passed |
+| Compiler validation campaign | All 14 checks passed; 17 passes and one unconfirmed numerical discrepancy |
+| Legacy suite | 31 passed |
+| Ruff lint and requested formatting | Passed |
+| Installed-wheel quick and standard | SAFE; independent worker versions and JSON schema verified |
+| GitHub Actions at `2f7874e` | All six jobs passed; small-model ten-batch upgrade check SAFE |
+| Preservation audit | 23 prior validation entries and 32 historical evidence files unchanged |
 
-Completed checks on the frozen experimental implementation: 326 portable tests,
-12 actual CPU Inductor tests, all 14 compiler-validation checks, and 31 legacy
-tests passed. The validation campaign retained 17 passes and one unconfirmed
-numerical discrepancy. Lint and formatting passed. Controlled tests cover a
-uniform planted degradation, a one-batch-only degradation, threshold boundaries,
-missing coverage, and the replicated bisection predicate.
+Earlier frozen and integrated snapshots also passed their recorded checks: 326 and
+355 portable tests respectively, all 12 Inductor tests, all 14 compiler-validation
+checks and all 31 legacy tests. These are separate from the final runtime checks above.
 
-A separate real ten-batch same-version CPU comparison completed with ten ties,
-median log2 growth zero, p-value one and no replicated flag. Resuming it preserved
-all committed evidence hashes and launched no replacement workers. This control
-uses the small example workload; it is not a same-version full-catalog sweep.
+The initial overlapping runs encountered a host OOM and later WSL interruptions.
+All 130 completed upgrade-pair commits and nine completed partial-cost commits passed
+hash verification. Interrupted artifacts were retained; the final ten-cell timing
+series restarted in new directories and the upgrade campaign resumed unchanged.
+An exclusive queue then completed the remaining upgrade pairs and same-version controls.
+No interrupted host process was relabeled as a compiler failure.
+Windows also suspended the host for nearly eight hours during catalog calibration;
+the workers resumed with their saved evidence. The timing study had already completed,
+so no reported preset cost spans that pause.
+A later WSL restart interrupted DistilBERT after 180 upgrade pairs had committed.
+All 180 commit records passed verification before another unchanged resume. The
+supervisor then used a persistent background client and durable logs; monitoring checks
+the boot ID and process start ticks so a reused PID cannot imply that a worker survived.
 
-The combined checkout was also frozen at commit
-`ae22c21` for an additional check after the usability changes arrived. That
-snapshot passed 355 portable tests, all 12 CPU Inductor tests and all 14
-compiler-validation checks. Ruff lint passed and all 110 files in the requested
-format scope were already formatted. These checks are separate from the source
-used by the still-running replicated sweep.
+Large completed calibration tensor copies are retained in verified lossless archives
+with per-file SHA256 values and restore tools. Frozen input bundles, weights and result
+JSON remain in place. Twelve archive lifecycle checks and a 52-file, 21.2-GiB real-data
+round trip passed; all result-JSON hashes remain unchanged. This local research storage
+step does not change normal tool output. Restore archived copies before local graph
+export or reduction.
 
-### Interruption and resume (November 11–12)
-
-The run above saved 130 batch pairs across thirteen complete models before WSL
-shut down. Each of those models has ten
-usable accuracy batches and no replicated flag. This partial result does not
-cover the remaining sixteen models. All 130 saved commit hashes passed
-verification after the interruption. Subsequent resume attempts encountered
-`Wsl/Service/E_UNEXPECTED`; separate logs and interrupted attempts are retained.
-No failed or missing batch was replaced or removed from planned coverage.
-An exclusive sequential queue completed all ten preset-cost cells and resumed the
-original sweep on November 12 with its original source, settings and frozen inputs.
-The final 29-model table and independent full-run audit remain pending completion.
-The additional legacy check on the `ae22c21` snapshot also passed all 31 tests.
+The [usability validation record](docs/research/usability-016.md),
+[calibration JSON](docs/research/calibration-016.json),
+[calibration CSV](docs/research/calibration-016.csv),
+[cost evidence](docs/research/cost-016.json) and
+[fresh-user transcript](docs/research/quickstart-test.md) provide the detailed evidence.
+The tested Git-normalized runtime hash is
+`9d07dfc043138e51979a3fba32fc47e964fb8f3821cc693c97283e980f64e31d`.
+All pre-0.16 RESULTS content, historical evidence and the license situation are preserved.
+Nothing was filed upstream and no compiler defect is claimed.

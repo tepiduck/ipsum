@@ -46,19 +46,34 @@ before execution. This avoids rerunning an existing baseline; it is not a compar
 an observation with itself. The two cohorts share those baseline measurements and their
 counts are therefore correlated. This scheduling change was declared before starting
 the fresh same-version workers and does not change the verdict or replication policy.
-Fresh controls run after both the timing study and upgrade sweep finish. The earlier
+Fresh controls ran after both the timing study and upgrade sweep finished. The earlier
 plan to overlap small controls was superseded before any control workers started.
 This resource-only scheduling change does not remove any model.
 
 Text models and seven not-yet-started vision models write upgrade evidence to a
 Windows-mounted volume to avoid filling the WSL disk. Fresh same-version outputs use
-that volume too. Existing evidence, including the interrupted ViT attempt, was not moved
-or deleted. Input bundles and all preset-cost output directories stay on the Linux
+that volume too. This routing left existing evidence, including the interrupted ViT
+attempt, in place. Input bundles and all preset-cost output directories stay on the Linux
 filesystem. Storage placement does not change the frozen tensors or worker settings.
 The Windows upgrade and fresh same-version output directories use transparent NTFS
 compression. The latter inherits compression from the existing evidence storage pool;
 this placement was set before those controls began. Tensor contents are unchanged, and
 the preset-cost measurements remain on the Linux filesystem without NTFS compression.
+
+After each completed catalog case, large captured tensor copies can be stored in a local
+lossless archive to keep the remaining calibration within available disk space. Every
+decompressed file is checked against its original SHA256, and the originals are checked
+again before removing their extracted copies. The archive retains original paths and a
+restore tool. Frozen input bundles, model weights, result JSON and commit records stay in
+place; all result-JSON hashes must remain unchanged. Graph export or reduction of these
+local validation artifacts requires restoring their tensor copies first. This is storage
+management for the release study, not a change to normal `faultline check` output.
+
+The archive helper passed twelve lifecycle checks, including corrupt archives, changed source
+files, path traversal, conflicting restore destinations and exact round trips. A separate
+real-data check reconstructed all 52 files from a 21.2-GiB completed tensor set; its archive
+was 388 MiB. Archival runs after the preset timing study, with a separate memory guard,
+and does not change the recorded cost measurements or numerical-worker settings.
 
 Historical-issue fixtures reuse the preserved 0.6 evidence. Controlled injected faults
 are new executions with explicit mutant labels. The exp_u20 control reuses the 20-batch
@@ -66,19 +81,105 @@ measurements from 0.15: that script recorded accuracy errors, not full primary o
 observations. Its replicated rule result can be checked, but it cannot establish SAFE.
 These cohorts must not be pooled into a false-positive rate.
 
-## Calibration status
+Windows suspended the host during upgrade calibration on November 12, from about
+09:54 to 17:47 UTC. The workers and committed evidence survived. The preset-cost study
+had already completed; no reported preset timing spans this pause.
 
-The preset measurements are complete. Full-catalog calibration remains in progress;
-no completed 29-model calibration is claimed yet.
+A subsequent WSL restart interrupted DistilBERT after 180 upgrade pairs had committed.
+All 180 commit records passed hash verification before resuming the frozen campaign.
+The supervisor now runs through a persistent background client with durable logs and
+checks both the Linux boot ID and process start ticks. Lightweight monitoring reads only
+the required summary metadata; it does not retain the large diagnostic report in memory.
 
-Completed controls: all three injected faults produce REGRESSION. Of four retained
-historical fixtures, two produce REGRESSION and two NEEDS_REVIEW. One missed historical
-fixture passes in both retained environments but lacks replicated gradient-accuracy
-evidence; the other fails in both. The policy is not retuned to turn these into hits.
+## Completed calibration
 
-The retained exp_u20 data do not trigger the replicated rule for any of its four model
-variants. The full verdict for this accuracy-only replay is INCONCLUSIVE because primary
-observations are absent. This is distinct from a successful full-model SAFE check.
+All 29 same-version pairs and 29 upgrade pairs have ten committed input batches each.
+The fixed policy was applied without retuning. Completed resource-limited or otherwise
+inconclusive attempts remain in the denominator; completion of the campaign does not
+mean every diagnostic completed or every verdict is SAFE.
+
+| Cohort | Planned | SAFE | REGRESSION | NEEDS_REVIEW | INCONCLUSIVE |
+|---|---:|---:|---:|---:|---:|
+| same_version | 29 | 4 | 0 | 25 | 0 |
+| upgrade | 29 | 4 | 0 | 25 | 0 |
+| historical | 4 | 0 | 2 | 2 | 0 |
+| controlled_injection | 3 | 0 | 3 | 0 | 0 |
+| exp_u20 | 4 | 0 | 0 | 0 | 4 |
+
+The same-version SAFE target was missed by 25 of 29 models. Each model's verdict is
+listed below. The [JSON evidence](calibration-016.json) and [CSV table](calibration-016.csv)
+retain the recorded reasons and batch-level values.
+These misses must not be presented as a false-positive rate. Same-version workers can
+agree with one another while both retain unexplained eager-versus-compiled findings.
+
+Of the 25 same-version misses, 22 contain contrary numerical evidence and five contain
+unexplained failures; two models belong to both groups. SmolLM2 also lacks replicated
+accuracy coverage. The same-version cohort has no replicated accuracy flags. This
+policy therefore still requires manual review for most of this catalog, even when the
+environment is unchanged. The completed workflow is not a general automatic upgrade
+approval gate.
+
+Replicated accuracy flags in the upgrade cohort: none.
+A REGRESSION verdict can also arise from a stable candidate-only primary failure;
+the JSON distinguishes those reasons from replicated accuracy degradation.
+With fewer than ten usable batch scores, a false replicated flag means insufficient
+coverage to apply the rule, not evidence that an accuracy shift is absent.
+
+| Model | Same version | Upgrade | Upgrade accuracy batches | Worse | Median growth | Replicated flag |
+|---|---|---|---:|---:|---:|---|
+| resnet18 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| resnet34 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| resnet50 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| resnet101 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| resnext50_32x4d | SAFE | SAFE | 10/10 | 0 | 1.000x | False |
+| efficientnet_b0 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 2 | 1.000x | False |
+| efficientnet_b1 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 2 | 1.000x | False |
+| efficientnet_b2 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 3 | 1.000x | False |
+| efficientnet_b3 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 3 | 1.000x | False |
+| efficientnet_v2_s | SAFE | SAFE | 10/10 | 0 | 1.000x | False |
+| mobilenet_v2 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| mobilenet_v3_small | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| mobilenet_v3_large | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| vit_b_16 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 9 | 1.004x | False |
+| swin_t | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 4 | 1.000x | False |
+| convnext_tiny | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 5 | 1.000x | False |
+| bert | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 7 | 1.016x | False |
+| gpt2 | NEEDS_REVIEW | NEEDS_REVIEW | 9/10 | 4 | 0.969x | False |
+| distilbert | SAFE | SAFE | 10/10 | 7 | 1.011x | False |
+| smollm2 | NEEDS_REVIEW | NEEDS_REVIEW | 0/10 | 0 | missing | False |
+| regnet_y_400mf | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| densenet121 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| shufflenet_v2_x1_0 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| squeezenet1_1 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| mnasnet1_0 | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| t5_small_encoder | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 0 | 1.000x | False |
+| roberta_base | SAFE | SAFE | 10/10 | 5 | 0.998x | False |
+| opt_125m | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 6 | 1.002x | False |
+| pythia_160m | NEEDS_REVIEW | NEEDS_REVIEW | 10/10 | 6 | 1.011x | False |
+
+All three explicitly injected faults produce REGRESSION. Of four retained historical
+fixtures, two produce REGRESSION and two NEEDS_REVIEW. One missed fixture passes in both
+retained environments but lacks replicated gradient-accuracy evidence; the other fails
+in both. These are calibration misses, not policy changes or new discoveries.
+
+The retained exp_u20 evidence triggers no replicated flag for any of its four variants.
+Their full verdict is INCONCLUSIVE because the 0.15 script recorded accuracy errors but
+not primary oracle observations. This is not a successful full-model SAFE check.
+
+The three paired standard-cost cases and the other 26 retrospective full-diagnostic
+controls use the distinct execution protocols described above. The upgrade cohort and
+those 26 controls share preserved baseline observations. Input batches share their source
+material. These results describe this catalog, these frozen inputs and these settings;
+they are not independent estimates of deployment risk.
+
+For a retained legacy worker that exceeded its resource budget during diagnostics, the
+policy replay uses its already-saved primary checkpoint and records the diagnostic gap.
+The raw resource-limit outcome is unchanged. SmolLM2 illustrates the distinction: all
+twenty upgrade workers retained primary comparisons but reached the diagnostic memory
+limit without retaining a completed fp64 report, leaving 0/10 paired accuracy scores.
+The ten fresh same-version SmolLM2 workers also retained their primary comparisons
+before reaching the diagnostic memory limit. These full-AOT cohorts are separate from
+the new standard-preset SmolLM2 run that completed within 8,015.6 MiB.
 
 ## Measured costs
 
@@ -118,7 +219,7 @@ evidence remains visible and the first unexplained workload is exported. This me
 
 The six completed cells below precede the exact-match and diagnostic-storage changes
 described next. That timing series was stopped after two BERT thorough batches; all
-48 committed batches and the incomplete artifacts were preserved. A new series reruns
+48 committed batches and the incomplete artifacts were preserved. The final series reran
 all ten cost cells from separate empty caches. ResNet-50 and BERT use separate baseline
 and candidate workers in the same PyTorch version; SmolLM2 uses one environment.
 
@@ -183,9 +284,9 @@ contexts are identical. Timing and resource fields are measured separately.
 The first optimized timing attempt was interrupted by a kernel global OOM while it
 overlapped the upgrade sweep. Hash verification retained all 130 committed upgrade
 pairs and nine completed SmolLM2 batches. The interrupted SmolLM2 attempt is not a
-completed timing cell. A new ten-cell timing series starts with empty caches and runs
-sequentially; the original upgrade campaign then resumes with its original source,
-settings and committed evidence. The same-version controls follow. No result is
+completed timing cell. The final ten-cell timing series started with empty caches and ran
+sequentially; the original upgrade campaign then resumed with its original source,
+settings and committed evidence. The same-version controls followed. No result is
 reclassified as a model/compiler failure because its host environment was interrupted.
 
 The changed implementation passed 366 Linux portable tests, 365 Windows tests with one

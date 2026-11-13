@@ -31452,7 +31452,7 @@
   },
   "usability_validation": {
     "version": "0.16.0",
-    "status": "catalog_calibration_in_progress",
+    "status": "complete",
     "advisory_only": true,
     "policy": "docs/verdict-policy.md",
     "replication_policy": "docs/v016-policy.json",
@@ -31519,9 +31519,11 @@
       "scope": "Fresh empty caches, frozen inputs, one interpreter, sequential after the host OOM. All ten primary comparisons and numerical contexts equal the retained preoptimization result."
     },
     "limitations": [
-      "Full 29-model calibration still running; all ten preset-cost measurements complete.",
+      "The fixed policy returns NEEDS_REVIEW for 25/29 same-version models; the automatic SAFE target is not met. All misses are retained without retuning, and these counts are not a false-positive rate.",
       "Fresh venv used populated global pip/model caches; timings are not cold-network measurements.",
-      "No new GPU execution is claimed."
+      "No new GPU execution is claimed.",
+      "Standard BERT and GPT-2 take 33.67 and 36.44 minutes on the measured CPU workloads, exceeding the approximate 30-minute goal.",
+      "Full-diagnostic upgrade GPT-2 has 9/10 usable accuracy batches and SmolLM2 has 0/10; a false replicated flag in either case does not establish absence of a shift."
     ],
     "license_unchanged": true,
     "upstream_filed": false,
@@ -31573,7 +31575,19 @@
       "optimized_cost_batches_preserved": 9,
       "cause": "Kernel global OOM during overlapping experiments, followed by WSL service interruptions.",
       "recovery": "Exclusive sequential queue: costs, upgrade resume, same-version controls. Interrupted timing attempts are excluded from completed full-command costs.",
-      "all_139_commit_hashes_verified": true
+      "all_139_commit_hashes_verified": true,
+      "host_suspend": {
+        "sleep_entry_utc": "2026-11-12T09:53:44Z",
+        "resume_clock_sync_utc": "2026-11-12T17:46:42Z",
+        "source": "Windows Kernel-Power sleep/resume events and Kernel-General clock synchronization event",
+        "scope": "Upgrade calibration paused with the host. Preset costs were already complete; none was measured across this pause. Workers and committed evidence survived."
+      },
+      "later_wsl_restart": {
+        "date_utc": "2026-11-12",
+        "completed_upgrade_pairs_preserved": 180,
+        "all_commit_hashes_verified": true,
+        "recovery": "Hidden persistent Windows WSL client with durable logs; process identity checks include Linux boot ID and start ticks. The frozen sweep resumed unchanged."
+      }
     },
     "cost_study": {
       "status": "complete",
@@ -31593,6 +31607,125 @@
       ],
       "wall_time_field": "outer_wall_s",
       "scope": "Pretrained float32 frozen workloads; paired 2.15.0 CPU workers except single-environment SmolLM2. Linux evidence storage, exclusive sequential timing queue, otherwise uncontrolled host."
+    },
+    "calibration": {
+      "status": "complete",
+      "planned_catalog_models": 29,
+      "committed_same_version_batches": 290,
+      "committed_upgrade_batches": 290,
+      "counts": {
+        "controlled_injection": {
+          "REGRESSION": 3
+        },
+        "exp_u20": {
+          "INCONCLUSIVE": 4
+        },
+        "historical": {
+          "NEEDS_REVIEW": 2,
+          "REGRESSION": 2
+        },
+        "same_version": {
+          "NEEDS_REVIEW": 25,
+          "SAFE": 4
+        },
+        "upgrade": {
+          "NEEDS_REVIEW": 25,
+          "SAFE": 4
+        }
+      },
+      "same_version_safe_target_misses": [
+        "resnet18",
+        "resnet34",
+        "resnet50",
+        "resnet101",
+        "efficientnet_b0",
+        "efficientnet_b1",
+        "efficientnet_b2",
+        "efficientnet_b3",
+        "mobilenet_v2",
+        "mobilenet_v3_small",
+        "mobilenet_v3_large",
+        "vit_b_16",
+        "swin_t",
+        "convnext_tiny",
+        "bert",
+        "gpt2",
+        "smollm2",
+        "regnet_y_400mf",
+        "densenet121",
+        "shufflenet_v2_x1_0",
+        "squeezenet1_1",
+        "mnasnet1_0",
+        "t5_small_encoder",
+        "opt_125m",
+        "pythia_160m"
+      ],
+      "upgrade_replicated_accuracy_flags": [],
+      "evidence": {
+        "docs/research/calibration-016.json": "60e18672b4827c2e41a591e6cbdf3f00b689f3b8f6865380bf2d28445aaccdb8",
+        "docs/research/calibration-016.csv": "88d49d4df9c9d84455aff11ae28c963325eac1b52df064fdad43ca3695750e17"
+      },
+      "retained_source_sha256": {
+        "json": "60e18672b4827c2e41a591e6cbdf3f00b689f3b8f6865380bf2d28445aaccdb8",
+        "csv": "bdb511fe36dc855fa46d495808462120241082586c70b76dc0d114533137572f"
+      },
+      "publication_note": "CSV line endings are normalized to LF for Git. Retained raw source hashes and published-file hashes are recorded separately.",
+      "policy_retuned": false,
+      "false_positive_rate": false,
+      "full_diagnostic_source_sha256": "e3df2ce88585d782f558960ffab0d9f095eed427f93d3e128754812b9297b355",
+      "standard_cost_source_sha256": "a3f9549e314d62930f840df4c37f3d07b83462a880915bfc4c55df3bf2caa14f",
+      "scope": "Three independently executed paired standard-cost controls; 26 fresh full-diagnostic controls reuse matching independently executed upgrade baselines. All 29 full-diagnostic upgrade pairs retained. Shared source inputs and baselines mean counts are correlated."
+    },
+    "storage_preservation": {
+      "cases": 41,
+      "tensor_files": 1510,
+      "original_bytes": 334466682450,
+      "archive_bytes": 70429671009,
+      "all_result_json_unchanged": true,
+      "lifecycle_checks": 12,
+      "archive_sha256": [
+        "04afdfc0a5c4be30612286bce432bc7906b06603403b9e8d294c1e9c69232944",
+        "08cb0bd776f542901e60ee366f3281c82486dabc479ac7ae8c82081218e5a2e9",
+        "166da9598e2f0dfe5d6b987850efce3e57ce682276e48e17a033dc6f27f8a489",
+        "2133be9418c86057b9d13aa21bb1fcff08d35e13e92aa5829cc7444ca2bbf13b",
+        "231a73e64608cb7f61082535f74d9e2bdcbd8f8bad1212e1ec81200391042278",
+        "3965d1490ff4504276f3d0cc35aecf2be333dde870ff6ece751fdc2e2fd20b8a",
+        "3d2245a42767031d24e1a4e34a116933a899c09bfb0b666b5b437a0851a1d29f",
+        "3d97dfe3153d8c53f75b26f27f2273119e0fbc785aaf67aa717593657f71f12a",
+        "40d63ff8909ffb39d70690df323dbe7936684faa91a7af65f92c888d08358484",
+        "45ed4c8067a7612b971e1aa0394f70a480e82d5249d1a80d794f114e79e6e543",
+        "490605a3c1a71b42c243f7c0d2a3864616975f77f2e15506deab6fa11c709bce",
+        "5e074c322bb9b0a9524dfff8f572e1ae6fe7dff4e5b2483511d0d42accede25a",
+        "5f07eb32c59608782f57af7247202ae009d7319046886cd0a77e53a85350b21d",
+        "6fd0e6618d795f1e5bc682033f18828b9ba089f13d7021ab2fc45555adc9f789",
+        "813579c4dcacda3aa0d7fff68eddee3085ef435973158bddcbb7174203e5eba0",
+        "822d2b7b49ca391fd0a996b094ec6806f7d6313a22024f4ada0d2cd6a020ac0d",
+        "867851f8cea13c344b6af38ba68e9cbae2731ea2e9c7625138b78ac4fcdf793d",
+        "87f8127acfec61bc79468aa7c8c2f288ff9642c3b6127b42bf6e2ade35461519",
+        "883c81f0aadaedb72b06c6517cb70a6968189761f817f3ba8356a5556d7560ed",
+        "8fbcaff9ca9923000e19223a82fd059156a7b5ee993b9f9ea9d2bb426f6939aa",
+        "907f5ac8027945177a21a4007072fca7c3a90e2c56fa7fe8dca86924c728ba63",
+        "91c8a358d688d3de7342bb06c98156fce130f8d31c4a1772cd6992f1b14c258d",
+        "952b965d2225ccd522d7fca79b97206575209febc9a72fa81880edccb5f68ecb",
+        "9a58b07c41736879761d21dec1332ec2dcab35cb7806614ca62a856a6a7a7d28",
+        "9f253fe251f6956f5fcefb542c3632afa5929da7bbfc2caa1b534ada519eb4c8",
+        "a2b863fec4d21aaee29c695fa5f8cafa1366a8c208432483e608b8ccc71eb005",
+        "a383c996e15e9a201236f83292fc4c8eb0d934d0b936ad1632ba115513aebe76",
+        "a3de06d57a87b70ddab072865023546c23db1d8e1ea188e3f507c2055c453a38",
+        "a3eba52a6fbaecf2491cb7256d9bce21d93d252ee68c16512b091fe2fabc766e",
+        "a42f2c30669cde4afcbe75bb1f2d298137f4209b6a3a26bd0669326b8df52737",
+        "a55fe91e91624c99cbd16b27142cba29af1724ae53aeb86abf460c1c9cd53dde",
+        "b75c0fc85a9b36ec2e7e381c38072bd138bfab023d24703af2d122f118a63c82",
+        "bf739f1bc853c07ed0078613208700865d2c549d904a261c77bcda1949c26d35",
+        "c167447fbb4c24088d2bc8b473436a230b64b2f2f81748c462aca61bfdb09dcf",
+        "c29d4f5791d9d2130ac64e55ad13700596c68d4a594ef602329aa01e8159df1e",
+        "c628e6e64aa8c1d31f9533e4454a250859bff8264f1f7de530cc88cc254bae9b",
+        "c630a18797ccf88a9ea76f54b429ab2f23a15476e3cdbe7e5d9beb4b7a670a81",
+        "c9fc0f6ac7ac1bd250ecf16715ba458d8a16e4f54dcbb91110c5d1afc5656656",
+        "cd042fd730717105a1e84f1ea2e8358bbb39e2794aa86aa84154728214b122f4",
+        "d74fcbab0b79432c0cc104626170af8f8f7036b9601a939dca329b57253e2137",
+        "e5c7ed0335b97c716214765aa8d6e2ced0cc645091aed3f78b51bd8e871e10f3"
+      ]
     }
   }
 }
