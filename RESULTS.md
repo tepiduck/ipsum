@@ -1653,3 +1653,41 @@ See the [0.17 research record](docs/research/usability-017.md),
 The initial cold-per-batch-cache attempt remains retained; the final measurements use
 new directories and the same frozen inputs. No compiler defect or new GPU validation
 is claimed, and nothing was filed upstream.
+
+
+## 0.18 — memory-aware check defaults
+
+`check` defaults to `--jobs auto`: the first frozen batch runs alone with the full budget,
+then its measured peak determines concurrency with 25% headroom. The total budget defaults
+to 75% of available RAM, capped at 32 GiB. Parallel memory failures receive a full-budget
+serial retry after the pool drains. Auto diagnostics are sequential and use the full budget.
+Explicit job counts retain their initial divided allocation; retries never enlarge the total
+budget. The report and evidence retain the choice, reason, measured peak and original attempts.
+Verdict v2, primary statuses, tolerances, signatures, reducer predicates and exit codes are unchanged.
+
+The requested CPU 2.15.0+cpu → 2.16.0.dev20261105+cpu standard-level measurements were:
+
+| Model | Requested → chosen jobs | Total MiB | Probe MiB | Minutes | Primary pairs | Accuracy scores | Verdict |
+|---|---|---:|---:|---:|---:|---:|---|
+| resnet50 | auto → 4 | 10981 | 1751 | 6.44 | 10/10 | 3/10 | SAFE |
+| bert | auto → 1 | 10957 | 6094 | 21.56 | 10/10 | 8/10 | SAFE |
+| gpt2 | auto → 1 | 11069 | 7405 | 20.90 | 10/10 | 5/10 | SAFE |
+| smollm2 | auto → 1 | 11100 | 7318 | 20.19 | 10/10 | 4/10 | SAFE |
+| bert | 1 → 1 | 11104 | — | 20.96 | 10/10 | 8/10 | SAFE |
+| gpt2 | 1 → 1 | 11112 | — | 20.93 | 10/10 | 5/10 | SAFE |
+
+Transformer cells missing the 15-minute-and-decisive target: bert (jobs auto), gpt2 (jobs auto), smollm2 (jobs auto), bert (jobs 1), gpt2 (jobs 1).
+Counts below ten accuracy scores represent verified early stopping, not missing primary work.
+Elapsed times include the first-batch measurement and required diagnostics. The earlier 0.17
+costs used same-version pairs and remain unchanged; no direct speedup claim is made here.
+
+The original GPT-2 9/10 accuracy coverage was caused by a combined numerics worker exceeding
+its 12-GiB limit (14,707 MiB sampled peak) after retaining the baseline primary checkpoint.
+The exact former batch-9 workload produced 1/1 complete paired accuracy scores in the current separated diagnostic path. Its single-batch verdict is INCONCLUSIVE: one batch cannot satisfy the unchanged ten-batch replication requirement. The frozen bundle hash matches the old AOT/numerics job. This is a targeted coverage check, not a rescore of 0.16.
+
+Executed checks: Linux portable 390 passed; Windows 389 passed, one skipped; CPU Inductor 13
+passed; legacy 31 passed; all 14 compiler validation checks passed; Ruff lint and formatting
+passed. Memory/lifecycle tests cover full-budget calibration, serial retry after parallel OOM,
+retry interruption/resume and serial/parallel parity. All 43 protected historical files
+and 25 prior validation entries are preserved. See the [0.18 research record](docs/research/memory-018.md)
+and [portable measurements](docs/research/memory-018.json). No compiler-defect or GPU claim is made.

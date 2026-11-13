@@ -8,6 +8,7 @@ from pathlib import Path
 
 from .bisect_env import supervise
 from .check import PRESETS, report, run_check
+from .check_resources import memory_budget
 from .compare_envs import interpreter
 from .evaluate import Settings
 from .storage import atomic_json, read_json
@@ -23,6 +24,18 @@ class CheckAwareParser(argparse.ArgumentParser):
         if self.check_invocation or self.prog.endswith(" check"):
             self.exit(3, f"INCONCLUSIVE - {message}\nNext: run faultline check --help.\n")
         super().error(message)
+
+
+def jobs_argument(value):
+    if value == "auto":
+        return value
+    try:
+        result = int(value)
+        if result > 0:
+            return result
+    except ValueError:
+        pass
+    raise argparse.ArgumentTypeError("--jobs must be auto or a positive integer")
 
 
 def add_check_command(commands):
@@ -49,8 +62,9 @@ def add_check_command(commands):
     )
     parser.add_argument(
         "--jobs",
-        type=int,
-        help="Concurrent single-threaded batch workers (default: min(4, available cores/2)); RSS budget is divided across jobs",
+        type=jobs_argument,
+        default="auto",
+        help="Concurrent batch workers: auto measures the first batch; N fixes initial concurrency",
     )
     parser.add_argument(
         "--no-early-stop", action="store_true", help="Evaluate every requested accuracy batch"
@@ -63,7 +77,11 @@ def add_check_command(commands):
     parser.add_argument("--deterministic", action="store_true")
     parser.add_argument("--threads", type=int, default=1)
     parser.add_argument("--timeout", type=float, default=600)
-    parser.add_argument("--max-rss-mb", type=int, default=12288)
+    parser.add_argument(
+        "--max-rss-mb",
+        type=int,
+        help="Total worker RSS budget in MiB (default: 75%% of available RAM, capped at 32 GiB)",
+    )
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--output", type=Path)
     return parser
@@ -94,6 +112,12 @@ def terminal(verdict, output):
         lines.append(
             f"Pre-existing differences: {verdict['pre_existing_differences']['batches']} batches; see report for counts and links."
         )
+    if (output / "evidence.json").exists():
+        scheduling = read_json(output / "evidence.json").get("scheduling")
+        if scheduling:
+            lines.append(
+                f"Scheduling: {scheduling['effective_jobs']} job(s); {scheduling['candidate_total_rss_mb']} MiB total; {len(scheduling['serial_retries'])} primary serial retries."
+            )
     if verdict["notes"]:
         lines.append(
             f"Notes: {len(verdict['notes'])} explanations, baseline-only differences or unavailable diagnostics; see report."
@@ -163,8 +187,8 @@ def check_command(args):
             )
         if args.batches is not None and not 1 <= args.batches <= 100:
             raise ValueError("--batches must be in [1, 100]")
-        if args.jobs is not None and args.jobs < 1:
-            raise ValueError("--jobs must be a positive integer")
+        budget = memory_budget(output, args.max_rss_mb, resume=args.resume)
+        print(f"Memory budget: {budget['chosen_mb']} MiB total ({budget['reason']}).", flush=True)
         candidate = interpreter(args.candidate)
         baseline = interpreter(args.baseline) if args.baseline else None
         preset = PRESETS[args.level]
@@ -175,7 +199,7 @@ def check_command(args):
             "deterministic": args.deterministic,
             "threads": args.threads,
             "timeout_s": args.timeout,
-            "max_rss_mb": args.max_rss_mb,
+            "max_rss_mb": budget["chosen_mb"],
         }
         settings = Settings(**common, backend=args.backend, compile_mode=args.compile_mode)
         base_settings = Settings(
@@ -196,7 +220,7 @@ def check_command(args):
                 "explicit_batches": args.batches is not None,
                 "include": args.include,
                 "timeout": args.timeout,
-                "max_rss_mb": args.max_rss_mb,
+                "max_rss_mb": budget["chosen_mb"],
             }
             preparation = output / "preparation"
             if preparation.exists():
@@ -227,7 +251,7 @@ def check_command(args):
                     command,
                     output / "preparation-supervision",
                     timeout=max(args.timeout, 900),
-                    max_rss_mb=args.max_rss_mb,
+                    max_rss_mb=budget["chosen_mb"],
                 )
                 if observed["status"] != "complete":
                     log = output / "preparation-supervision/stderr.log"

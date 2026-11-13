@@ -28,7 +28,7 @@ python3 -m venv .venv
 python -m pip install build
 python -m build --wheel
 python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu
-python -m pip install 'dist/faultline_ml-0.17.0-py3-none-any.whl[sweep]'
+python -m pip install 'dist/faultline_ml-0.18.0-py3-none-any.whl[sweep]'
 faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart
 ```
 
@@ -80,7 +80,7 @@ def factory():
 
 ```bash
 faultline check model.py:factory --output faultline-runs/model
-faultline check --hf openai-community/gpt2 --jobs 1 --output faultline-runs/gpt2
+faultline check --hf openai-community/gpt2 --output faultline-runs/gpt2
 faultline check captured/bundle --level quick --output faultline-runs/replay
 ```
 
@@ -96,10 +96,11 @@ covered in the [user guide](docs/user-guide.md).
 | standard | 10 | Forward, gradients, paired accuracy; explanations run as needed |
 | thorough | 10 | Standard coverage plus full control and AOT/mask diagnostics |
 
-Primary batches run concurrently with `--jobs N` (default: up to four single-threaded
-workers). The default 12-GiB host-RSS budget is **divided across jobs**: four jobs get
-3 GiB each. Use `--jobs 1` for models needing the full budget. Each worker has a
-600-second timeout. Accuracy diagnostics run in batch order and stop once the replicated
+The default `--jobs auto` measures the first batch at the full memory budget, then
+selects up to four workers with 25% memory headroom and retries memory-limited batches alone.
+The budget is 75% of available RAM, capped at 32 GiB, and the chosen budget and worker
+count are printed and saved; `--jobs N` and `--max-rss-mb` allow explicit settings.
+Each worker has a 600-second timeout. Accuracy diagnostics run in batch order and stop once the replicated
 rule's outcome is mathematically fixed; all planned primary checks still run. A positive
 accuracy flag always needs at least ten completed batches. `--no-early-stop` requests
 every accuracy measurement. Missing required evidence can prevent SAFE; skipped optional

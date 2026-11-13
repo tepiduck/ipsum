@@ -355,3 +355,11 @@ separately on resume. `replication_stop.py` bounds the unchanged replicated rule
 possible remaining completed-score count; diagnostics consume an ordered prefix, while all
 planned primary comparisons still run. `verdict_v2.py` changes only paired change attribution;
 `verdict.py` retains the v1 single-environment and opt-in policy. No advisory feeds a reducer.
+
+Version 0.18 adds `check_resources.py` for a frozen RAM-derived budget and measured first-batch
+concurrency. An auto probe is a normal committed primary pair, reused instead of rerun.
+Scheduling decisions are independently committed and revalidated on resume. Memory-limited
+parallel attempts retain their original outcomes and receive a full-budget serial retry
+after the worker pool drains. Auto diagnostics are sequential and use the full budget;
+explicitly divided diagnostic allocations can also retry serially. Reports retain both
+attempts and identify which completed primary observations the unchanged verdict summarizes.

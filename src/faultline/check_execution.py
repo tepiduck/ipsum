@@ -1,7 +1,8 @@
 """Resumable parallel primary checks and ordered, bounded accuracy diagnostics."""
 
 import copy
-import os
+import hashlib
+import json
 import sys
 import time
 from concurrent.futures import ThreadPoolExecutor
@@ -10,6 +11,7 @@ from pathlib import Path
 from queue import Queue
 
 from .batches import verify_batches
+from .check_resources import cpu_jobs, measured_schedule, memory_budget, memory_limited
 from .compare_envs import interpreter
 from .evaluate import Settings
 from .native import NativeJob, file_hash
@@ -22,10 +24,11 @@ from .verdict import assessment, summarize
 
 
 def default_jobs():
-    cores = (
-        len(os.sched_getaffinity(0)) if hasattr(os, "sched_getaffinity") else os.cpu_count() or 1
-    )
-    return max(1, min(4, cores // 2))
+    return cpu_jobs()
+
+
+def row_hash(row):
+    return hashlib.sha256(json.dumps(row, sort_keys=True).encode()).hexdigest()
 
 
 def committed(root, pattern, filename):
@@ -81,12 +84,16 @@ def execute(
 
     if verdict_policy not in {"v1", "v2"}:
         raise ValueError("Unknown verdict policy")
-    if jobs is not None and (type(jobs) is not int or jobs < 1):
-        raise ValueError("--jobs must be a positive integer")
+    jobs = "auto" if jobs is None else jobs
+    if jobs != "auto" and (type(jobs) is not int or jobs < 1):
+        raise ValueError("--jobs must be auto or a positive integer")
     bundle, output = Path(bundle).resolve(), Path(output).resolve()
     preset = check.PRESETS[level]
     settings = settings or Settings(
-        gradients=preset["gradients"], repeats=preset["repeats"], timeout_s=600, max_rss_mb=12288
+        gradients=preset["gradients"],
+        repeats=preset["repeats"],
+        timeout_s=600,
+        max_rss_mb=memory_budget(output, resume=resume)["chosen_mb"],
     )
     baseline_settings = baseline_settings or settings
     candidate_python = interpreter(candidate_python or sys.executable)
@@ -100,32 +107,32 @@ def execute(
         if manifest
         else {0: bundle}
     )
-    effective_jobs = min(jobs or default_jobs(), planned)
+    maximum_jobs = min(default_jobs(), planned)
+    if jobs == "auto" and (settings.threads != 1 or baseline_settings.threads != 1):
+        maximum_jobs = 1
+    effective_jobs = min(jobs, planned) if jobs != "auto" else 1
     if effective_jobs > 1 and (settings.threads != 1 or baseline_settings.threads != 1):
         raise ValueError(
             "Parallel batch workers require --threads 1; use --jobs 1 for another thread count"
         )
     allocation = {
         "requested_jobs": jobs,
-        "effective_jobs": effective_jobs,
+        "effective_jobs": effective_jobs if jobs != "auto" else None,
+        "maximum_auto_jobs": maximum_jobs if jobs == "auto" else None,
         "candidate_total_rss_mb": settings.max_rss_mb,
         "baseline_total_rss_mb": baseline_settings.max_rss_mb,
     }
-    settings = replace(settings, max_rss_mb=settings.max_rss_mb // effective_jobs)
-    baseline_settings = replace(
-        baseline_settings, max_rss_mb=baseline_settings.max_rss_mb // effective_jobs
-    )
     settings.validate()
     baseline_settings.validate()
     identity = {
-        "schema_version": 2,
+        "schema_version": 3,
         "mode": mode,
         "level": level,
         "planned": planned,
         "verdict_policy": policy,
         "early_stop": early_stop,
         "allocation": allocation,
-        "cache_policy": "exclusive_lane_v1",
+        "cache_policy": "measured_exclusive_lane_v2",
         "source_sha256": provenance()["faultline_source_sha256"],
         "bundle_hash": file_hash(bundle / ("batches.json" if manifest else "workload.json")),
         "candidate_python": candidate_python,
@@ -144,6 +151,7 @@ def execute(
     rows, scores = [], []
     certificate = None
     accuracy_required = bool(baseline_python) and level != "quick"
+    schedule = {"mode": jobs, "effective_jobs": effective_jobs, "reason": "explicit_jobs"}
 
     def unchanged():
         if provenance()["faultline_source_sha256"] != identity["source_sha256"]:
@@ -158,7 +166,7 @@ def execute(
             )
         }
 
-    def primary(entry):
+    def primary(entry, *, full_budget=False):
         index, source = entry
         unchanged()
         root = output / f"batch-{index:04d}"
@@ -166,10 +174,52 @@ def execute(
         if existing is not None:
             return existing
         directory = root / f"primary-attempt-{len(list(root.glob('primary-attempt-*'))) + 1:04d}"
-        row = {"batch": index, "diagnostics": {}}
+        row = {
+            "batch": index,
+            "diagnostics": {},
+            "worker_jobs": 1 if full_budget else effective_jobs,
+        }
         for side, python, config in sides:
+            config = replace(config, max_rss_mb=config.max_rss_mb // row["worker_jobs"])
+            config.validate()
             row[side] = check.run_case(
                 NativeJob.create(source),
+                config,
+                directory / side / "primary",
+                python=python,
+                env=environment(index, side),
+            )
+        unchanged()
+        commit(directory, "primary.json", row)
+        return row
+
+    def retry_primary(raw):
+        if raw["worker_jobs"] == 1 or not any(memory_limited(raw[s]) for s, _, _ in sides):
+            return raw
+        index = raw["batch"]
+        root = output / f"batch-{index:04d}"
+        existing = committed(root, "serial-retry-*/commit.json", "primary.json")
+        if existing is not None:
+            if existing["resource_retry"]["original_sha256"] != row_hash(raw):
+                raise ValueError("Committed memory retry has a different primary")
+            return existing
+        directory = root / f"serial-retry-{len(list(root.glob('serial-retry-*'))) + 1:04d}"
+        row = {
+            "batch": index,
+            "diagnostics": {},
+            "worker_jobs": 1,
+            "resource_retry": {
+                "reason": "parallel_memory_limit",
+                "original_sha256": row_hash(raw),
+                "original_statuses": {s: raw[s]["status"] for s, _, _ in sides},
+                "original_peaks_mb": {s: raw[s].get("peak_tree_rss_mb") for s, _, _ in sides},
+                "attempt": directory.relative_to(output).as_posix(),
+                "full_budget_mb": {s: config.max_rss_mb for s, _, config in sides},
+            },
+        }
+        for side, python, config in sides:
+            row[side] = check.run_case(
+                NativeJob.create(entries[index]),
                 config,
                 directory / side / "primary",
                 python=python,
@@ -215,7 +265,22 @@ def execute(
             "peak_worker_rss_mb": max([0, *peaks]),
         }
         verdict["execution_state"] = state
-        check.report(output, verdict, {"configuration": identity, "batches": current})
+        scheduling = {
+            **schedule,
+            **{key: value for key, value in allocation.items() if key != "effective_jobs"},
+            "serial_retries": [
+                {"batch": r["batch"], **r["resource_retry"]}
+                for r in current
+                if "resource_retry" in r
+            ],
+        }
+        if (output / "memory-budget.json").exists():
+            scheduling["budget_selection"] = read_json(output / "memory-budget.json")
+        check.report(
+            output,
+            verdict,
+            {"configuration": identity, "scheduling": scheduling, "batches": current},
+        )
         return verdict
 
     with campaign_lock(output):
@@ -227,6 +292,25 @@ def execute(
         else:
             atomic_json(output / "check.json", identity)
         primary_rows = {}
+        if jobs == "auto" and entries:
+            first = min(entries)
+            warmup = primary((first, entries[first]), full_budget=True)
+            primary_rows[first] = warmup
+            expected = measured_schedule(
+                warmup, min(settings.max_rss_mb, baseline_settings.max_rss_mb), maximum_jobs
+            )
+            recorded = committed(output / "schedule", "commit.json", "schedule.json")
+            if recorded is not None and recorded != expected:
+                raise ValueError("Committed memory schedule changed")
+            schedule = expected
+            if recorded is None:
+                commit(output / "schedule", "schedule.json", schedule)
+            effective_jobs = schedule["effective_jobs"]
+            print(
+                f"Memory scheduling: first-batch peak {schedule['measured_peak_rss_mb']:.0f} MiB; {effective_jobs} job(s) ({schedule['reason']}).",
+                flush=True,
+            )
+            publish([warmup], "running")
         updates = Queue()
 
         def lane(entries):
@@ -245,7 +329,7 @@ def execute(
                     [
                         entry
                         for entry in sorted(entries.items())
-                        if entry[0] % effective_jobs == index
+                        if entry[0] % effective_jobs == index and entry[0] not in primary_rows
                     ],
                 )
                 for index in range(effective_jobs)
@@ -260,7 +344,8 @@ def execute(
                     publish([primary_rows[i] for i in sorted(primary_rows)], "running")
             for future in futures:
                 future.result()
-        primaries = [primary_rows[i] for i in sorted(primary_rows)]
+        # The pool is drained before any full-budget retry: no competing owned workers.
+        primaries = [retry_primary(primary_rows[i]) for i in sorted(primary_rows)]
         for raw in primaries:
             unchanged()
             index = raw["batch"]
@@ -272,6 +357,9 @@ def execute(
                 evaluate_accuracy = accuracy_required and certificate is None
                 row["accuracy_evaluated"] = evaluate_accuracy
                 for side, python, config in sides:
+                    # Auto diagnostics are sequential and can use the full budget.
+                    divisor = 1 if jobs == "auto" or raw["worker_jobs"] == 1 else effective_jobs
+                    diagnostic_config = replace(config, max_rss_mb=config.max_rss_mb // divisor)
                     explain = (
                         policy == "v1"
                         or level == "thorough"
@@ -284,7 +372,7 @@ def execute(
                     row[side], row["diagnostics"][side] = check.inspect_side(
                         source,
                         directory / side,
-                        config,
+                        diagnostic_config,
                         python,
                         level,
                         paired=bool(baseline_python),
@@ -293,6 +381,29 @@ def execute(
                         accuracy=evaluate_accuracy or explain,
                         explain=explain,
                     )
+                    if divisor > 1 and any(
+                        memory_limited(phase) for phase in row["diagnostics"][side]
+                    ):
+                        retry, phases = check.inspect_side(
+                            source,
+                            directory / side / "serial-retry",
+                            config,
+                            python,
+                            level,
+                            paired=bool(baseline_python),
+                            primary=raw[side],
+                            env=environment(index, side),
+                            accuracy=evaluate_accuracy or explain,
+                            explain=explain,
+                        )
+                        for key in ("fp64_advisory", "numerical_context"):
+                            if key not in retry and key in row[side]:
+                                retry[key] = row[side][key]
+                        row[side] = retry
+                        row["diagnostics"][side].append(
+                            {"status": "serial_memory_retry", "full_budget_mb": config.max_rss_mb}
+                        )
+                        row["diagnostics"][side].extend(phases)
                 unchanged()
                 commit(directory, "evidence.json", row)
             if row.get("accuracy_evaluated") != (accuracy_required and certificate is None):

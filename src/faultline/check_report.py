@@ -8,6 +8,26 @@ def number(value):
     return f"{value:.4g}" if isinstance(value, (int, float)) and math.isfinite(value) else "—"
 
 
+def scheduling_html(evidence):
+    schedule = evidence.get("scheduling")
+    if not schedule:
+        return ""
+    rows = [
+        ("Requested / chosen jobs", f"{schedule['requested_jobs']} / {schedule['effective_jobs']}"),
+        (
+            "Total candidate / baseline budget (MiB)",
+            f"{schedule['candidate_total_rss_mb']} / {schedule['baseline_total_rss_mb']}",
+        ),
+        ("Measured first-batch peak (MiB)", number(schedule.get("measured_peak_rss_mb"))),
+        ("Scheduling reason", schedule["reason"]),
+        ("Primary serial retries", str(len(schedule["serial_retries"]))),
+    ]
+    table = "".join(
+        f"<tr><th>{html.escape(key)}</th><td>{html.escape(value)}</td></tr>" for key, value in rows
+    )
+    return f"<h2>Memory scheduling</h2><table>{table}</table><p>Full evidence retains the measured allocation and every memory retry. A successful retry does not erase the original attempt.</p>"
+
+
 def accuracy_html(evidence):
     if "completed" not in evidence:
         message = (

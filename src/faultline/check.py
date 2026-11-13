@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .bisect_env import supervise
 from .bootstrap import python_command
-from .check_report import accuracy_html, finding_html
+from .check_report import accuracy_html, finding_html, scheduling_html
 from .native import NativeJob
 from .native_runtime import native_failure_key
 from .runner import run_case
@@ -269,6 +269,7 @@ def report(output, verdict, evidence):
         f"{scope['completed_batches']}/{scope['planned_batches']} conclusive primary batches. "
         f"Execution: {verdict.get('execution_state', 'complete')}.</p>"
         f"<p>{'<br>'.join(environments)}</p>"
+        f"{scheduling_html(evidence)}"
         '<p><a href="verdict.json">Verdict JSON</a> · <a href="evidence.json">Full evidence</a></p>'
         f"{existing_html}<h2>Change-related findings / blocking evidence</h2><ul>{reasons or '<li>No blocking evidence in the requested checks.</li>'}</ul>"
         f"<h2>Notes</h2><ul>{notes}</ul>"

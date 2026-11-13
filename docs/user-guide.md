@@ -58,12 +58,23 @@ Thorough runs the existing eager controls and AOT/mask diagnostic path for every
 `--batches N` changes the requested batch count, but never lowers the ten-complete-batch threshold
 for an accuracy shift. Selecting a captured collection uses its existing batches in order.
 
-`--jobs N` runs independent primary batch pairs in parallel, capped at the planned batch
-count. The default is `max(1, min(4, available cores // 2))`. Parallel jobs require
-`--threads 1`; `--timeout` applies per supervised worker. `--max-rss-mb` is a total worker
-budget divided across effective jobs, including diagnostic workers. For example,
-`--jobs 4 --max-rss-mb 12288` gives each worker 3072 MiB. Use `--jobs 1` for a model
-needing the full budget; Faultline does not silently increase it after a memory limit.
+The default `--jobs auto` measures the first batch alone, then selects up to four workers
+with 25% memory headroom and retries memory-limited batches alone at the full budget.
+The default budget is 75% of available RAM capped at 32 GiB; the chosen allocation and
+retries are printed and retained in the report and evidence JSON.
+
+These 0.18 execution defaults supersede the scheduling section of the preserved 0.17
+policy document. Verdict v2's decision rules remain unchanged.
+
+The measured schedule is `max(1, min(cores // 2, 4, floor(budget / (1.25 * peak))))`,
+also capped by the planned batch count. Both environments contribute to the first-batch
+peak. A missing peak or first-batch memory limit selects one job. Auto diagnostics run
+sequentially with the full budget. Explicit `--jobs N` fixes initial concurrency and
+divides the total `--max-rss-mb` budget across workers, including initial diagnostics;
+a memory-limited attempt still receives a recorded serial retry at the full total budget.
+Retries start only after other owned batch workers finish and never increase the total budget.
+Generic crashes and timeouts are not treated as memory failures. Parallel jobs require
+`--threads 1`; auto with more threads selects one job. `--timeout` applies per supervised worker.
 Coordinator memory and RSS sampling overshoot are outside this bound. The memory limit
 is host RSS including descendants, not a GPU VRAM limit or security sandbox.
 Use `--deterministic` to request the existing deterministic-algorithm and BLAS workspace policy,
@@ -128,7 +139,8 @@ signature. `check` does not relax that predicate or claim to extend PyTorch's mi
 Keep completed artifacts. `--resume` verifies identity before reusing completed batches; use a new
 output directory after changing the model, source, environment, settings, jobs, policy, or inputs.
 Primary commits and diagnostic commits are separate: an interrupted diagnostic does not
-rerun already committed primary workers. A pre-0.17 execution directory is retained as
+rerun already committed primary workers. Auto budget and scheduling decisions are frozen
+and verified on resume. A pre-0.18 execution directory is retained as
 old evidence; its execution identity is incompatible with the new coordinator.
 Resume requires completed preparation. If download or capture was interrupted before the
 prepared bundle was committed, retain that attempt and choose a new output directory.

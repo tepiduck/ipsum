@@ -3,6 +3,7 @@
 User-facing workflows are in the [user guide](../user-guide.md). This section records
 calibration methods, measured limits, and investigations, including negative results.
 
+- [0.18 memory scheduling and transformer costs](memory-018.md)
 - [0.17 change-attribution policy and validation](usability-017.md)
 - [0.16 usability calibration and cost](usability-016.md)
 - [0.16 fresh-install transcript](quickstart-test.md)
