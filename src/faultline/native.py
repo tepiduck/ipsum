@@ -311,6 +311,14 @@ class GraphRecorder:
         self.enabled = True
         self.current_step = 0
 
+    def prepare(self, invocation):
+        self.enabled = invocation == 0
+        if invocation:
+            # The complete cold trace is already serialized and sealed. Warm calls
+            # need counters, not another live copy of every captured parameter.
+            for entry in (*self.entries, *self.aot_entries):
+                entry["requests"].clear()
+
     def record(self, entry, module, args, metadata=None):
         entry["calls"] += 1
         if not self.enabled:
@@ -500,7 +508,7 @@ def evaluate_native(job, settings, directory):
             load_native_graph,
             compile_model if candidate or probe else None,
             requests_selection=job.requests,
-            before_run=(lambda n: setattr(recorder, "enabled", n == 0)) if recorder else None,
+            before_run=recorder.prepare if recorder else None,
             step_hook=(lambda n: setattr(probe, "step", n))
             if probe
             else (lambda n: setattr(recorder, "current_step", n))

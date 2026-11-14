@@ -1691,3 +1691,51 @@ passed. Memory/lifecycle tests cover full-budget calibration, serial retry after
 retry interruption/resume and serial/parallel parity. All 43 protected historical files
 and 25 prior validation entries are preserved. See the [0.18 research record](docs/research/memory-018.md)
 and [portable measurements](docs/research/memory-018.json). No compiler-defect or GPU claim is made.
+
+
+## 0.19 — bounded comparison and observation efficiency
+
+A full GPT-2 standard-check profile attributed 557.56 of 1,388.50 instrumented seconds
+to comparisons, versus 66.66 seconds in compiler calls/cache loading. Peak worker-tree
+RSS was 7,469.83 MiB, including 3,324.03 MiB of retained observations/captured inputs.
+The uninstrumented 0.18 command took 1,253.80 seconds; profiling overhead is explicit.
+
+CPU comparisons now use bounded scratch blocks with the original pointwise operations,
+exact integer counts and maxima. Native observations share only byte-identical owned
+state copies, release raw gradients as copied, release the eager callable after repeat
+checks, and release captured tensors after the complete cold trace is sealed on disk.
+Fresh workers, frozen layouts, all repeat checks and graph artifacts remain. Verdicts,
+policies, tolerances, signatures, reducer predicates and exit codes are unchanged.
+
+| Model | 0.18 min | 0.19 min | Jobs before → after | Probe MiB before → after | Accuracy pairs | Verdict |
+|---|---:|---:|---|---|---:|---|
+| resnet50 | 6.44 | 6.58 | 4 → 4 | 1751 → 1331 | 3/10 | SAFE |
+| bert | 21.56 | 16.11 | 1 → 2 | 6094 → 3091 | 8/10 | SAFE |
+| gpt2 | 20.90 | 15.02 | 1 → 2 | 7405 → 3431 | 5/10 | SAFE |
+| smollm2 | 20.19 | 15.63 | 1 → 2 | 7318 → 3839 | 4/10 | SAFE |
+
+Every model completed all ten primary pairs, and all numerical primary and diagnostic evidence,
+accuracy distributions, stopping decisions, verdict reasons and verdicts match 0.18 exactly.
+Counts below ten accuracy pairs are unchanged early stopping, not missing primary executions.
+These uninstrumented operational costs include auto calibration and required diagnostics;
+other host applications were uncontrolled. The profile and old evidence remain preserved.
+
+Checks passed: Linux portable 407; Windows portable 406 with one skip; CPU Inductor 13;
+legacy 31; all 14 compiler campaign checks; Ruff lint/format; installed-wheel check/resume.
+The scheduling mock fixture now declares available RAM after two initial Windows test
+failures under host memory pressure; production resource policy is unchanged.
+All 26 earlier validation entries and 64 protected documentation/evidence files are preserved.
+See the [profiling and measurement record](docs/research/efficiency-019.md) and
+[portable evidence](docs/research/efficiency-019.json). No compiler-defect or new GPU claim.
+
+Peak RSS including fp64 diagnostics remains higher than the primary probe:
+
+| Model | 0.18 peak worker MiB | 0.19 peak worker MiB |
+|---|---:|---:|
+| resnet50 | 1844 | 1678 |
+| bert | 6316 | 5375 |
+| gpt2 | 7405 | 5982 |
+| smollm2 | 7531 | 6189 |
+
+The 2–3-GiB aspiration is not met throughout transformer checks; sequential fp64 workers
+still use the full budget. These maxima are per worker tree, not the sum of concurrent jobs.

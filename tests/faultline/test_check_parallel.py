@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pytest
 
-from faultline import check, check_execution, sweep
+from faultline import check, check_execution, check_resources, sweep
 from faultline.evaluate import Settings
 from faultline.replication import encoded
 from faultline.storage import atomic_json, read_json
@@ -12,6 +12,9 @@ from faultline.storage import atomic_json, read_json
 
 @pytest.fixture
 def engine(monkeypatch, tmp_path):
+    # These mocked workers allocate no model memory. Keep their scheduling tests
+    # independent of unrelated processes changing the host's available RAM.
+    monkeypatch.setattr(check_resources, "available_memory_mb", lambda: 16000)
     source = tmp_path / "source"
     source.mkdir()
     atomic_json(source / "batches.json", {})

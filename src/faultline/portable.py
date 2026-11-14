@@ -20,6 +20,10 @@ TOLERANCES = {
     "bfloat16": (5e-2, 5e-3),
 }
 
+# Bounds scratch arrays, not the comparison rule. Maxima and integer counts combine
+# exactly across blocks; no floating-point sum or mean is reordered.
+COMPARE_BLOCK_ELEMENTS = 262144
+
 REDUCIBLE = {
     "numerical_mismatch",
     "structural_mismatch",
@@ -77,6 +81,46 @@ def compare(reference, candidate, rtol, atol):
         }
         if ref.shape != actual.shape or ref.dtype != actual.dtype:
             reports.append({**base, "matches": False, "kind": "structure"})
+            continue
+        if (
+            type(ref) is type(actual) is torch.Tensor
+            and ref.device == actual.device
+            and ref.device.type == "cpu"
+            and ref.layout == actual.layout == torch.strided
+            and ref.dtype in {torch.float16, torch.bfloat16, torch.float32, torch.float64}
+            and ref.numel() > COMPARE_BLOCK_ELEMENTS
+            and math.isfinite(rtol)
+            and math.isfinite(atol)
+            and rtol >= 0
+            and atol >= 0
+        ):
+            left, right = ref.reshape(-1), actual.reshape(-1)
+            combined = {
+                **base,
+                "matches": True,
+                "kind": "numeric",
+                "elements": ref.numel(),
+                "mismatched_elements": 0,
+                "reference_nonfinite": 0,
+                "candidate_nonfinite": 0,
+                "max_abs_error": 0.0,
+                "max_scaled_error": 0.0,
+                "bitwise_equal": True,
+            }
+            for start in range(0, ref.numel(), COMPARE_BLOCK_ELEMENTS):
+                stop = start + COMPARE_BLOCK_ELEMENTS
+                block = compare((left[start:stop],), (right[start:stop],), rtol, atol)["outputs"][0]
+                for key in ("matches", "bitwise_equal"):
+                    combined[key] = combined[key] and block[key]
+                for key in ("mismatched_elements", "reference_nonfinite", "candidate_nonfinite"):
+                    combined[key] += block[key]
+                for key in ("max_abs_error", "max_scaled_error"):
+                    combined[key] = (
+                        None
+                        if combined[key] is None or block[key] is None
+                        else max(combined[key], block[key])
+                    )
+            reports.append(combined)
             continue
         # Frozen state and repeat checks often match exactly. Their finite errors
         # are zero; avoid allocating full-sized error buffers for those tensors.

@@ -8,10 +8,32 @@ import importlib.util
 import random
 import sys
 import time
+import weakref
 from contextlib import contextmanager
 from pathlib import Path
 
 import torch
+
+_STATE_SNAPSHOTS = weakref.WeakValueDictionary()
+
+
+def snapshot_state(name, value):
+    """Share only byte-identical owned state copies; never model/input storage."""
+    snapshot = value.detach().cpu().clone()
+    if (
+        type(snapshot) is not torch.Tensor
+        or snapshot.layout != torch.strided
+        or snapshot.is_quantized
+        or not snapshot.is_contiguous()
+        or snapshot.numel() * snapshot.element_size() < 65536
+    ):
+        return snapshot
+    key = (name, snapshot.dtype, tuple(snapshot.shape), tuple(snapshot.stride()))
+    previous = _STATE_SNAPSHOTS.get(key)
+    if previous is not None and torch.equal(previous.view(torch.uint8), snapshot.view(torch.uint8)):
+        return previous
+    _STATE_SNAPSHOTS[key] = snapshot
+    return snapshot
 
 
 @contextmanager
@@ -187,7 +209,10 @@ def observe_native(
             )
             if gradient_hook:
                 gradient_hook(step, targets, derivatives)
-            for (name, value), derivative in zip(targets, derivatives, strict=True):
+            derivatives = list(derivatives)
+            for index, ((name, value), derivative) in enumerate(
+                zip(targets, derivatives, strict=True)
+            ):
                 prefix = f"step:{step}:gradient:{name}"
                 values[prefix + ":present"] = torch.tensor(derivative is not None)
                 # Keep only actual gradients, rather than full-sized zero placeholders.
@@ -195,10 +220,15 @@ def observe_native(
                     if wrong_gradient:
                         derivative = derivative * 2
                     values[prefix + ":value"] = derivative.detach().cpu().clone()
+                # The immutable observation owns its copy; release each raw gradient
+                # instead of retaining the entire derivative tuple until function exit.
+                derivatives[index] = None
     for name, buffer in model.named_buffers():
-        values[f"state:buffer:{name}"] = buffer.detach().cpu().clone()
+        target = f"state:buffer:{name}"
+        values[target] = snapshot_state(target, buffer)
     for name, parameter in model.named_parameters():
-        values[f"state:parameter:{name}"] = parameter.detach().cpu().clone()
+        target = f"state:parameter:{name}"
+        values[target] = snapshot_state(target, parameter)
     return values, structures
 
 
@@ -298,6 +328,9 @@ def check_native(reference, candidate_factory, settings, policy, advisory=None):
             del other
     except Exception as exc:
         return policy.exception_record(exc, "reference_error")
+
+    # Later checks consume the frozen observation, not the eager callable/model.
+    del reference
 
     def cold():
         candidate = candidate_factory()
@@ -424,7 +457,7 @@ def make_native_execution(
             torch.manual_seed(manifest["seed"])
         else:
             payload = torch.load(bundle / "snapshot.pt", map_location=device, weights_only=True)
-            model.load_state_dict(payload["state"], strict=True)
+            model.load_state_dict(payload.pop("state"), strict=True)
             for name, parameter in model.named_parameters():
                 parameter.requires_grad_(payload["trainable"][name])
             requests = payload["requests"]

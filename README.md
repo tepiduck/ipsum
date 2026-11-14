@@ -28,7 +28,7 @@ python3 -m venv .venv
 python -m pip install build
 python -m build --wheel
 python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu
-python -m pip install 'dist/faultline_ml-0.18.0-py3-none-any.whl[sweep]'
+python -m pip install 'dist/faultline_ml-0.19.0-py3-none-any.whl[sweep]'
 faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart
 ```
 
@@ -106,6 +106,8 @@ accuracy flag always needs at least ten completed batches. `--no-early-stop` req
 every accuracy measurement. Missing required evidence can prevent SAFE; skipped optional
 diagnostics do not erase primary results. [0.16 costs](docs/research/usability-016.md)
 remain available under their original execution policy.
+The [0.19 efficiency measurements](docs/research/efficiency-019.md) compare current CPU
+costs and memory use with 0.18 on four frozen pretrained workloads.
 
 ## Compare environments or settings
 

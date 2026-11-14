@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "faultline-ml"
-version = "0.18.0"
+version = "0.19.0"
 description = "Differential testing and failure reduction for PyTorch compilers"
 readme = "README.md"
 requires-python = ">=3.11"

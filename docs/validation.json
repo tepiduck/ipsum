@@ -32084,5 +32084,64 @@
       "docs/research/memory-018.json": "1a3c8c3582be36478d21cea71607880a202b46e96808d056ee27334a5a10bb0f"
     },
     "note": "Execution scheduling only. Verdict v2, primary rules and prior evidence are unchanged. Observational CPU costs, not isolated throughput benchmarks or compiler-defect claims."
+  },
+  "efficiency_validation_019": {
+    "version": "0.19.0",
+    "policy_version": 2,
+    "source_sha256": "f3e0bf5d614dd771a74d63b8f7adc238d99a650076abe12da7d2294040596642",
+    "source_git_normalized_sha256": "b7aaec6f64f06b5f9f80bbd46f8f3c21c32aa887e173c697c2b5c2b432468bff",
+    "checks": {
+      "linux_portable": {
+        "passed": 407,
+        "deselected": 13
+      },
+      "windows_portable": {
+        "passed": 406,
+        "skipped": 1,
+        "deselected": 13
+      },
+      "cpu_inductor": {
+        "passed": 13
+      },
+      "legacy": {
+        "passed": 31
+      },
+      "compiler_campaign": {
+        "passed": true,
+        "checks": 14
+      },
+      "focused_scheduling_fixture": {
+        "passed": 14,
+        "deselected": 1
+      },
+      "ruff_lint": "passed",
+      "ruff_format": "passed",
+      "installed_wheel": {
+        "version": "0.19.0",
+        "installed_wheel": true,
+        "backend": "inductor",
+        "verdict": "SAFE",
+        "completed_batches": 3,
+        "default_auto": true,
+        "resume_preserved_budget_and_commits": true
+      }
+    },
+    "preservation": {
+      "baseline": "23243a8",
+      "prior_validation_entries": 26,
+      "protected_documentation_and_evidence_files": 64
+    },
+    "counts": {
+      "SAFE": 4,
+      "REGRESSION": 0,
+      "NEEDS_REVIEW": 0,
+      "INCONCLUSIVE": 0
+    },
+    "all_numerical_evidence_identical": true,
+    "public_evidence_sha256": {
+      "docs/research/efficiency-019.md": "f9a640d1ec84de3005aae1a9ff018c24b1ba654eb56b79c95b4ad665e0822326",
+      "docs/research/efficiency-019.json": "1170c94df7c22b68c0f1e1ccafcfc7248505e07064c556fe2019d056eeef7054"
+    },
+    "note": "Efficiency only. Verdict policy, primary outcomes, thresholds, signatures, reducer predicates and exit codes are unchanged. No new GPU validation or compiler-defect claim."
   }
 }

@@ -363,3 +363,16 @@ parallel attempts retain their original outcomes and receive a full-budget seria
 after the worker pool drains. Auto diagnostics are sequential and use the full budget;
 explicitly divided diagnostic allocations can also retry serially. Reports retain both
 attempts and identify which completed primary observations the unchanged verdict summarizes.
+
+Version 0.19 bounds CPU floating-point comparison scratch space to 262,144 elements.
+It retains the original pointwise calculation and combines exact integer counts and maxima;
+it does not change tolerances or reorder floating-point sums. Noncontiguous tensors retain
+their original layouts in captured evidence; flattening a noncontiguous value for comparison
+may allocate a temporary contiguous copy. The block limit bounds pointwise error buffers,
+not these layout-conversion copies.
+Native observations weakly share owned state copies only after a byte-for-byte equality check.
+They never share live model storage, and changed state receives a separate copy. Raw gradients
+are released as their observation copies are made, the eager callable is released after its
+repeat checks, and captured graph tensors are released after the complete cold trace is sealed.
+Frozen graph files, repeat counts, fresh-worker isolation and decision rules remain unchanged.
+The [efficiency record](research/efficiency-019.md) includes the profiling method and evidence checks.
