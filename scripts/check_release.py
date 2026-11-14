@@ -48,6 +48,7 @@ FILES = {
     "docs/research/calibration-016.csv",
     "docs/research/cost-016.json",
     "README.md",
+    "LICENSE",
     "RESULTS.md",
     "pyproject.toml",
     "MANIFEST.in",
@@ -151,6 +152,7 @@ def archive_allowed(name, wheel):
                 "RECORD",
                 "entry_points.txt",
                 "top_level.txt",
+                "licenses/LICENSE",
             }
         )
     if public_source(name) or name in {"PKG-INFO", "setup.cfg"}:

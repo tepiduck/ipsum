@@ -153,3 +153,7 @@ commands remain available; check exit codes apply only to the new `check` comman
 - [CLI reference](docs/cli.md), [architecture](docs/architecture.md), and [numerics](docs/numerics.md).
 - [Sweeps](docs/sweeps.md) and [replicated nightly bisection](docs/bisect.md).
 - [Research and validation record](docs/research/README.md), including the historical evidence in RESULTS.md.
+
+## License
+
+Faultline is licensed under the [MIT License](LICENSE).

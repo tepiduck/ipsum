@@ -1,4 +1,4 @@
-include README.md RESULTS.md pyproject.toml
+include LICENSE README.md RESULTS.md pyproject.toml
 recursive-include src/faultline *.py
 recursive-include tests/faultline *.py
 include scripts/validate_faultline.py scripts/check_release.py
