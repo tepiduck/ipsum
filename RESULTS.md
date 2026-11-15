@@ -1791,3 +1791,87 @@ times was 12.83 hours, excluding setup and artifact storage work.
 These are CPU observations, not a compiler-defect claim or a false-positive rate.
 Large inputs, environments and complete worker artifacts remain local. Prior evidence and
 the existing license were not changed.
+
+## 0.20.1 — NVIDIA/CUDA validation
+
+Executed on November 15, 2026, on a Google Colab **Tesla T4** (compute capability 7.5,
+15,360 MiB device memory), driver 580.82.07, two logical CPUs and 12.67 GiB host RAM.
+Initial disk capacity was 112.64 GiB. `nvidia-smi` reported CUDA 13.0. The selected
+environments used **PyTorch 2.15.0+cu132** and **2.16.0.dev20261114+cu132**, with Triton
+3.9.0 and 3.9.0+gitb7ddcf86 respectively. Both actual Inductor `cuda:0` doctor probes
+passed. GPU runs used main commit `3aabc0bcbc97c4fd98d73436d75321985aa63acf` (0.20.0);
+the 0.20.1 reporting fix described below was tested locally afterward.
+
+The original qualification checkpoint retains JSON/HTML reports and worker logs for
+the first eight commands. After reconnection, Colab's runtime storage no longer contained
+the run directories or later archives, which had not yet been downloaded. Ten additional completed runs were recovered from the notebook's
+printed command records and outcomes. Their original detailed JSON/HTML, frozen tensors,
+worker logs and reproducers were not recovered. The following table explicitly marks
+those rows as **notebook only**; their outcomes are recorded observations, not a claim
+that the missing detailed evidence was reconstructed.
+
+| Run | Recorded outcome | Seconds | Host RSS MiB | GPU used MiB | Retained evidence |
+|---|---|---:|---:|---:|---|
+| Stable dtype matrix | 6 pass; 3 `aot_capture_missing`; inconclusive | 132.54 | 1849.7 | 163 | Original checkpoint |
+| Nightly dtype matrix | 6 pass; 3 `aot_capture_missing`; inconclusive | 129.86 | 1971.8 | 163 | Original checkpoint |
+| Stable bfloat16 autocast | 3 pass with compilation-skip warnings | 40.76 | 1690.2 | 161 | Original checkpoint |
+| Nightly bfloat16 autocast | 3 pass with compilation-skip warnings | 41.85 | 1716.2 | 161 | Original checkpoint |
+| Stable buffer/shape sequence | 2 pass | 32.26 | 1660.8 | 161 | Original checkpoint |
+| Nightly buffer/shape sequence | 2 pass | 35.44 | 1686.9 | 161 | Original checkpoint |
+| Stable reduce-overhead | 3 pass | 51.69 | 1735.2 | 183 | Original checkpoint |
+| Nightly reduce-overhead | 3 pass | 51.26 | 1746.9 | 185 | Original checkpoint |
+| ResNet-50 default | INCONCLUSIVE, 0/10 primary pairs | 460.64 | 2470.9 | 511 | Notebook only |
+| ResNet-50 deterministic | SAFE, 10/10 primary pairs | 925.32 | 2951.9 | 917 | Notebook only |
+| BERT default | INCONCLUSIVE, 7/10 primary pairs | 3428.87 | 6147.8 | 2029 | Notebook only |
+| GPT-2 default | SAFE, 10/10 primary pairs | 2910.34 | 6425.8 | 2245 | Notebook only |
+| Injected gradient-scale control | REGRESSION, 1/1 supplied batch | 78.19 | 1686.2 | 161 | Notebook only |
+| Three historical CUDA fixtures | 2 paired reproductions; 1 not observed | 119.10 | 1629.9 | 123 | Notebook only |
+| Stable expanded graph trace | 3 pass | 45.42 | 1633.1 | 183 | Notebook only |
+| Nightly expanded graph trace | 3 pass | 44.70 | 1651.9 | 185 | Notebook only |
+| Stable float16 autocast | 2 gradient mismatches; 1 pass | 54.92 | 1830.7 | 163 | Notebook only |
+| Nightly float16 autocast | 2 gradient mismatches; 1 pass | 55.54 | 1855.4 | 163 | Notebook only |
+
+Memory columns are sampled observations: summed host process-tree RSS and device-wide
+`nvidia-smi` used memory, including contexts, sampled every 0.5 seconds plus query time.
+They are not allocator peaks; short peaks can be missed and shared host pages can be
+counted repeatedly. Command times include preparation, compilation and diagnostics.
+For example, deterministic ResNet-50's own first-batch probe recorded 3,721 MiB, higher
+than the external sampler's 2,951.9-MiB maximum; both observations are retained.
+The 18 commands totaled 2.40 hours, excluding setup and artifact handling.
+
+Float32/float16 dtype qualification passed. T4 bfloat16 runs explicitly warned that
+native bfloat16 compilation was skipped; passing autocast comparisons therefore do not
+validate compiled bfloat16. Float16 autocast reported MLP and convolution gradient
+discrepancies in both current versions; attention passed. No tolerance was changed.
+
+ResNet-50's default eager references were unstable in both environments. Reusing the same
+frozen inputs with `--deterministic` produced SAFE, with pre-existing differences on all
+ten batches. GPT-2 likewise recorded SAFE with ten pre-existing-difference batches. BERT
+recorded unstable **compiled** execution in both environments and incomplete accuracy
+evidence; it remains INCONCLUSIVE. A deterministic BERT run was not performed. All model
+checks used the standard level, default auto scheduling (one job), and explicit `cuda:0`.
+No CPU substitution occurred, and SAFE is limited to the tested change, inputs and settings.
+
+The controlled injected fault returned REGRESSION and stayed explicitly labeled. The
+historical 2.12.0 CUDA environment installed successfully from the official `cu130`
+index. Fixtures **183986** and **182012** recorded `paired_reproduction` against 2.15.0;
+**180164** ran but was `not_observed`. The historical environment's exact resolved build
+manifest and detailed errors were not recovered. These are existing upstream fixtures,
+not new discoveries; nothing was filed upstream.
+
+`TORCH_LOGS=perf_hints` was captured for the original reduce-overhead runs, but those
+preserved logs contain no affirmative capture evidence. Additional runs with
+`+inductor,perf_hints,cudagraphs` completed, but their worker logs were lost with the
+runtime. **Actual CUDA-graph use versus skipping remains unverified.**
+
+The patch makes recognized Inductor bfloat16 compilation-skip warnings visible in
+qualification CLI/JSON/HTML as advisory coverage information. Missing or unreadable logs
+produce unavailable coverage. Primary statuses, verdicts, tolerances, signatures, reducer
+predicates and exit codes remain unchanged. Other NVIDIA architectures, native bfloat16,
+multi-GPU behavior, deterministic BERT and the missing detailed evidence remain untested
+or unresolved. Setup failures and recovery limitations are retained in the
+[NVIDIA research record](docs/research/nvidia-0201.md),
+[JSON evidence](docs/research/nvidia-0201.json), and
+[HTML summary](docs/research/nvidia-0201.html).
+
+Checks passed after the reporting fix: Linux portable 422; actual CPU Inductor 14; legacy 31; all 14 compiler validation checks; Ruff lint and formatting. All 28 prior validation entries, 71 protected historical files and the preceding RESULTS content are preserved.

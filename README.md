@@ -28,7 +28,7 @@ python3 -m venv .venv
 python -m pip install build
 python -m build --wheel
 python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu
-python -m pip install 'dist/faultline_ml-0.20.0-py3-none-any.whl[sweep]'
+python -m pip install 'dist/faultline_ml-0.20.1-py3-none-any.whl[sweep]'
 faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart
 ```
 
@@ -138,8 +138,11 @@ the compatible CUDA/ROCm runtime; use the [PyTorch installer](https://pytorch.or
 
 To compare settings in one interpreter, pass that interpreter as both baseline and
 candidate, then select `--baseline-compile-mode` and `--compile-mode`. For AMD/ROCm
-execution use `--device cuda:0`; Faultline does not fall back to CPU. NVIDIA execution
-has not been validated in this repository.
+execution use `--device cuda:0`; Faultline does not fall back to CPU. NVIDIA Tesla T4
+checks cover float32/float16 qualification, three pretrained models and historical
+controls, with inconclusive results and evidence gaps recorded in the
+[CUDA validation report](docs/research/nvidia-0201.md). Native bfloat16 compilation
+and actual CUDA-graph capture are not established by those runs.
 
 ## CI and reproducer sharing
 

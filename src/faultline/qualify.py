@@ -8,6 +8,35 @@ from .native_artifacts import run_native, write_native_report
 from .storage import atomic_json
 
 
+def compilation_coverage(stderr):
+    """Expose a known Inductor eager fallback without changing the primary predicate."""
+    path = Path(stderr)
+    try:
+        if not path.is_file():
+            return {"advisory_only": True, "status": "unavailable", "warnings": []}
+        lines = path.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError as exc:
+        return {
+            "advisory_only": True,
+            "status": "unavailable",
+            "warnings": [],
+            "error": type(exc).__name__,
+        }
+    warnings = list(
+        dict.fromkeys(
+            line.split("UserWarning:", 1)[-1].strip()
+            for line in lines
+            if "does not support bfloat16 compilation natively, skipping" in line
+        )
+    )
+    return {
+        "advisory_only": True,
+        "status": "skipped" if warnings else "no_skip_reported",
+        "warnings": warnings,
+        "note": "Known skip-warning detection only; absence of a warning does not prove compiler coverage.",
+    }
+
+
 def qualify_device(
     output,
     settings,
@@ -95,12 +124,18 @@ def qualify_device(
                     "status": result["status"],
                     "exit_code": result["exit_code"],
                     "report": f"cases/{key}/check/report.html",
+                    "compilation_coverage": {
+                        **compilation_coverage(directory / "check" / "run" / "stderr.log"),
+                        "evidence": f"cases/{key}/check/run/stderr.log",
+                    },
                 }
             except (ValueError, OSError) as exc:
                 record = {"id": key, "status": "capture_error", "exit_code": 2, "error": str(exc)}
             summary["cases"].append(record)
             if progress:
                 progress(f"{key}: {record['status']}")
+                for warning in record.get("compilation_coverage", {}).get("warnings", []):
+                    progress(f"  Compiler coverage advisory: {warning}; not compiled validation.")
             atomic_json(output / "summary.json", summary)
     codes = [item["exit_code"] for item in summary["cases"]]
     code = 2 if 2 in codes else 1 if 1 in codes else 0

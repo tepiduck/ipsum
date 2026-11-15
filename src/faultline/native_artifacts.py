@@ -163,17 +163,20 @@ def write_native_report(output, summary):
                 for side in ("baseline", "candidate")
                 if isinstance(case.get(side), dict)
             )
+            coverage = case.get("compilation_coverage", {})
+            coverage_text = coverage.get("status", "not recorded")
+            if coverage.get("warnings"):
+                coverage_text += ": " + "; ".join(coverage["warnings"])
             rows.append(
                 f"<tr><td>{label}</td><td>{html.escape(case['status'])}</td>"
                 f"<td>{accuracy_cell(case.get('accuracy_comparison'))}</td>"
                 f"<td>{shift_cell(case.get('accuracy_shift'))}</td>"
-                f"<td>{html.escape(triage)}</td></tr>"
+                f"<td>{html.escape(triage)}</td><td>{html.escape(coverage_text)}</td></tr>"
             )
         table = (
             "<table><tr><th>Workload</th><th>Primary outcome</th>"
-            "<th>Fraction advisory</th><th>Distributional accuracy shift</th><th>Numerical triage</th></tr>"
-            + "".join(rows)
-            + "</table>"
+            "<th>Fraction advisory</th><th>Distributional accuracy shift</th><th>Numerical triage</th>"
+            "<th>Compiler coverage (advisory)</th></tr>" + "".join(rows) + "</table>"
         )
     if "accuracy_comparison" in summary:
         table += (

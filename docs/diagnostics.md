@@ -117,11 +117,18 @@ does not prove CUDA graphs were used. Set `TORCH_LOGS=perf_hints` and inspect ea
 for skip information. The environment records PyTorch CUDA/HIP versions, devices, and float32
 matmul precision.
 
+Qualification reports also expose recognized Inductor bfloat16 compilation-skip warnings in a
+separate compiler-coverage advisory. PyTorch can skip unsupported compilation while the numerical
+comparison still passes. Such a pass is not compiled-dtype validation. Primary statuses, tolerances
+and exit codes are unchanged; `no_skip_reported` only means the known warning was not found.
+
 The manual [GPU workflow](../.github/workflows/gpu.yml) requires a self-hosted Linux runner labeled
 `cuda` or `rocm`, with its matching PyTorch environment already prepared. It runs dtype, autocast,
 state/shape, and compile-mode checks and uploads evidence. It does not run on public pull requests
 or provision a GPU. AMD RX 7900 XT / WSL measurements are recorded in [RESULTS.md](../RESULTS.md).
-NVIDIA/CUDA remains unvalidated.
+Tesla T4 / CUDA observations, including unsupported bfloat16 compilation, float16
+autocast discrepancies and unresolved CUDA-graph coverage, are recorded in the
+[NVIDIA validation report](research/nvidia-0201.md).
 
 ## Remaining work
 
