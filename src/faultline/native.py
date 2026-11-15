@@ -472,6 +472,9 @@ def evaluate_native(job, settings, directory):
     torch._dynamo.reset()
     bundle, directory = Path(job.bundle), Path(directory)
     recorders = []
+    from .compile_tracking import CompilationTracker
+
+    compilation_tracker = CompilationTracker()
 
     def make_execution(candidate=False, precision=None, request_transform=None, probe=None):
         recorder = (
@@ -501,7 +504,7 @@ def evaluate_native(job, settings, directory):
                 return torch.compile(model, backend=recorder.backend, dynamic=settings.dynamic)
             return compile_native_graph(model, recorder.backend)
 
-        return make_native_execution(
+        execution = make_native_execution(
             bundle,
             manifest,
             settings.to_dict(),
@@ -518,6 +521,14 @@ def evaluate_native(job, settings, directory):
             request_transform=request_transform,
             gradient_hook=probe.observe_gradients if probe else None,
         )
+        if candidate and probe is None:
+
+            def tracked_execution():
+                with compilation_tracker.observe():
+                    return execution()
+
+            return tracked_execution
+        return execution
 
     def advisory(eager, candidate, primary):
         from . import native_precision
@@ -611,6 +622,7 @@ def evaluate_native(job, settings, directory):
     if job.aot:
         atomic_json(directory / "aot-graphs.json", aot_graphs)
     result.update(
+        compilation_structure=compilation_tracker.summary(),
         graphs=graphs,
         graph_count=len(graphs),
         parameter_count=manifest.get("parameter_count"),

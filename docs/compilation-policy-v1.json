@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "policy": "compilation-structure-v1",
+  "advisory_only": true,
+  "new_graph_breaks": "At least one normalized reason/location in the candidate is absent from its paired baseline batch; both observations must have complete graph-break coverage.",
+  "recompile_increase": "Candidate recompile events exceed baseline by at least one in a paired batch; both observations must have complete recompile coverage.",
+  "compile_time_increase": {
+    "minimum_ratio": 1.5,
+    "minimum_absolute_increase_seconds": 10.0,
+    "aggregation": "Compare arithmetic mean compile wall seconds over the same complete paired primary batches; require all planned primary pairs for the time advisory."
+  },
+  "scope": "Only existing compiled primary executions, including cold call, warm repeats and existing exception confirmations. Exclude eager and optional diagnostic replays. Never invoke explain or execute the model an extra time to collect telemetry.",
+  "timing": "Dynamo compilation metric intervals (forward and deferred backward), merged to avoid double counting nested intervals. Includes tracing, cache lookup and compiler work; cache state, warm repeats and graph breaks affect these observational costs. Not an isolated benchmark.",
+  "counts": "Frame attempts and captured graphs are deltas of Dynamo counters. Recompiles are compilation metric events with a nonempty recompile reason, not guard-failure strings (multiple guards may fail per event). Reasons and source locations are deduplicated while event counts remain explicit. Fresh batch workers cannot observe recompilation across batches.",
+  "missing": "Unavailable or incompatible adapter evidence is marked partial/unavailable, never interpreted as zero and never changes primary status, fingerprint, v2 verdict or exit code.",
+  "normalization": "Replace memory addresses and factory import namespaces; use a source filename and line number rather than machine-specific absolute paths for matching. Retain raw evidence locally.",
+  "predeclared": "Before 0.20 measurements. No thresholds are selected from the seven-night history."
+}

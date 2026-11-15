@@ -376,3 +376,14 @@ are released as their observation copies are made, the eager callable is release
 repeat checks, and captured graph tensors are released after the complete cold trace is sealed.
 Frozen graph files, repeat counts, fresh-worker isolation and decision rules remain unchanged.
 The [efficiency record](research/efficiency-019.md) includes the profiling method and evidence checks.
+
+Version 0.20 adds an isolated Dynamo telemetry adapter around existing primary compiled calls.
+`compilation.py` aggregates its observations into report notes after the existing verdict has
+been computed. Native sweep comparisons retain the same advisory structure separately from
+their classifications. Unsupported telemetry cannot replace a primary result.
+
+`watch.py` coordinates frozen model catalogs, supervised standard checks, committed history and
+HTML timelines. It reuses the environment installer and the check scheduler. `verdict_bisect.py`
+adds an explicit standard-check v2 bisection mode, with independent endpoint confirmation and
+full input-collection exports; existing accuracy-only bisection modes retain their behavior.
+The external scheduler invokes watch once at a time. No issue tracker is contacted.

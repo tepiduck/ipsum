@@ -120,7 +120,7 @@ def terminal(verdict, output):
             )
     if verdict["notes"]:
         lines.append(
-            f"Notes: {len(verdict['notes'])} explanations, baseline-only differences or unavailable diagnostics; see report."
+            f"Notes: {len(verdict['notes'])} explanations, baseline-only differences, compilation advisories or unavailable diagnostics; see report."
         )
     if any(note["code"] == "diagnostic_skipped_memory" for note in verdict["notes"]):
         lines.append("Diagnostics: skipped (memory); completed primary evidence retained.")

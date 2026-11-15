@@ -203,6 +203,14 @@ def inspect_side(
 
 
 def report(output, verdict, evidence):
+    from .compilation import compare_structure, notes, structure_html
+
+    structure = compare_structure(evidence.get("batches", []), verdict["scope"]["planned_batches"])
+    evidence["compilation_structure"] = structure
+    codes = {"new_graph_breaks", "recompile_increase", "compile_time_increase"}
+    verdict["notes"] = [note for note in verdict["notes"] if note["code"] not in codes] + notes(
+        structure
+    )
     atomic_json(output / "evidence.json", evidence)
     atomic_json(output / "verdict.json", verdict)
     reasons = "".join(f"<li>{html.escape(r['message'])}</li>" for r in verdict["reasons"])
@@ -273,6 +281,7 @@ def report(output, verdict, evidence):
         '<p><a href="verdict.json">Verdict JSON</a> · <a href="evidence.json">Full evidence</a></p>'
         f"{existing_html}<h2>Change-related findings / blocking evidence</h2><ul>{reasons or '<li>No blocking evidence in the requested checks.</li>'}</ul>"
         f"<h2>Notes</h2><ul>{notes}</ul>"
+        f"{structure_html(structure)}"
         f"{accuracy_html(verdict['accuracy_shift_replicated'])}"
         f"<h2>Batch evidence</h2><table><tr><th>Batch</th><th>Environment</th><th>Primary status</th><th>Explanation labels</th><th>Diagnostics</th></tr>{''.join(batches)}</table>"
         f"<h2>Finding details</h2>{''.join(findings) or '<p>No failing primary targets.</p>'}"

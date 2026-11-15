@@ -119,7 +119,7 @@ def create_environment(
                     "pip",
                     "install",
                     "--only-binary=:all:",
-                    *(["--pre"] if torch_spec == "nightly" else []),
+                    *(["--pre"] if torch_spec == "nightly" or "/nightly/" in index_url else []),
                     *torch_args,
                     "--index-url",
                     index_url,

@@ -1739,3 +1739,55 @@ Peak RSS including fp64 diagnostics remains higher than the primary probe:
 
 The 2–3-GiB aspiration is not met throughout transformer checks; sequential fp64 workers
 still use the full budget. These maxima are per worker tree, not the sum of concurrent jobs.
+
+
+## 0.20 — nightly watch and compilation structure
+
+`check` and sweeps now record Dynamo frames, graphs, graph breaks and source locations,
+recompiles and guard reasons, and forward/backward compile wall time. The comparison
+report shows paired deltas. New graph breaks, increased recompiles, and compile time
+at least 1.5× and ten seconds higher are advisory notes under a policy declared before
+measurement. Verdict v2, primary statuses, tolerances, signatures, reducer predicates
+and existing exit codes are unchanged.
+
+`faultline watch` installs isolated nightly environments and runs standard checks against
+both pinned stable and the previous available nightly. Immutable committed records feed
+resumable JSON and per-model HTML histories. A v2 REGRESSION exports the full frozen batch
+collection and triggers replicated bisection when an observed SAFE bracket exists, with
+independent endpoint confirmation. Nothing is filed upstream. CPU GitHub Actions and local
+WSL/AMD cron/systemd setup are documented; no local timer was installed.
+
+The real CPU seed covered November 8–14, 2026, with November 7 as the previous-nightly
+anchor and 2.15.0+cpu as stable. All 70 checks and 700/700 primary batch pairs completed:
+
+| Model | Stable comparison | Previous-nightly comparison |
+|---|---|---|
+| resnet50 | 7 SAFE | 7 SAFE |
+| mobilenet_v3_small | 7 SAFE | 7 SAFE |
+| bert | 7 SAFE | 7 SAFE |
+| gpt2 | 7 SAFE | 7 SAFE |
+| vit_b_16 | 7 SAFE | 7 SAFE |
+
+There were no compilation advisories; all 70 checks had complete compile-time coverage.
+Accuracy diagnostics completed 273 paired scores with the unchanged early-stopping
+rule and no replicated accuracy flag. The seed therefore did not exercise a real regression
+bisection; controlled lifecycle tests cover that path. Actual Inductor adapter controls on
+2.15.0 and the November 13 nightly retained identical outputs/gradients while an inserted
+break and shape specialization changed frames/graphs/breaks/recompiles from 1/1/0/0 to
+4/4/2/2. The controls generated both expected structural labels.
+
+Checks passed: Linux portable 418 plus one focused export test; Windows portable 417 plus
+one focused export test and one platform skip; CPU Inductor 14; legacy 31; compiler campaign
+14/14; Ruff lint and formatting. A fresh default-catalog MobileNetV3 preparation captured
+ten batches and verified reuse. An installed wheel reused all 70 committed seed checks
+without new check supervisors or altered evidence hashes. All 27 prior validation entries,
+65 protected historical evidence files and the preceding RESULTS content are preserved.
+
+See the [0.20 research record](docs/research/watch-020.md),
+[per-pair evidence](docs/research/watch-020.json), and [watch setup](docs/watch.md).
+The seed used preserved 0.16 inputs with pinned current model dependencies, including
+Transformers 5.23.0; it is not an exact rerun of the 0.19 environment. The sum of check command
+times was 12.83 hours, excluding setup and artifact storage work.
+These are CPU observations, not a compiler-defect claim or a false-positive rate.
+Large inputs, environments and complete worker artifacts remain local. Prior evidence and
+the existing license were not changed.

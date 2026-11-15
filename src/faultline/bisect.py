@@ -440,8 +440,14 @@ def add_bisect_command(commands):
     parser.add_argument("--requirements", type=Path, help="exact pinned non-PyTorch dependencies")
     parser.add_argument("--growth", type=float, default=1.4)
     parser.add_argument(
-        "--predicate", choices=("single-input", "replicated"), default="single-input"
+        "--predicate", choices=("single-input", "replicated", "verdict-v2"), default="single-input"
     )
+    parser.add_argument("--device", default="cpu", help="device for verdict-v2 bisection")
+    parser.add_argument("--index-url", help="nightly wheel index for verdict-v2")
+    parser.add_argument("--environment-cache", type=Path)
+    parser.add_argument("--jobs", default="auto")
+    parser.add_argument("--max-wall-s", type=float, default=21600)
+    parser.add_argument("--deterministic", action="store_true")
     parser.add_argument("--observations", type=int, default=3)
     parser.add_argument("--timeout", type=float, default=600)
     parser.add_argument("--max-rss-mb", type=int, default=12288)
@@ -457,6 +463,42 @@ def add_bisect_command(commands):
 def bisect_command(args):
     if args.retry_installations and not args.resume:
         raise ValueError("--retry-installations requires --resume")
+    if args.predicate == "verdict-v2":
+        import time
+
+        from .check_cli import jobs_argument
+        from .verdict_bisect import run_verdict_bisect
+
+        if args.requirements or args.retry_installations:
+            raise ValueError(
+                "verdict-v2 uses the watch environment installer and immutable completed checks"
+            )
+        if not math.isfinite(args.max_wall_s) or args.max_wall_s <= 0:
+            raise ValueError("--max-wall-s must be finite and positive")
+        result = run_verdict_bisect(
+            args.bundle,
+            args.output,
+            interpreter(args.baseline_python),
+            args.start,
+            args.end,
+            settings=Settings(
+                device=args.device,
+                gradients=True,
+                repeats=2,
+                threads=1,
+                timeout_s=args.timeout,
+                max_rss_mb=args.max_rss_mb,
+                deterministic=args.deterministic,
+            ),
+            index_url=args.index_url,
+            environment_cache=args.environment_cache,
+            jobs=jobs_argument(args.jobs),
+            install_timeout=args.install_timeout,
+            resume=args.resume,
+            deadline=time.monotonic() + args.max_wall_s,
+        )
+        print(result["status"], result["boundary"])
+        return result["exit_code"]
     result = run_bisect(
         args.bundle,
         args.output,

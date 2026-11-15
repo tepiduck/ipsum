@@ -59,3 +59,5 @@ include scripts/validate_check_memory.py
 include scripts/summarize_check_memory.py
 include scripts/profile_check_workers.py scripts/summarize_check_efficiency.py
 include docs/verdict-policy-v2.md docs/verdict-v2.schema.json
+include docs/watch.md docs/compilation-policy-v1.json docs/compilation-structure.md
+include scripts/validate_compilation.py

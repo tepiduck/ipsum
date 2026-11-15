@@ -34,12 +34,12 @@ class WheelLinks(HTMLParser):
             self.links.extend(value for key, value in attrs if key == "href")
 
 
-def nightly_catalog(start, end, *, document=None, tags=None):
+def nightly_catalog(start, end, *, document=None, tags=None, index_url=INDEX, local_version="cpu"):
     first, last = date.fromisoformat(start), date.fromisoformat(end)
     if first > last or (last - first).days > 366:
         raise ValueError("Nightly search requires an ordered window of at most 366 days")
     if document is None:
-        with urllib.request.urlopen(INDEX, timeout=30) as response:
+        with urllib.request.urlopen(index_url, timeout=30) as response:
             document = response.read(16 * 1024**2 + 1)
         if len(document) > 16 * 1024**2:
             raise ValueError("Nightly index exceeds the size limit")
@@ -49,7 +49,7 @@ def nightly_catalog(start, end, *, document=None, tags=None):
     compatible = set(sys_tags() if tags is None else tags)
     wheels = {}
     for link in parser.links:
-        url = urllib.parse.urljoin(INDEX, link)
+        url = urllib.parse.urljoin(index_url, link)
         parts = urllib.parse.urlsplit(url)
         if parts.scheme != "https" or parts.hostname not in {
             "download.pytorch.org",
@@ -63,7 +63,7 @@ def nightly_catalog(start, end, *, document=None, tags=None):
             name, version, _, wheel_tags = parse_wheel_filename(filename)
         except ValueError:
             continue
-        if name != "torch" or version.local != "cpu" or not wheel_tags & compatible:
+        if name != "torch" or version.local != local_version or not wheel_tags & compatible:
             continue
         match = re.search(r"\.dev(\d{8})(?:\+|$)", str(version))
         if not match:
@@ -83,11 +83,11 @@ def nightly_catalog(start, end, *, document=None, tags=None):
         }
         key = day.isoformat()
         if key in wheels and wheels[key] != row:
-            raise ValueError(f"Ambiguous compatible CPU wheels on {key}")
+            raise ValueError(f"Ambiguous compatible {local_version} wheels on {key}")
         wheels[key] = row
     days = [first + timedelta(days=i) for i in range((last - first).days + 1)]
     return {
-        "index": INDEX,
+        "index": index_url,
         "wheels": [wheels[k] for k in sorted(wheels)],
         "missing_dates": [d.isoformat() for d in days if d.isoformat() not in wheels],
     }

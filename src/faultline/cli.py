@@ -244,6 +244,9 @@ def main(argv=None):
     from .bisect import add_bisect_command, bisect_command
 
     add_bisect_command(commands)
+    from .watch import add_watch_command, watch_command
+
+    add_watch_command(commands)
     args = parser.parse_args(argv)
     try:
         if args.command == "check":
@@ -252,6 +255,8 @@ def main(argv=None):
             return env_command(args)
         if args.command == "bisect":
             return bisect_command(args)
+        if args.command == "watch":
+            return watch_command(args)
         if args.command == "sweep":
             return sweep_command(args, settings_from)
         if args.command == "benchmark":

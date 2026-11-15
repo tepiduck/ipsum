@@ -224,6 +224,9 @@ def compare_batches(
                 "accuracy_shift_replicated": accuracy_shift_replicated(scores, manifest["planned"]),
                 "exit_code": gate_status(Counter(row["classification"] for row in results)),
             }
+            from .compilation import compare_structure
+
+            summary["compilation_structure"] = compare_structure(results, manifest["planned"])
             write_native_report(output, summary)
         if not results:
             summary = {

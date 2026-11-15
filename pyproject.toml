@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "faultline-ml"
-version = "0.19.0"
+version = "0.20.0"
 description = "Differential testing and failure reduction for PyTorch compilers"
 readme = "README.md"
 license = "MIT"
@@ -43,3 +43,5 @@ target-version = "py311"
 "src/faultline/worker.py" = ["BLE001"]
 "src/faultline/native.py" = ["BLE001"]
 "src/faultline/native_runtime.py" = ["BLE001"]
+# Advisory adapter failures must never replace a primary execution outcome.
+"src/faultline/compile_tracking.py" = ["BLE001"]

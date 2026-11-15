@@ -111,9 +111,17 @@ def export_native(job, settings, output, expected=None):
 
 
 def write_native_report(output, summary):
+    from .compilation import structure_html
+
     output = Path(output)
     atomic_json(output / "summary.json", summary)
     body = html.escape(json.dumps(summary, indent=2))
+    compilation_section = structure_html(summary.get("compilation_structure"))
+    for row in summary.get("cases", summary.get("models", [])):
+        if row.get("compilation_structure"):
+            compilation_section += f"<h3>{html.escape(str(row['id']))}</h3>" + structure_html(
+                row["compilation_structure"]
+            )
     links = ['<a href="summary.json">JSON result</a>']
     if (output / "workload" / "workload.json").exists():
         links.append('<a href="workload/workload.json">Workload manifest</a>')
@@ -212,7 +220,11 @@ def write_native_report(output, summary):
         "table{border-collapse:collapse;width:100%;table-layout:fixed}"
         "th,td{padding:.5rem;text-align:left;vertical-align:top;border-bottom:1px solid #ddd;overflow-wrap:anywhere}"
         "pre{white-space:pre-wrap;overflow-wrap:anywhere}a{margin-right:20px}</style>"
-        "<h1>Model comparison</h1>" + " ".join(links) + table + f"<pre>{body}</pre>",
+        "<h1>Model comparison</h1>"
+        + " ".join(links)
+        + table
+        + compilation_section
+        + f"<pre>{body}</pre>",
         encoding="utf-8",
     )
 
@@ -340,7 +352,12 @@ def compare_native_environments(
     baseline = run_case(job, settings, output / "baseline", python=baseline_python)
     candidate = run_case(job, candidate_settings, output / "candidate", python=candidate_python)
     label = classification(baseline, candidate)
+    from .compilation import compare_structure
+
     summary = {
+        "compilation_structure": compare_structure(
+            [{"baseline": baseline, "candidate": candidate}]
+        ),
         "schema_version": 1,
         "classification": label,
         "exit_code": gate_status({label: 1}),

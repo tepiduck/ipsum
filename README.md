@@ -28,7 +28,7 @@ python3 -m venv .venv
 python -m pip install build
 python -m build --wheel
 python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu
-python -m pip install 'dist/faultline_ml-0.19.0-py3-none-any.whl[sweep]'
+python -m pip install 'dist/faultline_ml-0.20.0-py3-none-any.whl[sweep]'
 faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart
 ```
 
@@ -108,6 +108,19 @@ diagnostics do not erase primary results. [0.16 costs](docs/research/usability-0
 remain available under their original execution policy.
 The [0.19 efficiency measurements](docs/research/efficiency-019.md) compare current CPU
 costs and memory use with 0.18 on four frozen pretrained workloads.
+Reports also show [compilation structure](docs/compilation-structure.md): graph breaks,
+recompilation reasons and observed compile time. These notes do not change the verdict.
+
+## Watch nightlies
+
+```bash
+faultline watch --output faultline-runs/nightly-watch
+```
+
+Watch compares five pretrained models with pinned stable PyTorch and the previous
+available nightly, using standard checks. Repeating the command resumes or appends to
+the saved JSON/HTML history. Regressions trigger replicated bisection when a SAFE nightly
+bracket exists. See [watch setup](docs/watch.md) for catalogs, CPU CI, and WSL/AMD scheduling.
 
 ## Compare environments or settings
 
@@ -144,7 +157,8 @@ python check-report/reproducer/repro.py
 Reproducers include exact model weights, inputs, and trusted factory code. Inspect
 them before sharing. Large checkpoints and private inputs should stay out of Git.
 The existing `model reduce`, `model export`, `sweep`, `bisect`, `benchmark`, and `ui`
-commands remain available; check exit codes apply only to the new `check` command.
+commands remain available with their existing exit conventions. `watch` uses the
+same verdict exit codes as `check` and returns INCONCLUSIVE when its plan is incomplete.
 
 ## Documentation
 

@@ -32143,5 +32143,98 @@
       "docs/research/efficiency-019.json": "1170c94df7c22b68c0f1e1ccafcfc7248505e07064c556fe2019d056eeef7054"
     },
     "note": "Efficiency only. Verdict policy, primary outcomes, thresholds, signatures, reducer predicates and exit codes are unchanged. No new GPU validation or compiler-defect claim."
+  },
+  "nightly_watch_validation_020": {
+    "version": "0.20.0",
+    "policy_version": 2,
+    "source_sha256": "281a9a16f3330d87d06c97af35f4ea7e24f71ccf37efbee7aedfb4ef39f6865d",
+    "checks": {
+      "linux_portable": {
+        "passed": 418,
+        "deselected": 14
+      },
+      "windows_portable": {
+        "passed": 417,
+        "skipped": 1,
+        "deselected": 14
+      },
+      "focused_export": {
+        "linux_passed": 1,
+        "windows_passed": 1
+      },
+      "cpu_inductor": {
+        "passed": 14
+      },
+      "legacy": {
+        "passed": 31
+      },
+      "compiler_campaign": {
+        "passed": true,
+        "checks": 14
+      },
+      "adapter_stable_and_nightly": {
+        "passed": true,
+        "controlled": true
+      },
+      "ruff_lint": "passed",
+      "ruff_format": "passed",
+      "fresh_catalog_preparation": {
+        "batches": 10,
+        "bundle_sha256": "0abda4299bd30bd15c3b50220777c5fe5277dd118e92fda0109ed19a95278032",
+        "model": "mobilenet_v3_small",
+        "planned": 10,
+        "pretrained": true,
+        "resume_reused_capture": true,
+        "seconds": 37.19722125299995
+      },
+      "installed_wheel_resume": {
+        "checks_unchanged": true,
+        "committed_files_verified": 420,
+        "completed_checks": 70,
+        "installed_wheel": true,
+        "no_new_check_supervisors": true,
+        "returncode": 0,
+        "seconds": 48.01047651400586,
+        "source_sha256": "281a9a16f3330d87d06c97af35f4ea7e24f71ccf37efbee7aedfb4ef39f6865d",
+        "version": "0.20.0"
+      }
+    },
+    "preservation": {
+      "baseline": "dd67eaad32c207c53411bee02b899992c19f8831",
+      "prior_validation_entries": 27,
+      "protected_evidence_files": 65
+    },
+    "nightlies": [
+      "2026-11-08",
+      "2026-11-09",
+      "2026-11-10",
+      "2026-11-11",
+      "2026-11-12",
+      "2026-11-13",
+      "2026-11-14"
+    ],
+    "planned_checks": 70,
+    "completed_checks": 70,
+    "summary": {
+      "accuracy_decisions_complete": 70,
+      "accuracy_flags": 0,
+      "accuracy_pairs": 273,
+      "check_command_wall_hours": 12.83146673373472,
+      "compilation_advisories": {},
+      "compile_timing_coverage": {
+        "complete": 70
+      },
+      "planned_primary_pairs": 700,
+      "primary_pairs": 700,
+      "verdicts": {
+        "SAFE": 70
+      }
+    },
+    "public_evidence_sha256": {
+      "docs/research/watch-020.md": "145645de64c8679b36c341b71c3c5aeb03e4764ff5c1b30414b002afd041734c",
+      "docs/research/watch-020.json": "2f6dfaed16cc4c74c9991074cbb7cbe3460e49d06fa9ff7440dc951e2e00a205",
+      "docs/compilation-policy-v1.json": "e6756a55c73ab70b7cc2eceba8354167c7ca950bf03c11fa83bbddecd65f7dcd"
+    },
+    "note": "Advisory compilation telemetry and nightly orchestration only. Verdict v2, primary rules and prior evidence remain unchanged. No real regression in the seed; automatic bisection is covered by controlled lifecycle tests. No new GPU validation, false-positive-rate or compiler-defect claim."
   }
 }

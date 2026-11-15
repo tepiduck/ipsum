@@ -110,6 +110,7 @@ def finding_context(result):
     )
     return {
         "status": result["status"],
+        "compilation_structure": result.get("compilation_structure", {}),
         "labels": labels,
         "label_coverage": {
             k: {name: value for name, value in row.items() if name != "targets"}
@@ -296,6 +297,7 @@ def run_sweep(
                     row = {
                         "id": name,
                         "classification": result["classification"],
+                        "compilation_structure": result.get("compilation_structure", {}),
                         "baseline": finding_context(result["baseline"]),
                         "candidate": finding_context(result["candidate"]),
                         "accuracy_comparison": {

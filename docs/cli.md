@@ -305,7 +305,7 @@ faultline env create --torch 2.15.0 --device cpu --output environments/stable
 faultline env create --torch nightly --minimal --output environments/nightly
 ```
 
-Only `check` uses SAFE/0, REGRESSION/1, NEEDS_REVIEW/2, INCONCLUSIVE/3.
+`check` uses SAFE/0, REGRESSION/1, NEEDS_REVIEW/2, INCONCLUSIVE/3.
 Argument/setup failures use 3; malformed arguments may not create report files.
 See the [user guide](user-guide.md), [paired v2 policy](verdict-policy-v2.md), and
 [JSON contract](verdict-schema.md). Model source options are mutually exclusive.
@@ -319,3 +319,25 @@ across jobs. Memory-limited parallel attempts receive a serial full-budget retry
 alongside the original evidence. Accuracy diagnostics consume batches in order;
 `--no-early-stop` disables mathematical stopping of those diagnostics. All planned primaries run.
 `env create --resume` verifies the installed identity; GPU indexes are explicit.
+
+## Nightly watch and compilation notes
+
+```bash
+faultline watch --output faultline-runs/watch
+faultline watch --catalog models.json --seed-nightlies 7 --output faultline-runs/seed
+faultline bisect frozen-batches --predicate verdict-v2 --baseline-python /stable/python --start 2026-11-07 --end 2026-11-13 --output faultline-runs/verdict-bisect
+```
+
+Watch uses standard checks and unchanged v2 policy. It exits 1 for a REGRESSION in the
+selected nightly/model comparisons, 3 for incomplete work or INCONCLUSIVE, 2 for
+NEEDS_REVIEW, otherwise 0. Existing command exit codes remain unchanged. Old timeline
+rows outside the selected dates do not determine the current invocation's exit code.
+Operational setup failures return 3; malformed command-line syntax uses argparse's 2.
+`bisect --predicate verdict-v2` retains the bisection command's 0 for a confirmed adjacent
+boundary and 2 for an inconclusive search; it does not use check's verdict exit codes.
+
+Compilation structure is recorded in native worker outcomes and shown separately in check
+and sweep reports. The labels `new_graph_breaks`, `recompile_increase` and
+`compile_time_increase` are advisory notes; they do not affect any gate or reducer.
+See [the fixed policy](compilation-policy-v1.json), [collection details](compilation-structure.md),
+and [watch scheduling/resume](watch.md).
