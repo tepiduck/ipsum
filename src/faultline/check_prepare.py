@@ -58,7 +58,11 @@ def prepare(specification, output):
                 sweep_models.TEXT_MODELS[name] = model_id
             if specification.get("revision"):
                 sweep_models.TEXT_REVISIONS[name] = specification["revision"]
-        sweep_models.real_inputs(output / "inputs", count)
+        sweep_models.real_inputs(
+            output / "inputs",
+            count,
+            modality="vision" if specification.get("torchvision") else "text",
+        )
         sweep_models.prepare_model(name, output / "source", output / "inputs")
         factory = f"{output / 'source/factory.py'}:factory"
         include = ["weights.pt", "inputs.pt", "model.json"]

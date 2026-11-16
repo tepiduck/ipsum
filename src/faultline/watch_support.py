@@ -23,6 +23,10 @@ DEFAULT_CATALOG = [
 ]
 
 
+class HistoryIncompatible(ValueError):
+    """A different campaign identity, distinct from corrupted committed evidence."""
+
+
 def catalog(path=None):
     rows = read_json(path) if path else DEFAULT_CATALOG
     return validate_catalog(rows)
@@ -116,6 +120,18 @@ def frozen_plan(root, models, records, seed_nightlies, through, discover_catalog
         "selected_dates": [w["date"] for w in wheels[-seed_nightlies:]],
         "seed_nightlies": seed_nightlies,
         "through": through,
+    }
+    requested = through or datetime.now(UTC).date().isoformat()
+    selected = wheels[-1]["date"]
+    plan["availability"] = {
+        "requested_through": requested,
+        "latest_available": selected,
+        "fallback": selected < requested,
+        "reason": (
+            f"No compatible nightly published for {requested}; using latest available {selected}."
+            if selected < requested
+            else f"Using latest available nightly {selected}."
+        ),
     }
     path = root / "plans" / f"{time.time_ns()}.json"
     atomic_json(path, plan)

@@ -2,6 +2,8 @@
 
 import hashlib
 import json
+import time
+import urllib.error
 import urllib.request
 from pathlib import Path
 
@@ -108,29 +110,44 @@ def digest(path):
 
 def download(url, path):
     path = Path(path)
-    with urllib.request.urlopen(url, timeout=60) as response:
-        data = response.read(16 * 1024**2 + 1)
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(url, timeout=60) as response:
+                data = response.read(16 * 1024**2 + 1)
+            break
+        except urllib.error.HTTPError as exc:
+            if exc.code not in {429, 500, 502, 503, 504} or attempt == 2:
+                raise
+            time.sleep(2**attempt)
+        except urllib.error.URLError:
+            if attempt == 2:
+                raise
+            time.sleep(2**attempt)
     if len(data) > 16 * 1024**2:
         raise ValueError("Sweep sample exceeds the 16 MiB input download limit")
     path.write_bytes(data)
     return {"url": url, "sha256": digest(path), "bytes": len(data)}
 
 
-def real_inputs(directory, input_batches=1):
+def real_inputs(directory, input_batches=1, *, modality="both"):
     if type(input_batches) is not int or input_batches < 1:
         raise ValueError("input_batches must be positive")
+    if modality not in {"both", "vision", "text"}:
+        raise ValueError("Unknown input modality")
     directory = Path(directory)
     directory.mkdir(parents=True, exist_ok=False)
     sources = []
-    for index, url in enumerate(IMAGE_URLS):
+    for index, url in enumerate(IMAGE_URLS if modality != "text" else ()):
         sources.append(download(url, directory / f"image-{index}.jpg"))
-    sources.append(download(BOOK_URL, directory / "book.txt"))
-    book = (directory / "book.txt").read_text(encoding="utf-8-sig")
-    start = book.index("Alice was beginning to get very tired")
-    # Fixed real prose, not generated tokens. Both text samples remain in the input manifest.
-    paragraphs = [
-        part.strip().replace("\n", " ") for part in book[start:].split("\n\n") if part.strip()
-    ]
+    paragraphs = []
+    if modality != "vision":
+        sources.append(download(BOOK_URL, directory / "book.txt"))
+        book = (directory / "book.txt").read_text(encoding="utf-8-sig")
+        start = book.index("Alice was beginning to get very tired")
+        # Fixed real prose, not generated tokens.
+        paragraphs = [
+            part.strip().replace("\n", " ") for part in book[start:].split("\n\n") if part.strip()
+        ]
     texts = paragraphs[:2]
     manifest = {
         "schema_version": 1,
@@ -144,12 +161,12 @@ def real_inputs(directory, input_batches=1):
         from PIL import Image
 
         words = " ".join(paragraphs[2:]).split()
-        if 400 * input_batches > len(words):
+        if modality != "vision" and 400 * input_batches > len(words):
             raise ValueError("Insufficient disjoint source text for requested input batches")
         manifest["batches"] = []
         for batch in range(input_batches):
             images = []
-            for index in range(2):
+            for index in range(2 if modality != "text" else 0):
                 with Image.open(directory / f"image-{index}.jpg") as image:
                     left = image.width * batch // input_batches
                     right = image.width * (batch + 1) // input_batches
@@ -180,6 +197,21 @@ def real_inputs(directory, input_batches=1):
         manifest["scope"] = (
             "Disjoint deterministic image strips from two photos and disjoint 200-word passages from one book; source dependence remains. Original full images/paragraphs are retained separately, not counted as replicates."
         )
+    if modality != "both":
+        manifest["modality"] = modality
+        manifest["scope"] = (
+            "Two real photographs; multiple batches use disjoint deterministic strips, not independent photographs."
+            if modality == "vision"
+            else "Public-domain prose from one book; multiple batches use disjoint 200-word passages. Source dependence remains."
+        )
+        if modality == "vision":
+            manifest.pop("texts")
+            for batch in manifest.get("batches", []):
+                batch.pop("texts")
+                batch.pop("word_range")
+        else:
+            for batch in manifest.get("batches", []):
+                batch.pop("images")
     (directory / "inputs.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
     return manifest
 

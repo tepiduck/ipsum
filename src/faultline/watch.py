@@ -19,6 +19,7 @@ from .evaluate import Settings
 from .native import file_hash
 from .storage import atomic_json, campaign_lock, provenance, read_json
 from .watch_support import (
+    HistoryIncompatible,
     catalog,
     commit_record,
     discover,
@@ -68,7 +69,17 @@ def prepared_model(root, model, baseline, settings, deadline):
                 max_rss_mb=settings.max_rss_mb,
             )
             if observed["status"] != "complete":
-                raise ValueError(f"Preparation {observed['status']}; logs retained in {parent}")
+                detail = ""
+                logs = sorted(parent.glob("supervision-*/stderr.log"))
+                if logs:
+                    with logs[-1].open("rb") as stream:
+                        stream.seek(max(0, logs[-1].stat().st_size - 2048))
+                        lines = stream.read().decode("utf-8", errors="replace").strip().splitlines()
+                    if lines:
+                        detail = f": {lines[-1][:500]}"
+                raise ValueError(
+                    f"Preparation {observed['status']}{detail}; logs retained in {parent}"
+                )
             bundle = Path(read_json(target / "prepared.json")["bundle"])
     manifest = verify_batches(bundle)
     if manifest["planned"] != 10 or len(manifest["batches"]) != 10:
@@ -170,7 +181,7 @@ def run_watch(
         config_path = root / "watch.json"
         if config_path.exists():
             if read_json(config_path) != configuration:
-                raise ValueError(
+                raise HistoryIncompatible(
                     "Watch source, catalog, baseline, device, settings or dependency identity changed; use a new history directory"
                 )
         else:
@@ -188,6 +199,9 @@ def run_watch(
             lambda: discover(through, index_url, local),
         )
         wheels = plan["inventory"]["wheels"]
+        availability = plan.get("availability", {})
+        if progress and availability.get("fallback"):
+            progress(availability["reason"], flush=True)
         chosen = [w for w in wheels if w["date"] in plan["selected_dates"]]
         planned = [
             {"date": w["date"], "model": m["id"], "reference": rail}

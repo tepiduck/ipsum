@@ -1875,3 +1875,25 @@ or unresolved. Setup failures and recovery limitations are retained in the
 [HTML summary](docs/research/nvidia-0201.html).
 
 Checks passed after the reporting fix: Linux portable 422; actual CPU Inductor 14; legacy 31; all 14 compiler validation checks; Ruff lint and formatting. All 28 prior validation entries, 71 protected historical files and the preceding RESULTS content are preserved.
+
+## 0.20.2 scheduled-watch repair (November 16, 2026)
+
+Both jobs in [the first scheduled 0.20.1 run](https://github.com/tepiduck/ipsum/actions/runs/43943844208)
+failed during model preparation, before a comparison. `gh run view --log-failed` reported
+`INCONCLUSIVE - Preparation command_failed` (exit 3); the artifact's preparation stderr
+identified `urllib.error.HTTPError: HTTP Error 503: Service Unavailable` from the Gutenberg
+book download in `sweep_models.real_inputs`. Both jobs were vision models. Neither restored
+a history cache, and the install log retained `torch-2.15.0+cpu`; those suspected causes
+were not responsible for this run. The old workflow then treated exit 3 as a job failure.
+
+Preparation now downloads only the required modality, preserving the same image crop and
+text selection rules. Transient sample HTTP/network failures get bounded retries. CI pins
+stable torch and torchvision from the CPU index and constrains the extras installation.
+The CI adapter maps only watch exit 1 to a red job; exits 2/3 retain their meaning with
+summary warnings and annotations. Incompatible restored history is archived before a new
+campaign starts; corrupted evidence still fails validation. Latest-available nightly
+selection now records and reports its fallback date. Primary rules and CLI exit codes
+are unchanged; earlier evidence is retained.
+
+Focused checks: 46 tests passed. Full release checks and the manual two-model workflow
+verification are in progress; their outcomes will be appended after completion.

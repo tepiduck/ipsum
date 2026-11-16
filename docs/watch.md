@@ -20,6 +20,9 @@ Old history stays readable. Keep the virtual environments and frozen inputs with
 An incomplete selection is frozen in `plans/`; a newer wheel cannot displace unfinished
 work. Resume with the original `--seed-nightlies` and `--through` options. Once that plan
 finishes, a subsequent invocation can discover and append newer nightlies.
+If today's compatible wheel has not been published, the watch selects the latest date
+available in the official index. The frozen plan records the requested date, selected date
+and fallback reason; CI repeats the reason in its summary and warning annotation.
 
 Open `index.html` for per-model HTML timelines or read `history.json`. Each row links to
 the standard check report and retains the exact candidate wheel version, upstream commit,
@@ -94,14 +97,27 @@ but one batch alone cannot reproduce a replicated accuracy decision. Nothing is 
 [The scheduled workflow](../.github/workflows/watch.yml) checks ResNet-50 and MobileNetV3-Small
 in separate CPU jobs each day at 09:43 UTC. It caches pip wheels and compatible history,
 allows two hours of watch work within a 150-minute job cap, and uploads evidence for 30 days.
-It fails visibly for any non-SAFE/incomplete result; a failed workflow is not automatically
-a compiler-regression finding. The full five-model default can be used on a larger runner.
+Only a recorded `REGRESSION` (watch exit 1) makes the workflow red. `NEEDS_REVIEW` (2)
+and `INCONCLUSIVE` (3), including setup failures, finish green with a prominent warning
+and the reason in the step summary and annotations. **Green does not mean SAFE**: read
+the model verdict table. CLI exit codes and verdict policy v2 are unchanged. GitHub can
+still cancel or terminate a job at the platform timeout. The full five-model default
+can be used on a larger runner.
+
+The runner installs `torch==2.15.0` and `torchvision==0.29.2` from the same CPU index,
+then constrains both while installing `.[sweep]`; `pip check` and version assertions
+verify the installation. Model preparation downloads only its required input modality.
+Transient sample-download errors get at most three attempts; permanent errors remain visible.
 
 CI caches contain frozen inputs and committed JSON/HTML history; full worker artifacts are
 in that run's downloadable artifact, not guaranteed to survive cache eviction. Interrupted
 checks may need replay on the next runner. Caches are scoped by Faultline source and runner
-image/Python identity; an incompatible image starts a new history rather than changing an old
-campaign's environment. Download retained artifacts before their retention period ends.
+image/Python identity. If a restored campaign still has a different source, environment,
+catalog or settings identity, the CI adapter moves it to `watch-history-archived-TIMESTAMP`
+and creates a fresh `watch-history`. The archive is uploaded, not deleted or merged into
+the new timeline. Archived absolute paths need relocation before local replay. Changed
+committed hashes or frozen inputs remain INCONCLUSIVE; they do not trigger automatic rotation.
+The local CLI keeps its strict resume behavior. Download retained artifacts before retention ends.
 
 ## WSL and AMD scheduling
 
