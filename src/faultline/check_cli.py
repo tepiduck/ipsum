@@ -75,6 +75,11 @@ def add_check_command(commands):
     parser.add_argument("--baseline-compile-mode", default="default")
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--deterministic", action="store_true")
+    parser.add_argument(
+        "--no-deterministic-retry",
+        action="store_true",
+        help="Disable the one deterministic retry for unstable CUDA/ROCm batches",
+    )
     parser.add_argument("--threads", type=int, default=1)
     parser.add_argument("--timeout", type=float, default=600)
     parser.add_argument(
@@ -122,6 +127,11 @@ def terminal(verdict, output):
         lines.append(
             f"Notes: {len(verdict['notes'])} explanations, baseline-only differences, compilation advisories or unavailable diagnostics; see report."
         )
+    retry_notes = [
+        n["message"] for n in verdict["notes"] if n["code"].startswith("deterministic_retry")
+    ]
+    for message in list(dict.fromkeys(retry_notes))[:3]:
+        lines.append("GPU retry: " + message)
     if any(note["code"] == "diagnostic_skipped_memory" for note in verdict["notes"]):
         lines.append("Diagnostics: skipped (memory); completed primary evidence retained.")
     if verdict["injected_fault"]:
@@ -277,6 +287,7 @@ def check_command(args):
             verdict_policy=args.verdict_policy,
             jobs=args.jobs,
             early_stop=not args.no_early_stop,
+            deterministic_retry=not args.no_deterministic_retry,
         )
         verdict.setdefault("metrics", {})["command_wall_s"] = time.monotonic() - started
         report(output, verdict, read_json(output / "evidence.json"))

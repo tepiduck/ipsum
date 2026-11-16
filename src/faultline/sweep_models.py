@@ -141,7 +141,9 @@ def real_inputs(directory, input_batches=1, *, modality="both"):
         sources.append(download(url, directory / f"image-{index}.jpg"))
     paragraphs = []
     if modality != "vision":
-        sources.append(download(BOOK_URL, directory / "book.txt"))
+        from faultline.sample_text import bundled_text
+
+        sources.append(bundled_text(directory / "book.txt"))
         book = (directory / "book.txt").read_text(encoding="utf-8-sig")
         start = book.index("Alice was beginning to get very tired")
         # Fixed real prose, not generated tokens.

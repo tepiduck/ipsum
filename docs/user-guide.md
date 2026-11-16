@@ -40,6 +40,9 @@ Built-in `--torchvision NAME` supports torchvision classification models with pr
 remote custom code is not enabled. Use `--revision COMMIT` to pin a Hub checkpoint. Built-in
 text batches are disjoint book excerpts; vision batches are disjoint strips from two photos.
 Shared photos/book and weights limit the statistical independence and domain coverage.
+Text preparation uses [bundled public-domain passages](sample-inputs.md) with a checked
+SHA-256; it needs no text-source download. Model weights and tokenizer assets still need
+their usual download or local cache. Existing prepared bundles remain unchanged.
 
 ## Execution and levels
 
@@ -77,8 +80,19 @@ Generic crashes and timeouts are not treated as memory failures. Parallel jobs r
 `--threads 1`; auto with more threads selects one job. `--timeout` applies per supervised worker.
 Coordinator memory and RSS sampling overshoot are outside this bound. The memory limit
 is host RSS including descendants, not a GPU VRAM limit or security sandbox.
-Use `--deterministic` to request the existing deterministic-algorithm and BLAS workspace policy,
-including for AMD/ROCm (`--device cuda:0`). Unsupported deterministic operations remain explicit failures.
+On CUDA and ROCm, `check` retries a batch once under the existing `--deterministic` policy
+when default eager or compiled execution is unstable across repeats. A paired check reruns
+both environments on that same frozen batch with matching deterministic settings and the
+full memory budget. Original and retry outcomes are retained separately, and the report says
+"default execution was nondeterministic on this device; verdict uses --deterministic".
+Diagnostics and exported reproducers use the selected attempt's settings. A retry that is
+still unstable or reports an unsupported deterministic operator supplies no eligible primary
+execution; the check remains INCONCLUSIVE and includes the original operator error.
+These are execution-selection rules, not new primary statuses or changes to verdict policy.
+Use `--no-deterministic-retry` to retain default-only execution, or `--deterministic` to start
+with deterministic algorithms and the BLAS workspace policy. CPU behavior is unchanged.
+Completed retries are verified and reused on resume; changing the retry option requires a
+new output directory. Retries use a separate compilation cache and run after the primary pool drains.
 Compilation caches are isolated per execution slot and environment. A slot runs its
 batches sequentially and exclusively owns its caches; diagnostics reuse the same slot.
 Capture, first compilation, and optional diagnostics can dominate wall time.

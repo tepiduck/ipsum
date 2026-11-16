@@ -117,7 +117,7 @@ def test_input_preparation_downloads_only_required_modality(tmp_path, monkeypatc
 
     monkeypatch.setattr(sweep_models, "download", download)
     result = sweep_models.real_inputs(tmp_path / "inputs", 10, modality=modality)
-    assert (sweep_models.BOOK_URL in urls) == (modality != "vision")
+    assert sweep_models.BOOK_URL not in urls
     assert (sweep_models.IMAGE_URLS[0] in urls) == (modality != "text")
     assert len(result["batches"]) == 10
     if modality != "text":

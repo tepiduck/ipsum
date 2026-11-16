@@ -203,6 +203,7 @@ def inspect_side(
 
 
 def report(output, verdict, evidence):
+    from . import check_retry
     from .compilation import compare_structure, notes, structure_html
 
     structure = compare_structure(evidence.get("batches", []), verdict["scope"]["planned_batches"])
@@ -210,6 +211,17 @@ def report(output, verdict, evidence):
     codes = {"new_graph_breaks", "recompile_increase", "compile_time_increase"}
     verdict["notes"] = [note for note in verdict["notes"] if note["code"] not in codes] + notes(
         structure
+    )
+    verdict["notes"] = [
+        note
+        for note in verdict["notes"]
+        if note["code"] not in {"deterministic_retry", "deterministic_retry_unavailable"}
+    ] + check_retry.notes(evidence.get("batches", []))
+    verdict["injected_fault"] = verdict["injected_fault"] or any(
+        outcome.get("injected_fault", False)
+        for row in evidence.get("batches", [])
+        for group in ("original_results", "outcomes")
+        for outcome in row.get("deterministic_retry", {}).get(group, {}).values()
     )
     atomic_json(output / "evidence.json", evidence)
     atomic_json(output / "verdict.json", verdict)
@@ -281,6 +293,7 @@ def report(output, verdict, evidence):
         '<p><a href="verdict.json">Verdict JSON</a> · <a href="evidence.json">Full evidence</a></p>'
         f"{existing_html}<h2>Change-related findings / blocking evidence</h2><ul>{reasons or '<li>No blocking evidence in the requested checks.</li>'}</ul>"
         f"<h2>Notes</h2><ul>{notes}</ul>"
+        f"{check_retry.retry_html(evidence.get('batches', []))}"
         f"{structure_html(structure)}"
         f"{accuracy_html(verdict['accuracy_shift_replicated'])}"
         f"<h2>Batch evidence</h2><table><tr><th>Batch</th><th>Environment</th><th>Primary status</th><th>Explanation labels</th><th>Diagnostics</th></tr>{''.join(batches)}</table>"
@@ -305,6 +318,7 @@ def run_check(
     verdict_policy="v2",
     jobs=None,
     early_stop=True,
+    deterministic_retry=True,
 ):
     from .check_execution import execute
 
@@ -321,4 +335,5 @@ def run_check(
         verdict_policy=verdict_policy,
         jobs=jobs,
         early_stop=early_stop,
+        deterministic_retry=deterministic_retry,
     )

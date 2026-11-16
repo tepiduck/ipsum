@@ -28,7 +28,7 @@ python3 -m venv .venv
 python -m pip install build
 python -m build --wheel
 python -m pip install torch==2.15.0 torchvision --index-url https://download.pytorch.org/whl/cpu
-python -m pip install 'dist/faultline_ml-0.20.2-py3-none-any.whl[sweep]'
+python -m pip install 'dist/faultline_ml-0.20.3-py3-none-any.whl[sweep]'
 faultline check --torchvision resnet18 --level quick --output faultline-runs/quickstart
 ```
 
@@ -142,7 +142,13 @@ execution use `--device cuda:0`; Faultline does not fall back to CPU. NVIDIA Tes
 checks cover float32/float16 qualification, three pretrained models and historical
 controls, with inconclusive results and evidence gaps recorded in the
 [CUDA validation report](docs/research/nvidia-0201.md). Native bfloat16 compilation
-and actual CUDA-graph capture are not established by those runs.
+and actual CUDA-graph capture are not established by those runs; other NVIDIA architectures
+remain untested.
+
+GPU checks retry unstable default execution once with deterministic settings, retaining
+both attempts and identifying which one supplies the verdict. Use `--no-deterministic-retry`
+to disable this; CPU behavior is unchanged. Built-in text inputs are bundled public-domain
+passages, so text preparation needs no network access beyond model and tokenizer assets.
 
 ## CI and reproducer sharing
 

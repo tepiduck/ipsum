@@ -32446,5 +32446,68 @@
       }
     ],
     "prior_validation_entries_preserved": 29
+  },
+  "gpu_defaults_0203": {
+    "version": "0.20.3",
+    "date": "2026-11-16",
+    "scope": "GPU deterministic retry coordinator and offline text inputs; NVIDIA rerun evidence recorded separately when completed.",
+    "release_checks": [
+      {
+        "name": "portable",
+        "returncode": 0,
+        "wall_s": 601.999665584
+      },
+      {
+        "name": "compiler",
+        "returncode": 0,
+        "wall_s": 144.309771222
+      },
+      {
+        "name": "legacy",
+        "returncode": 0,
+        "wall_s": 1.0361169510000536
+      },
+      {
+        "name": "lint",
+        "returncode": 0,
+        "wall_s": 0.0971158810000361
+      },
+      {
+        "name": "format",
+        "returncode": 0,
+        "wall_s": 0.10150296699998762
+      },
+      {
+        "name": "campaign",
+        "returncode": 0,
+        "wall_s": 141.247992446
+      }
+    ],
+    "tests_passed": {
+      "portable": 449,
+      "compiler": 14,
+      "legacy": 31
+    },
+    "compiler_campaign_checks_passed": 14,
+    "text_compatibility": {
+      "old_source_sha256": "01b38ea4c710a84bc18d0bd41271a5a1a92b94e97b2812f4dece97d4a694725e",
+      "bundled_sha256": "ee916c3a0ce79fc528621480fd5123f9b55258f0e5938a6be6a04a0defeac06d",
+      "original_paragraphs_identical": true,
+      "disjoint_batches_identical": 65,
+      "comparison": "exact Unicode strings before tokenization; existing frozen bundles untouched"
+    },
+    "installed_wheel_offline_test": {
+      "version": "0.20.3",
+      "installed_wheel": true,
+      "network_disabled": true,
+      "text_batches": 10,
+      "bundled_sha256": "ee916c3a0ce79fc528621480fd5123f9b55258f0e5938a6be6a04a0defeac06d"
+    },
+    "preservation": {
+      "prior_validation_entries": 30,
+      "protected_docs": 74,
+      "prior_results_prefix_unchanged": true
+    },
+    "policies": "Primary statuses, tolerances, signatures, reducer predicates, verdict rules and exit codes unchanged. Retry selection retains original raw outcomes."
   }
 }

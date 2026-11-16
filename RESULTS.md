@@ -1923,3 +1923,31 @@ Checks passed: 433 portable, 14 actual CPU Inductor, 31 legacy, all 14 compiler 
 checks, Ruff lint/format and package/publication audits. Two CI-only test setup issues
 were corrected: Pillow is now included in the development extra, and summary assertions
 read UTF-8 explicitly on Windows. Neither correction changes watch execution or verdicts.
+
+
+## Version 0.20.3 GPU execution defaults and offline text inputs
+
+GPU `check` now retries affected batches once with the existing deterministic policy
+after unstable reference or compiled execution. Both environments rerun the same frozen
+batch at the full memory budget. The original attempt and the deterministic attempt remain
+separate evidence; diagnostics and reproducers use the selected deterministic settings.
+The CLI and report identify this selection. `--no-deterministic-retry` opts out, and CPU
+execution is unchanged. A still-unstable or unsupported deterministic retry supplies no
+eligible primary result and remains inconclusive, with the operator error retained.
+Primary status definitions, tolerances, failure signatures, reducer predicates, verdict
+policy and exit codes have not changed.
+
+Text preparation uses a checked, bundled public-domain copy of *Alice's Adventures in
+Wonderland*. Exact string comparisons against the cached 0.11 source confirmed that the
+original two paragraphs and all 65 supported disjoint batches are unchanged. An installed
+0.20.3 wheel prepared ten text batches with networking disabled. Existing frozen bundles
+and their hashes were not rewritten. See [sample inputs](docs/sample-inputs.md).
+
+Local validation passed **449 portable tests, 14 actual Inductor tests, 31 legacy tests,
+and all 14 validation-campaign checks** on PyTorch 2.15.0 CPU / Ubuntu WSL. Ruff lint and
+format checks passed. The index, wheel and source archive passed the publication audit.
+The retry tests use controlled worker outcomes, including unstable eager/compiled results,
+unsupported deterministic operations, a stable injected failure after retry, opt-out,
+serial/parallel agreement, preserved attempts and interrupted-check resumption. They do
+not establish hardware coverage. The 0.20.1 NVIDIA record and all preceding evidence are
+preserved; fresh NVIDIA measurements are recorded separately below when available.

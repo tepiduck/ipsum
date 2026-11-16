@@ -10,6 +10,7 @@ from dataclasses import replace
 from pathlib import Path
 from queue import Queue
 
+from . import check_retry
 from .batches import verify_batches
 from .check_resources import cpu_jobs, measured_schedule, memory_budget, memory_limited
 from .compare_envs import interpreter
@@ -78,10 +79,13 @@ def execute(
     verdict_policy="v2",
     jobs=None,
     early_stop=True,
+    deterministic_retry=True,
 ):
     from . import check
     from .sweep import runtime_environment
 
+    if type(deterministic_retry) is not bool:
+        raise ValueError("deterministic_retry must be boolean")
     if verdict_policy not in {"v1", "v2"}:
         raise ValueError("Unknown verdict policy")
     jobs = "auto" if jobs is None else jobs
@@ -131,6 +135,7 @@ def execute(
         "planned": planned,
         "verdict_policy": policy,
         "early_stop": early_stop,
+        "deterministic_retry": deterministic_retry,
         "allocation": allocation,
         "cache_policy": "measured_exclusive_lane_v2",
         "source_sha256": provenance()["faultline_source_sha256"],
@@ -159,12 +164,11 @@ def execute(
                 "Source changed during check; retain this run and choose a new output directory."
             )
 
-    def environment(index, side):
-        return {
-            "TORCHINDUCTOR_CACHE_DIR": str(
-                output / "compiler-cache" / f"lane-{index % effective_jobs:04d}" / side
-            )
-        }
+    def environment(index, side, *, retry=False):
+        directory = output / "compiler-cache" / f"lane-{index % effective_jobs:04d}" / side
+        if retry:
+            directory = directory / "deterministic"
+        return {"TORCHINDUCTOR_CACHE_DIR": str(directory)}
 
     def primary(entry, *, full_budget=False):
         index, source = entry
@@ -229,6 +233,53 @@ def execute(
         commit(directory, "primary.json", row)
         return row
 
+    def retry_deterministic(raw):
+        if not check_retry.needed(raw, sides, deterministic_retry):
+            return raw
+        index = raw["batch"]
+        root = output / f"batch-{index:04d}"
+        existing = committed(root, "deterministic-retry-*/commit.json", "primary.json")
+        if existing is not None:
+            if existing["deterministic_retry"]["original_sha256"] != row_hash(raw):
+                raise ValueError("Committed deterministic retry has a different primary")
+            return existing
+        directory = (
+            root / f"deterministic-retry-{len(list(root.glob('deterministic-retry-*'))) + 1:04d}"
+        )
+        row = copy.deepcopy(raw)
+        row["worker_jobs"] = 1
+        row["diagnostics"] = {}
+        retry = row["deterministic_retry"] = {
+            "original_sha256": row_hash(raw),
+            "original_results": {s: copy.deepcopy(raw[s]) for s, _, _ in sides},
+            "attempt": directory.relative_to(output).as_posix(),
+            "settings": {},
+            "outcomes": {},
+            "unavailable": {},
+        }
+        for side, python, config in sides:
+            config = check_retry.effective(config, row)
+            retry["settings"][side] = config.to_dict()
+            result = check.run_case(
+                NativeJob.create(entries[index]),
+                config,
+                directory / side / "primary",
+                python=python,
+                env=environment(index, side, retry=True),
+            )
+            retry["outcomes"][side] = result
+            reason = check_retry.unavailable(result)
+            if reason:
+                # Preserve the raw status above and on disk. An unsupported or still
+                # unstable retry supplies no eligible execution to the unchanged verdict.
+                retry["unavailable"][side] = reason
+                row.pop(side, None)
+            else:
+                row[side] = result
+        unchanged()
+        commit(directory, "primary.json", row)
+        return row
+
     def publish(current, state):
         replication = (
             replication_evidence(scores, planned, certificate=certificate)
@@ -259,6 +310,12 @@ def execute(
             for r in current
             for phases in r.get("diagnostics", {}).values()
             for p in phases
+        ]
+        peaks += [
+            outcome.get("peak_tree_rss_mb", 0) or 0
+            for r in current
+            for group in ("original_results", "outcomes")
+            for outcome in r.get("deterministic_retry", {}).get(group, {}).values()
         ]
         verdict["metrics"] = {
             "invocation_wall_s": time.monotonic() - started,
@@ -345,7 +402,9 @@ def execute(
             for future in futures:
                 future.result()
         # The pool is drained before any full-budget retry: no competing owned workers.
-        primaries = [retry_primary(primary_rows[i]) for i in sorted(primary_rows)]
+        primaries = [
+            retry_deterministic(retry_primary(primary_rows[i])) for i in sorted(primary_rows)
+        ]
         for raw in primaries:
             unchanged()
             index = raw["batch"]
@@ -357,6 +416,9 @@ def execute(
                 evaluate_accuracy = accuracy_required and certificate is None
                 row["accuracy_evaluated"] = evaluate_accuracy
                 for side, python, config in sides:
+                    if side not in raw:
+                        continue
+                    config = check_retry.effective(config, raw)
                     # Auto diagnostics are sequential and can use the full budget.
                     divisor = 1 if jobs == "auto" or raw["worker_jobs"] == 1 else effective_jobs
                     diagnostic_config = replace(config, max_rss_mb=config.max_rss_mb // divisor)
@@ -377,7 +439,7 @@ def execute(
                         level,
                         paired=bool(baseline_python),
                         primary=raw[side],
-                        env=environment(index, side),
+                        env=environment(index, side, retry="deterministic_retry" in raw),
                         accuracy=evaluate_accuracy or explain,
                         explain=explain,
                     )
@@ -392,7 +454,7 @@ def execute(
                             level,
                             paired=bool(baseline_python),
                             primary=raw[side],
-                            env=environment(index, side),
+                            env=environment(index, side, retry="deterministic_retry" in raw),
                             accuracy=evaluate_accuracy or explain,
                             explain=explain,
                         )
@@ -410,7 +472,12 @@ def execute(
                 raise ValueError("Committed accuracy schedule changed")
             rows.append(row)
             if row["accuracy_evaluated"]:
-                scores.append({"batch": index, **batch_score(row["baseline"], row["candidate"])})
+                scores.append(
+                    {
+                        "batch": index,
+                        **batch_score(row.get("baseline", {}), row.get("candidate", {})),
+                    }
+                )
                 if early_stop and policy == "v2":
                     certificate = stopping_certificate(scores, planned)
             reproducer = output / "reproducer"
@@ -427,7 +494,9 @@ def execute(
                 if side:
                     export_native(
                         NativeJob.create(source),
-                        settings if side == "candidate" else baseline_settings,
+                        check_retry.effective(
+                            settings if side == "candidate" else baseline_settings, row
+                        ),
                         reproducer,
                         expected=raw[side],
                     )

@@ -1,5 +1,6 @@
 include LICENSE README.md RESULTS.md pyproject.toml
 recursive-include src/faultline *.py
+include src/faultline/data/alice.txt
 recursive-include tests/faultline *.py
 include scripts/validate_faultline.py scripts/check_release.py
 include scripts/validate_upgrades.py
@@ -61,4 +62,5 @@ include scripts/summarize_check_memory.py
 include scripts/profile_check_workers.py scripts/summarize_check_efficiency.py
 include docs/verdict-policy-v2.md docs/verdict-v2.schema.json
 include docs/watch.md docs/compilation-policy-v1.json docs/compilation-structure.md
+include docs/sample-inputs.md
 include scripts/validate_compilation.py

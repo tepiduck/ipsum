@@ -318,6 +318,11 @@ workers with 25% RSS headroom. The total budget defaults to 75% of available RAM
 across jobs. Memory-limited parallel attempts receive a serial full-budget retry, retained
 alongside the original evidence. Accuracy diagnostics consume batches in order;
 `--no-early-stop` disables mathematical stopping of those diagnostics. All planned primaries run.
+On CUDA/ROCm, unstable default reference or compiled execution triggers one recorded
+deterministic retry of the affected batch in both environments. The selected retry supplies
+the verdict, diagnostics and reproducer settings; original outcomes remain in the evidence.
+An unstable or unsupported deterministic retry is INCONCLUSIVE, with its operator error
+reported. `--no-deterministic-retry` disables this behavior; CPU execution is unchanged.
 `env create --resume` verifies the installed identity; GPU indexes are explicit.
 
 ## Nightly watch and compilation notes

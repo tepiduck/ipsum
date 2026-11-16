@@ -12,6 +12,8 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 FILES = {
+    "src/faultline/data/alice.txt",
+    "docs/sample-inputs.md",
     ".gitattributes",
     ".gitignore",
     ".github/workflows/ci.yml",

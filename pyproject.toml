@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "faultline-ml"
-version = "0.20.2"
+version = "0.20.3"
 description = "Differential testing and failure reduction for PyTorch compilers"
 readme = "README.md"
 license = "MIT"
@@ -26,6 +26,9 @@ faultline = "faultline.cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
 include = ["faultline*"]
+
+[tool.setuptools.package-data]
+faultline = ["data/alice.txt"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests/faultline"]
