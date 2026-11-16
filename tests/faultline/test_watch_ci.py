@@ -39,9 +39,9 @@ def test_ci_exit_mapping_and_reasons(tmp_path, monkeypatch, capsys, code, outcom
     watch_ci.publish(result)
     assert (tmp_path / "output").read_text() == f"exit_code={code}\n"
     if code in {2, 3}:
-        assert "not a SAFE result" in (tmp_path / "summary").read_text()
+        assert "not a SAFE result" in (tmp_path / "summary").read_text(encoding="utf-8")
         assert "::warning::small" in capsys.readouterr().out
-        assert "controlled reason" in (tmp_path / "summary").read_text()
+        assert "controlled reason" in (tmp_path / "summary").read_text(encoding="utf-8")
 
 
 def test_ci_rotates_only_incompatible_identity_preserving_bytes(tmp_path, monkeypatch):
