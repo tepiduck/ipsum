@@ -1,0 +1,722 @@
+{
+  "release": "0.20.2",
+  "date": "2026-11-16",
+  "failed_run": {
+    "id": 43943844208,
+    "url": "https://github.com/tepiduck/ipsum/actions/runs/43943844208",
+    "preparation_error": "urllib.error.HTTPError: HTTP Error 503: Service Unavailable",
+    "source": "Gutenberg text downloaded unnecessarily for both vision models",
+    "comparison_started": false,
+    "restored_history": false,
+    "torch_replaced": false
+  },
+  "manual_run": {
+    "id": 43957317926,
+    "url": "https://github.com/tepiduck/ipsum/actions/runs/43957317926",
+    "commit": "8e77b8e7dfe24ad118f77077f956837d2e20b6a4",
+    "jobs": [
+      {
+        "model": "mobilenet_v3_small",
+        "outcome": "SAFE",
+        "watch_exit_code": 0,
+        "workflow_exit_code": 0,
+        "baseline_torch": "2.15.0+cpu",
+        "baseline_torchvision": "0.29.2+cpu",
+        "availability": {
+          "fallback": false,
+          "latest_available": "2026-11-16",
+          "reason": "Using latest available nightly 2026-11-16.",
+          "requested_through": "2026-11-16"
+        },
+        "archived_history": null
+      },
+      {
+        "model": "resnet50",
+        "outcome": "SAFE",
+        "watch_exit_code": 0,
+        "workflow_exit_code": 0,
+        "baseline_torch": "2.15.0+cpu",
+        "baseline_torchvision": "0.29.2+cpu",
+        "availability": {
+          "fallback": false,
+          "latest_available": "2026-11-16",
+          "reason": "Using latest available nightly 2026-11-16.",
+          "requested_through": "2026-11-16"
+        },
+        "archived_history": null
+      }
+    ],
+    "comparisons": [
+      {
+        "model": "mobilenet_v3_small",
+        "date": "2026-11-16",
+        "version": "2.16.0.dev20261116+cpu",
+        "reference": "stable",
+        "reference_date": null,
+        "verdict": "SAFE",
+        "reasons": [],
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "metrics": {
+          "command_wall_s": 366.406424853,
+          "invocation_wall_s": 363.43220719399994,
+          "peak_worker_rss_mb": 1146.99609375
+        },
+        "accuracy_shift_replicated": {
+          "accuracy_shift_replicated": false,
+          "attempted": 4,
+          "completed": 4,
+          "coverage": 0.4,
+          "decision_complete": true,
+          "deliberately_skipped": 6,
+          "distribution": [
+            {
+              "batch": 0,
+              "median_log2_growth": -7.265095160821566,
+              "median_status": "finite",
+              "paired_targets": 142,
+              "status": "complete"
+            },
+            {
+              "batch": 1,
+              "median_log2_growth": 0.04453320934036829,
+              "median_status": "finite",
+              "paired_targets": 142,
+              "status": "complete"
+            },
+            {
+              "batch": 2,
+              "median_log2_growth": -0.0013650185619860657,
+              "median_status": "finite",
+              "paired_targets": 142,
+              "status": "complete"
+            },
+            {
+              "batch": 3,
+              "median_log2_growth": -0.0022825256497987683,
+              "median_status": "finite",
+              "paired_targets": 142,
+              "status": "complete"
+            }
+          ],
+          "fraction_worsened": 0.25,
+          "improved": 3,
+          "labels": [],
+          "median_log2_growth": -0.001823772105892417,
+          "median_status": "finite",
+          "missing": 6,
+          "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+          "planned": 10,
+          "policy": {
+            "fraction_worsened_gte": 0.8,
+            "median_growth_gte": 1.25,
+            "minimum_completed_batches": 10
+          },
+          "sign_test_p": 0.9375,
+          "stopping": {
+            "bounds": [
+              {
+                "additional_complete": 0,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 1,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 2,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 3,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 4,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 5,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 6,
+                "can_flag": false,
+                "must_flag": false
+              }
+            ],
+            "outcome": "not_flagged",
+            "prefix_batches": [
+              0,
+              1,
+              2,
+              3
+            ],
+            "reason": "replicated_rule_fixed_for_every_remaining_completion",
+            "version": 1
+          },
+          "ties": 0,
+          "worsened": 1
+        },
+        "compilation_structure": {
+          "advisory_only": true,
+          "labels": [],
+          "policy": {
+            "compile_time_minimum_increase_s": 10.0,
+            "compile_time_minimum_ratio": 1.5,
+            "name": "compilation-structure-v1"
+          },
+          "schema_version": 1,
+          "timing": {
+            "baseline_mean_s": 14.241161600000002,
+            "candidate_mean_s": 14.002518599999998,
+            "increase_s": -0.23864300000000327,
+            "paired": 10,
+            "planned": 10,
+            "ratio": 0.9832427293009579,
+            "status": "complete"
+          },
+          "totals": {
+            "baseline": {
+              "compile_wall_s": 142.411616,
+              "frame_count": 10,
+              "graph_break_count": 0,
+              "graph_count": 10,
+              "recompile_count": 0
+            },
+            "candidate": {
+              "compile_wall_s": 140.025186,
+              "frame_count": 10,
+              "graph_break_count": 0,
+              "graph_count": 10,
+              "recompile_count": 0
+            }
+          }
+        }
+      },
+      {
+        "model": "mobilenet_v3_small",
+        "date": "2026-11-16",
+        "version": "2.16.0.dev20261116+cpu",
+        "reference": "previous",
+        "reference_date": "2026-11-15",
+        "verdict": "SAFE",
+        "reasons": [],
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "metrics": {
+          "command_wall_s": 343.4207191669999,
+          "invocation_wall_s": 340.57242781900004,
+          "peak_worker_rss_mb": 1131.94140625
+        },
+        "accuracy_shift_replicated": {
+          "accuracy_shift_replicated": false,
+          "attempted": 3,
+          "completed": 3,
+          "coverage": 0.3,
+          "decision_complete": true,
+          "deliberately_skipped": 7,
+          "distribution": [
+            {
+              "batch": 0,
+              "median_log2_growth": 0.0,
+              "median_status": "finite",
+              "paired_targets": 142,
+              "status": "complete"
+            },
+            {
+              "batch": 1,
+              "median_log2_growth": 0.0,
+              "median_status": "finite",
+              "paired_targets": 142,
+              "status": "complete"
+            },
+            {
+              "batch": 2,
+              "median_log2_growth": 0.0,
+              "median_status": "finite",
+              "paired_targets": 142,
+              "status": "complete"
+            }
+          ],
+          "fraction_worsened": 0.0,
+          "improved": 0,
+          "labels": [],
+          "median_log2_growth": 0.0,
+          "median_status": "finite",
+          "missing": 7,
+          "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+          "planned": 10,
+          "policy": {
+            "fraction_worsened_gte": 0.8,
+            "median_growth_gte": 1.25,
+            "minimum_completed_batches": 10
+          },
+          "sign_test_p": 1.0,
+          "stopping": {
+            "bounds": [
+              {
+                "additional_complete": 0,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 1,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 2,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 3,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 4,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 5,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 6,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 7,
+                "can_flag": false,
+                "must_flag": false
+              }
+            ],
+            "outcome": "not_flagged",
+            "prefix_batches": [
+              0,
+              1,
+              2
+            ],
+            "reason": "replicated_rule_fixed_for_every_remaining_completion",
+            "version": 1
+          },
+          "ties": 3,
+          "worsened": 0
+        },
+        "compilation_structure": {
+          "advisory_only": true,
+          "labels": [],
+          "policy": {
+            "compile_time_minimum_increase_s": 10.0,
+            "compile_time_minimum_ratio": 1.5,
+            "name": "compilation-structure-v1"
+          },
+          "schema_version": 1,
+          "timing": {
+            "baseline_mean_s": 14.0283628,
+            "candidate_mean_s": 13.462132,
+            "increase_s": -0.5662307999999996,
+            "paired": 10,
+            "planned": 10,
+            "ratio": 0.959636715412008,
+            "status": "complete"
+          },
+          "totals": {
+            "baseline": {
+              "compile_wall_s": 140.283628,
+              "frame_count": 10,
+              "graph_break_count": 0,
+              "graph_count": 10,
+              "recompile_count": 0
+            },
+            "candidate": {
+              "compile_wall_s": 134.62132,
+              "frame_count": 10,
+              "graph_break_count": 0,
+              "graph_count": 10,
+              "recompile_count": 0
+            }
+          }
+        }
+      },
+      {
+        "model": "resnet50",
+        "date": "2026-11-16",
+        "version": "2.16.0.dev20261116+cpu",
+        "reference": "stable",
+        "reference_date": null,
+        "verdict": "SAFE",
+        "reasons": [],
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "metrics": {
+          "command_wall_s": 478.1974953519999,
+          "invocation_wall_s": 473.18855740699996,
+          "peak_worker_rss_mb": 1772.984375
+        },
+        "accuracy_shift_replicated": {
+          "accuracy_shift_replicated": false,
+          "attempted": 3,
+          "completed": 3,
+          "coverage": 0.3,
+          "decision_complete": true,
+          "deliberately_skipped": 7,
+          "distribution": [
+            {
+              "batch": 0,
+              "median_log2_growth": -0.00011457159405533224,
+              "median_status": "finite",
+              "paired_targets": 161,
+              "status": "complete"
+            },
+            {
+              "batch": 1,
+              "median_log2_growth": -0.00014528054288651785,
+              "median_status": "finite",
+              "paired_targets": 161,
+              "status": "complete"
+            },
+            {
+              "batch": 2,
+              "median_log2_growth": -5.101445844418627e-06,
+              "median_status": "finite",
+              "paired_targets": 161,
+              "status": "complete"
+            }
+          ],
+          "fraction_worsened": 0.0,
+          "improved": 3,
+          "labels": [],
+          "median_log2_growth": -0.00011457159405533224,
+          "median_status": "finite",
+          "missing": 7,
+          "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+          "planned": 10,
+          "policy": {
+            "fraction_worsened_gte": 0.8,
+            "median_growth_gte": 1.25,
+            "minimum_completed_batches": 10
+          },
+          "sign_test_p": 1.0,
+          "stopping": {
+            "bounds": [
+              {
+                "additional_complete": 0,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 1,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 2,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 3,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 4,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 5,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 6,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 7,
+                "can_flag": false,
+                "must_flag": false
+              }
+            ],
+            "outcome": "not_flagged",
+            "prefix_batches": [
+              0,
+              1,
+              2
+            ],
+            "reason": "replicated_rule_fixed_for_every_remaining_completion",
+            "version": 1
+          },
+          "ties": 0,
+          "worsened": 0
+        },
+        "compilation_structure": {
+          "advisory_only": true,
+          "labels": [],
+          "policy": {
+            "compile_time_minimum_increase_s": 10.0,
+            "compile_time_minimum_ratio": 1.5,
+            "name": "compilation-structure-v1"
+          },
+          "schema_version": 1,
+          "timing": {
+            "baseline_mean_s": 12.9256126,
+            "candidate_mean_s": 13.408517900000001,
+            "increase_s": 0.4829053000000023,
+            "paired": 10,
+            "planned": 10,
+            "ratio": 1.0373603414355774,
+            "status": "complete"
+          },
+          "totals": {
+            "baseline": {
+              "compile_wall_s": 129.256126,
+              "frame_count": 10,
+              "graph_break_count": 0,
+              "graph_count": 10,
+              "recompile_count": 0
+            },
+            "candidate": {
+              "compile_wall_s": 134.085179,
+              "frame_count": 10,
+              "graph_break_count": 0,
+              "graph_count": 10,
+              "recompile_count": 0
+            }
+          }
+        }
+      },
+      {
+        "model": "resnet50",
+        "date": "2026-11-16",
+        "version": "2.16.0.dev20261116+cpu",
+        "reference": "previous",
+        "reference_date": "2026-11-15",
+        "verdict": "SAFE",
+        "reasons": [],
+        "scope": {
+          "completed_batches": 10,
+          "gradients": true,
+          "level": "standard",
+          "mode": "environment_comparison",
+          "planned_batches": 10,
+          "statement": "Limited to the frozen inputs, selected settings and requested checks; not a correctness or model-quality guarantee."
+        },
+        "metrics": {
+          "command_wall_s": 495.15482058099997,
+          "invocation_wall_s": 489.9887944290001,
+          "peak_worker_rss_mb": 1744.16796875
+        },
+        "accuracy_shift_replicated": {
+          "accuracy_shift_replicated": false,
+          "attempted": 3,
+          "completed": 3,
+          "coverage": 0.3,
+          "decision_complete": true,
+          "deliberately_skipped": 7,
+          "distribution": [
+            {
+              "batch": 0,
+              "median_log2_growth": 0.0,
+              "median_status": "finite",
+              "paired_targets": 161,
+              "status": "complete"
+            },
+            {
+              "batch": 1,
+              "median_log2_growth": 0.0,
+              "median_status": "finite",
+              "paired_targets": 161,
+              "status": "complete"
+            },
+            {
+              "batch": 2,
+              "median_log2_growth": 0.0,
+              "median_status": "finite",
+              "paired_targets": 161,
+              "status": "complete"
+            }
+          ],
+          "fraction_worsened": 0.0,
+          "improved": 0,
+          "labels": [],
+          "median_log2_growth": 0.0,
+          "median_status": "finite",
+          "missing": 7,
+          "note": "Advisory only. Batch sign p-value is descriptive; common weights and input sources do not establish statistical independence. Missing batches remain in planned coverage.",
+          "planned": 10,
+          "policy": {
+            "fraction_worsened_gte": 0.8,
+            "median_growth_gte": 1.25,
+            "minimum_completed_batches": 10
+          },
+          "sign_test_p": 1.0,
+          "stopping": {
+            "bounds": [
+              {
+                "additional_complete": 0,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 1,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 2,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 3,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 4,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 5,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 6,
+                "can_flag": false,
+                "must_flag": false
+              },
+              {
+                "additional_complete": 7,
+                "can_flag": false,
+                "must_flag": false
+              }
+            ],
+            "outcome": "not_flagged",
+            "prefix_batches": [
+              0,
+              1,
+              2
+            ],
+            "reason": "replicated_rule_fixed_for_every_remaining_completion",
+            "version": 1
+          },
+          "ties": 3,
+          "worsened": 0
+        },
+        "compilation_structure": {
+          "advisory_only": true,
+          "labels": [],
+          "policy": {
+            "compile_time_minimum_increase_s": 10.0,
+            "compile_time_minimum_ratio": 1.5,
+            "name": "compilation-structure-v1"
+          },
+          "schema_version": 1,
+          "timing": {
+            "baseline_mean_s": 13.917882800000001,
+            "candidate_mean_s": 13.4646862,
+            "increase_s": -0.45319660000000184,
+            "paired": 10,
+            "planned": 10,
+            "ratio": 0.9674378203558374,
+            "status": "complete"
+          },
+          "totals": {
+            "baseline": {
+              "compile_wall_s": 139.178828,
+              "frame_count": 10,
+              "graph_break_count": 0,
+              "graph_count": 10,
+              "recompile_count": 0
+            },
+            "candidate": {
+              "compile_wall_s": 134.646862,
+              "frame_count": 10,
+              "graph_break_count": 0,
+              "graph_count": 10,
+              "recompile_count": 0
+            }
+          }
+        }
+      }
+    ]
+  },
+  "release_checks": [
+    {
+      "name": "portable",
+      "returncode": 0,
+      "wall_s": 525.628486446
+    },
+    {
+      "name": "compiler",
+      "returncode": 0,
+      "wall_s": 138.86179530000004
+    },
+    {
+      "name": "legacy",
+      "returncode": 0,
+      "wall_s": 1.1002223870000307
+    },
+    {
+      "name": "lint",
+      "returncode": 0,
+      "wall_s": 0.08267880900007185
+    },
+    {
+      "name": "format",
+      "returncode": 0,
+      "wall_s": 0.08849450000002435
+    },
+    {
+      "name": "campaign",
+      "returncode": 0,
+      "wall_s": 132.81189565800003
+    }
+  ],
+  "controlled_checks": {
+    "ci_exit_codes": "0/1/2/3 mapping tested; only 1 makes the job fail",
+    "cache_rotation": "Identity mismatch preserves archive bytes; corruption is not rotated. Unit-test coverage; no incompatible cache in the manual run.",
+    "nightly_fallback": "Missing requested date selects preceding available date and preserves frozen selection on resume. Unit-test coverage; November 16 was available in the manual run.",
+    "development_ci_fixes": "Added Pillow to the dev extra and explicit UTF-8 reads to two Windows summary assertions; production watch code unchanged by these follow-ups."
+  },
+  "preservation": {
+    "prior_validation_entries_unchanged": 29,
+    "prior_research_evidence_unchanged": true
+  },
+  "scope": "Workflow and input preparation repair. Existing verdict policy, primary statuses, tolerances, signatures, reducer predicates and CLI exit codes unchanged. No compiler-defect claim."
+}

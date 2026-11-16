@@ -32400,5 +32400,51 @@
       "docs/research/nvidia-0201.html": "9452443b446d837b63a25df814a467b4fd970f14142173fc7c41d0b425ac892e"
     },
     "note": "Qualification compiler-skip reporting only; policies and primary rules unchanged. BERT remains inconclusive, float16 autocast findings remain recorded, and graph capture is unverified. Later detailed artifacts were lost; their printed summaries are explicitly recovered evidence. No new compiler-defect claim or upstream filing."
+  },
+  "watch_repair_0202": {
+    "version": "0.20.2",
+    "report": "docs/research/watch-0202.json",
+    "sha256": "c0cb8c82de6981f4a4f65a42af86e908f9882566df9cad0882281bb7cff91b42",
+    "workflow_run": "https://github.com/tepiduck/ipsum/actions/runs/43957317926",
+    "comparisons": 4,
+    "verdict_counts": {
+      "SAFE": 4,
+      "REGRESSION": 0,
+      "NEEDS_REVIEW": 0,
+      "INCONCLUSIVE": 0
+    },
+    "release_checks": [
+      {
+        "name": "portable",
+        "returncode": 0,
+        "wall_s": 525.628486446
+      },
+      {
+        "name": "compiler",
+        "returncode": 0,
+        "wall_s": 138.86179530000004
+      },
+      {
+        "name": "legacy",
+        "returncode": 0,
+        "wall_s": 1.1002223870000307
+      },
+      {
+        "name": "lint",
+        "returncode": 0,
+        "wall_s": 0.08267880900007185
+      },
+      {
+        "name": "format",
+        "returncode": 0,
+        "wall_s": 0.08849450000002435
+      },
+      {
+        "name": "campaign",
+        "returncode": 0,
+        "wall_s": 132.81189565800003
+      }
+    ],
+    "prior_validation_entries_preserved": 29
   }
 }

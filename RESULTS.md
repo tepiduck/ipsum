@@ -1895,5 +1895,31 @@ campaign starts; corrupted evidence still fails validation. Latest-available nig
 selection now records and reports its fallback date. Primary rules and CLI exit codes
 are unchanged; earlier evidence is retained.
 
-Focused checks: 46 tests passed. Full release checks and the manual two-model workflow
-verification are in progress; their outcomes will be appended after completion.
+The [manual run](https://github.com/tepiduck/ipsum/actions/runs/43957317926) completed both
+matrix jobs successfully using `torch==2.15.0+cpu`, `torchvision==0.29.2+cpu`, the
+November 16 nightly (`2.16.0.dev20261116+cpu`) and the November 15 preceding nightly.
+
+| Model | Reference | Verdict | Primary batches | Check seconds | Peak worker RSS, MiB |
+|---|---|---|---:|---:|---:|
+| ResNet-50 | 2.15.0 | SAFE | 10/10 | 478.20 | 1772.98 |
+| ResNet-50 | November 15 nightly | SAFE | 10/10 | 495.15 | 1744.17 |
+| MobileNetV3-Small | 2.15.0 | SAFE | 10/10 | 366.41 | 1147.00 |
+| MobileNetV3-Small | November 15 nightly | SAFE | 10/10 | 343.42 | 1131.94 |
+
+No replicated accuracy shift or compilation-structure advisory was flagged. Accuracy
+diagnostics completed 3, 3, 4 and 3 batches respectively; the unchanged early-stopping
+rule determined a negative result for the remaining batches. All 40 primary batch pairs
+completed. These are outcomes for the tested frozen inputs, not a general accuracy guarantee.
+Timings exclude installation, input preparation and artifact upload.
+
+November 16 wheels were available and no incompatible cache was restored in this run.
+Missing-nightly selection, history rotation/preservation, corruption rejection and exit-code
+annotations were exercised by controlled tests. Original failed-run logs and the new JSON
+summaries are retained locally; [portable evidence](docs/research/watch-0202.json) records
+the four results and check outcomes. All 29 prior validation entries and research evidence
+are preserved.
+
+Checks passed: 433 portable, 14 actual CPU Inductor, 31 legacy, all 14 compiler campaign
+checks, Ruff lint/format and package/publication audits. Two CI-only test setup issues
+were corrected: Pillow is now included in the development extra, and summary assertions
+read UTF-8 explicitly on Windows. Neither correction changes watch execution or verdicts.

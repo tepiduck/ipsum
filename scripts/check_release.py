@@ -24,6 +24,7 @@ FILES = {
     "docs/compilation-structure.md",
     "docs/research/watch-020.md",
     "docs/research/watch-020.json",
+    "docs/research/watch-0202.json",
     "docs/research/nvidia-0201.md",
     "docs/research/nvidia-0201.json",
     "docs/research/nvidia-0201.html",
